@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+// path: src/App.tsx
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Portfolio } from './components/Portfolio';

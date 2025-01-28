@@ -9,4 +9,4 @@ export const generateResponse = async (prompt: string) => {
         console.error('Error generating response:', error);
         throw error;
     }
-};  
+};

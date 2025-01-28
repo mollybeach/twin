@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Bot, ArrowRight, Check, Loader2, AlertCircle, MessageCircle, Users, Activity, Upload, Rocket } from 'lucide-react';
+import { Bot, Check, Loader2, AlertCircle, MessageCircle, Users, Activity, Upload, Rocket } from 'lucide-react';
 import { verifyTwitterAccount } from '../services/twitter';
 import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
+import { generateResponse } from '../services/openaiService';
 
 interface AgentConfig {
   twitterHandle: string;
@@ -46,6 +47,7 @@ export function CreateAgent() {
     interactions: 0,
     uptime: '0h 0m',
   });
+  const [generatedTweet, setGeneratedTweet] = useState<string | null>(null);
 
   const handleVerify = async () => {
     if (!config.twitterHandle) return;
@@ -139,6 +141,17 @@ export function CreateAgent() {
       }
     };
     reader.readAsDataURL(file);
+  };
+  
+  const handleGenerateResponse = async () => {
+    const prompt = `Generate a tweet for a ${config.personality} AI agent.`;
+    try {
+      const response = await generateResponse(prompt);
+      console.log('Generated response:', response);
+      setGeneratedTweet(response);
+    } catch (error) {
+      console.error('Failed to generate response:', error);
+    }
   };
 
   return (
@@ -309,8 +322,8 @@ export function CreateAgent() {
                           type="number"
                           min="0"
                           step="0.01"
-                          value={config.price === undefined ? '' : config.price}
-                          onChange={(e) => setConfig({ ...config, price: e.target.value ? parseFloat(e.target.value) : undefined })}
+                          value={config.price ?? 0}
+                          onChange={(e) => setConfig({ ...config, price: e.target.value ? parseFloat(e.target.value) : 0 })}
                           className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md bg-white/5 text-white"
                           placeholder="0.00"
                         />
@@ -411,6 +424,20 @@ export function CreateAgent() {
                 <span className="text-sm text-white">Active and responding to mentions</span>
               </div>
             </div>
+
+            <button
+              onClick={handleGenerateResponse}
+              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+            >
+              Generate Tweet
+            </button>
+
+            {generatedTweet && (
+              <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                <h3 className="text-lg font-medium text-white">Generated Tweet:</h3>
+                <p className="text-white">{generatedTweet}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

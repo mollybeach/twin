@@ -1,4 +1,3 @@
-import React from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { Trophy, TrendingUp, Users, MessageCircle, DollarSign, BadgeCheck, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';

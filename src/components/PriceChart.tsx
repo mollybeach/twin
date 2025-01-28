@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -73,17 +72,15 @@ export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
     responsive: true,
     plugins: {
       legend: {
-        display: false,
+        display: true,
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         titleColor: '#fff',
         bodyColor: '#fff',
         callbacks: {
-          label: function(context: any) {
-            return `$${context.parsed.y.toFixed(2)}`;
-          }
-        }
+          label: (context: any) => `${context.dataset.label}: ${context.raw}`,
+        },
       },
     },
     scales: {
@@ -92,32 +89,27 @@ export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
           display: false,
         },
         ticks: {
-          maxRotation: 45,
-          minRotation: 45,
+          color: '#fff',
         },
       },
       y: {
-        beginAtZero: true,
         grid: {
           color: 'rgba(255, 255, 255, 0.1)',
         },
         ticks: {
-          callback: function(value: any) {
-            return '$' + value.toFixed(2);
-          },
+          color: '#fff',
         },
       },
     },
     interaction: {
-      intersect: false,
-      mode: 'index',
+      mode: 'nearest',
     },
   };
 
   return (
     <div className="w-full h-48 bg-white/5 rounded-lg p-4">
       {cumulativeData.length > 0 ? (
-        <Line data={data} options={options} />
+        <Line data={data} options={options as any} />
       ) : (
         <div className="h-full flex items-center justify-center text-gray-400">
           No investment data available

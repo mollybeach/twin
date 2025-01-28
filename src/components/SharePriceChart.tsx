@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -126,7 +125,7 @@ export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: Sha
   return (
     <div className={`w-full ${isExpanded ? 'h-32' : 'h-16'} transition-all duration-300`}>
       {priceHistory.length > 0 ? (
-        <Line data={data} options={options} />
+        <Line data={data} options={options as any} />
       ) : (
         <div className="h-full flex items-center justify-center text-purple-300 text-sm">
           No price history available

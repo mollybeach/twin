@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { createChart, ColorType, IChartApi } from 'lightweight-charts';
 import { Transaction } from '../store/marketplace';
 
@@ -18,13 +18,13 @@ export function TradingChart({ transactions, pricePerShare }: TradingChartProps)
     const chartData = transactions
       .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
       .map(t => ({
-        time: new Date(t.timestamp).getTime() / 1000,
+        time: new Date(t.timestamp).toISOString(),
         value: t.pricePerShare,
       }));
 
     // Add current price as the latest point
     chartData.push({
-      time: new Date().getTime() / 1000,
+      time: new Date().toISOString(),
       value: pricePerShare,
     });
 

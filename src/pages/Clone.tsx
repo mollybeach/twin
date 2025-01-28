@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { GitMerge, Dna, Sparkles, Bot, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -213,6 +213,12 @@ export function Clone() {
                 )}
               </div>
             </div>
+
+            {draggedAgent && (
+              <div className="dragged-agent-info">
+                <p>Currently dragging: {agents.find(a => a.id === draggedAgent)?.twitterHandle}</p>
+              </div>
+            )}
 
             {selectedAgents.length === 2 && !cloneResult && (
               <div className="flex justify-center">

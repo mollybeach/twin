@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { 
   Wallet, 

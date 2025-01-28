@@ -1,4 +1,4 @@
-// path:server/server.js
+// path: server/server.js
 const express = require('express');
 const OpenAI = require('openai');
 require('dotenv').config({ path: '../.env' });
@@ -6,7 +6,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-const port = 3001;
+const port = 3002;
 
 app.use(express.json()); // Middleware to parse JSON requests
 app.use(cors()); // Enable CORS for all routes
@@ -30,15 +30,20 @@ const openai = new OpenAI({
 app.post('/generate', async(req, res) => {
     const { prompt } = req.body; // Extract prompt from request body
     try {
-        const response = await openai.chat.completions.create({
+        const completion = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo', // Specify the model to use
-            messages: [{ role: 'user', content: prompt }], // Set the message
+            messages: [
+                { role: 'user', content: prompt }, // User's message
+            ],
             max_tokens: 150, // Limit the number of tokens in the response
         });
-        res.json(response); // Send the response back to the client
+        res.json(completion); // Send the response back to the client
     } catch (error) {
         console.error('Error generating response:', error);
-        res.status(500).send('Error generating response'); // Handle errors
+        if (error.code === 'insufficient_quota') {
+            return res.status(429).send('Quota exceeded. Please check your OpenAI plan.');
+        }
+        res.status(500).send('Error generating response'); // Handle other errors
     }
 });
 

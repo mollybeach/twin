@@ -1,3 +1,4 @@
+// path: src/services/openaiService.ts
 import axios from 'axios';
 
 export const generateResponse = async (prompt: string) => {
@@ -8,4 +9,4 @@ export const generateResponse = async (prompt: string) => {
         console.error('Error generating response:', error);
         throw error;
     }
-}; 
+};  

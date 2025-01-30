@@ -8,13 +8,13 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const port = 3002;
 
-app.use(express.json()); // Middleware to parse JSON requests
-app.use(cors()); // Enable CORS for all routes
+app.use(express.json());
+app.use(cors());
 
-// Rate limiting middleware
+
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 5, // Limit each IP to 5 requests per windowMs
+    windowMs: 1 * 60 * 1000,
+    max: 5,
     message: 'Too many requests, please try again later.',
 });
 

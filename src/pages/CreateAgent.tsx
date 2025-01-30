@@ -4,6 +4,7 @@ import { verifyTwitterAccount } from '../services/twitter';
 import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
 import { generateResponse } from '../services/openaiService';
+import { fetchTweets } from '../services/twitter';
 
 interface AgentConfig {
   twitterHandle: string;
@@ -48,6 +49,7 @@ export function CreateAgent() {
     uptime: '0h 0m',
   });
   const [generatedTweet, setGeneratedTweet] = useState<string | null>(null);
+  const [fetchedTweets, setFetchedTweets] = useState<string[]>([]);
 
   const handleVerify = async () => {
     if (!config.twitterHandle) return;
@@ -60,13 +62,24 @@ export function CreateAgent() {
       if (response.verified) {
         setIsVerified(true);
         setStep(2);
+        await handleFetchTweets();
       } else {
         setVerificationError(response.error || 'Verification failed');
       }
     } catch (error) {
+      console.error('Verification error:', error);
       setVerificationError('Network error occurred');
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleFetchTweets = async () => {
+    try {
+      const tweets = await fetchTweets(config.twitterHandle);
+      setFetchedTweets(tweets);
+    } catch (error) {
+      console.error('Failed to fetch tweets:', error);
     }
   };
 
@@ -436,6 +449,17 @@ export function CreateAgent() {
               <div className="mt-4 p-4 bg-white/5 rounded-lg">
                 <h3 className="text-lg font-medium text-white">Generated Tweet:</h3>
                 <p className="text-white">{generatedTweet}</p>
+              </div>
+            )}
+
+            {fetchedTweets.length > 0 && (
+              <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                <h3 className="text-lg font-medium text-white">Fetched Tweets:</h3>
+                <ul className="text-white">
+                  {fetchedTweets.map((tweet, index) => (
+                    <li key={index} className="mt-2">{tweet}</li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>

@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 interface VerificationResponse {
   verified: boolean;
   error?: string;
@@ -16,3 +18,17 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
     }, 1000);
   });
 }
+
+export const fetchTweets = async (twitterHandle: string) => {
+    try {
+        const response = await axios.get(`https://api.twitter.com/2/tweets?username=${twitterHandle}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`, // Use your Twitter Bearer Token
+            },
+        });
+        return response.data.data; // Adjust based on the actual response structure
+    } catch (error) {
+        console.error('Error fetching tweets:', error);
+        throw error;
+    }
+};

@@ -4,6 +4,7 @@ const OpenAI = require('openai');
 require('dotenv').config({ path: '../.env' });
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 
 const app = express();
 const port = 3002;
@@ -44,6 +45,21 @@ app.post('/generate', async(req, res) => {
             return res.status(429).send('Quota exceeded. Please check your OpenAI plan.');
         }
         res.status(500).send('Error generating response'); // Handle other errors
+    }
+});
+
+app.post('/fetchTweets', async(req, res) => {
+    const { twitterHandle } = req.body;
+    try {
+        const response = await axios.get(`https://api.twitter.com/2/tweets?username=${twitterHandle}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+            },
+        });
+        res.json(response.data.data);
+    } catch (error) {
+        console.error('Error fetching tweets:', error);
+        res.status(500).send('Error fetching tweets');
     }
 });
 

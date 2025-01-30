@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Bot, Check, Loader2, AlertCircle, MessageCircle, Users, Activity, Upload, Rocket } from 'lucide-react';
-import { verifyTwitterAccount } from '../services/twitter';
+import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
 import { generateResponse } from '../services/openaiService';
@@ -8,12 +7,14 @@ import { fetchTweets } from '../services/twitter';
 
 interface AgentConfig {
   twitterHandle: string;
+  twinName: string;
   personality: string;
   description: string;
   autoReply: boolean;
   price: number;
   isListed: boolean;
   profileImage: string;
+  modelData?: Record<string, unknown>;
 }
 
 interface AgentStats {
@@ -29,20 +30,18 @@ export function CreateAgent() {
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<AgentConfig>({
     twitterHandle: '',
+    twinName: '',
     personality: 'friendly',
     description: '',
     autoReply: true,
     price: 1000,
     isListed: false,
-    profileImage: 'https://i.imgur.com/HDQ3OTC.png' // Default avatar
+    profileImage: 'https://i.imgur.com/HDQ3OTC.png', // Default avatar,
+    modelData: {}
   });
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
   const [deployError, setDeployError] = useState<string | null>(null);
-  const [isVerified, setIsVerified] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [agentStats, setAgentStats] = useState<AgentStats>({
     replies: 0,
     interactions: 0,
@@ -51,35 +50,35 @@ export function CreateAgent() {
   const [generatedTweet, setGeneratedTweet] = useState<string | null>(null);
   const [fetchedTweets, setFetchedTweets] = useState<string[]>([]);
 
-  const handleVerify = async () => {
-    if (!config.twitterHandle) return;
-    
-    setIsVerifying(true);
-    setVerificationError(null);
-    
-    try {
-      const response = await verifyTwitterAccount(config.twitterHandle);
-      if (response.verified) {
-        setIsVerified(true);
-        setStep(2);
-        await handleFetchTweets();
-      } else {
-        setVerificationError(response.error || 'Verification failed');
-      }
-    } catch (error) {
-      console.error('Verification error:', error);
-      setVerificationError('Network error occurred');
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
   const handleFetchTweets = async () => {
     try {
       const tweets = await fetchTweets(config.twitterHandle);
       setFetchedTweets(tweets);
+      
+      // Send tweets to OpenAI for training the model
+      const modelData = await trainModelWithTweets(tweets);
+      
+      // Update the agent data with the model information
+      await handleGenerateResponse(tweets, modelData); // Pass model data to the response handler
     } catch (error) {
-      console.error('Failed to fetch tweets:', error);
+      if (error instanceof Error) {
+        console.error('Failed to fetch tweets:', error);
+        setDeployError(error.message); // Display the error message to the user
+      } else {
+        console.error('Failed to fetch tweets:', error);
+        setDeployError('An unknown error occurred'); // Display a generic error message to the user
+      }
+    }
+  };
+
+  // Function to send tweets to OpenAI and get the model data
+  const trainModelWithTweets = async (tweets: string[]): Promise<Record<string, unknown>> => {
+    try {
+      const response = await generateResponse(tweets.join(' ')); // Adjust based on your OpenAI API
+      return response; // Return the model data
+    } catch (error) {
+      console.error('Failed to train model:', error);
+      throw new Error('Failed to train model with tweets.');
     }
   };
 
@@ -91,19 +90,46 @@ export function CreateAgent() {
 
     setIsDeploying(true);
     setDeployError(null);
-    
     try {
       const newAgentId = await addAgent({
+        id: crypto.randomUUID(),
+        createdAt: new Date(),
+        twinName: config.twinName,
         twitterHandle: config.twitterHandle,
         personality: config.personality,
         description: config.description,
         price: config.price,
         profileImage: config.profileImage,
+        stats: {
+          replies: 0,
+          interactions: 0
+        },
+        tokenShares: {
+          totalShares: 0,
+          availableShares: 0,
+          pricePerShare: 0,
+          shareholders: []
+        },
+        verification: {
+          isVerified: false,
+          verificationDate: undefined
+        },
+        analytics: {
+          impressions: 0,
+          engagementRate: 0,
+          clickThroughRate: 0,
+          dailyImpressions: [],
+          topInteractions: [],
+          reachByPlatform: [],
+          demographics: [],
+          peakHours: [],
+          cryptoHoldings: []
+        },
+        modelData: {}
       });
       
       setIsDeployed(true);
       startStatsSimulation();
-      
       // Navigate to the new agent's analytics page after a short delay
       setTimeout(() => {
         navigate(`/analytics/${newAgentId}`);
@@ -111,7 +137,8 @@ export function CreateAgent() {
     } catch (error) {
       console.error('Failed to deploy Twin:', error);
       setDeployError('Failed to deploy Twin. Please try again later.');
-      setIsDeploying(false);
+    } finally {
+      setIsDeploying(false); // Reset deploying state
     }
   };
 
@@ -131,39 +158,27 @@ export function CreateAgent() {
     return () => clearInterval(interval);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUploadError(null);
-    const file = event.target.files?.[0];
-    
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Please upload an image file');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Image size should be less than 5MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        setConfig({ ...config, profileImage: e.target.result as string });
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-  
-  const handleGenerateResponse = async () => {
-    const prompt = `Generate a tweet for a ${config.personality} AI agent.`;
+  const handleGenerateResponse = async (tweets: string[], modelData: Record<string, unknown>) => {
+    const prompt = `Based on the following tweets: ${tweets.join(', ')}, generate a tweet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
     try {
       const response = await generateResponse(prompt);
       console.log('Generated response:', response);
       setGeneratedTweet(response);
     } catch (error) {
       console.error('Failed to generate response:', error);
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setConfig({ ...config, profileImage: e.target.result as string });
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -184,209 +199,97 @@ export function CreateAgent() {
           </div>
         )}
 
-        {!isDeployed ? (
+        {step === 1 && !isDeployed ? (
           <div className="space-y-4">
-            {step === 1 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-purple-300">
-                    Twitter Handle
-                  </label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-purple-400 sm:text-sm">@</span>
-                    </div>
-                    <input
-                      type="text"
-                      value={config.twitterHandle}
-                      onChange={(e) => {
-                        setConfig({ ...config, twitterHandle: e.target.value });
-                        setIsVerified(false);
-                        setVerificationError(null);
-                      }}
-                      className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md text-white ${
-                        verificationError ? 'border-red-300' : ''
-                      }`}
-                      placeholder="twinuser"
-                    />
-                  </div>
-                  {verificationError && (
-                    <div className="flex items-center space-x-2 text-red-400 text-sm mt-1">
-                      <AlertCircle className="w-4 h-4" />
-                      <span>{verificationError}</span>
-                    </div>
-                  )}
-                  {isVerified && (
-                    <div className="flex items-center space-x-2 text-green-400 text-sm mt-1">
-                      <Check className="w-4 h-4" />
-                      <span>Account verified successfully!</span>
-                    </div>
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-purple-300">
+                Twin Name
+              </label>
+              <input
+                type="text"
+                value={config.twinName}
+                onChange={(e) => {
+                  setConfig({ ...config, twinName: e.target.value });
+                }}
+                className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-3 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
+                placeholder="Enter your Twin's name"
+              />
+            </div>
 
-                <button
-                  onClick={handleVerify}
-                  disabled={!config.twitterHandle || isVerifying}
-                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isVerifying ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      Let's Go! <Rocket className="ml-2 w-4 h-4" />
-                    </>
-                  )}
-                </button>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-purple-300">
+                Twitter Handle
+              </label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-purple-400 sm:text-sm">@</span>
+                </div>
+                <input
+                  type="text"
+                  value={config.twitterHandle}
+                  onChange={(e) => {
+                    setConfig({ ...config, twitterHandle: e.target.value });
+                  }}
+                  className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
+                  placeholder="twinuser"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleFetchTweets}
+              disabled={!config.twitterHandle}
+              className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Fetch Tweets <Rocket className="ml-2 w-4 h-4" />
+            </button>
+
+            {fetchedTweets.length > 0 && (
+              <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                <h3 className="text-lg font-medium text-white">Fetched Tweets:</h3>
+                <ul className="text-white">
+                  {fetchedTweets.map((tweet, index) => (
+                    <li key={index} className="mt-2">{tweet}</li>
+                  ))}
+                </ul>
               </div>
             )}
 
-            {step === 2 && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-purple-300">
-                    Upload Avatar
-                  </label>
-                  
-                  <div className="mb-4">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center justify-center px-4 py-2 border border-white/10 shadow-sm text-sm font-medium rounded-md text-purple-300 bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Avatar Image
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                    {uploadError && (
-                      <div className="flex items-center space-x-2 text-red-400 text-sm mt-2">
-                        <AlertCircle className="w-4 h-4" />
-                        <span>{uploadError}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-purple-300">
+                AI Personality
+              </label>
+              <select
+                value={config.personality}
+                onChange={(e) => setConfig({ ...config, personality: e.target.value })}
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md bg-white/5 text-white"
+              >
+                <option value="friendly">Friendly & Helpful</option>
+                <option value="professional">Professional & Formal</option>
+                <option value="casual">Casual & Relaxed</option>
+                <option value="witty">Witty & Humorous</option>
+              </select>
+            </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-purple-300">
-                    AI Personality
-                  </label>
-                  <select
-                    value={config.personality}
-                    onChange={(e) => setConfig({ ...config, personality: e.target.value })}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-white/10 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md bg-white/5 text-white"
-                  >
-                    <option value="friendly">Friendly & Helpful</option>
-                    <option value="professional">Professional & Formal</option>
-                    <option value="casual">Casual & Relaxed</option>
-                    <option value="witty">Witty & Humorous</option>
-                  </select>
-                </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+            >
+              Upload Profile Image
+            </button>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-purple-300">
-                    Twin Description
-                  </label>
-                  <textarea
-                    value={config.description}
-                    onChange={(e) => setConfig({ ...config, description: e.target.value })}
-                    rows={3}
-                    className="shadow-sm focus:ring-purple-500 focus:border-purple-500 mt-1 block w-full sm:text-sm border-white/10 rounded-md bg-white/5 text-white"
-                    placeholder="Describe your Twin's purpose and behavior..."
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-purple-300">
-                    List for Sale
-                  </label>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <input
-                        id="list-for-sale"
-                        type="checkbox"
-                        checked={config.isListed}
-                        onChange={(e) => setConfig({ ...config, isListed: e.target.checked })}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-white/10 rounded bg-white/5"
-                      />
-                      <label htmlFor="list-for-sale" className="ml-2 block text-sm text-purple-300">
-                        Make available in marketplace
-                      </label>
-                    </div>
-                  </div>
-                  
-                  {config.isListed && (
-                    <div className="mt-2">
-                      <label className="block text-sm font-medium text-purple-300">
-                        Price (USD)
-                      </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-purple-400 sm:text-sm">$</span>
-                        </div>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={config.price ?? 0}
-                          onChange={(e) => setConfig({ ...config, price: e.target.value ? parseFloat(e.target.value) : 0 })}
-                          className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md bg-white/5 text-white"
-                          placeholder="0.00"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    id="auto-reply"
-                    type="checkbox"
-                    checked={config.autoReply}
-                    onChange={(e) => setConfig({ ...config, autoReply: e.target.checked })}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-white/10 rounded bg-white/5"
-                  />
-                  <label htmlFor="auto-reply" className="ml-2 block text-sm text-purple-300">
-                    Enable automatic replies
-                  </label>
-                </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => {
-                      setStep(1);
-                      setIsVerified(false);
-                    }}
-                    className="flex-1 px-4 py-2 border border-white/10 shadow-sm text-sm font-medium rounded-md text-purple-300 bg-white/5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                  >
-                    Back
-                  </button>
-                  <button
-                    onClick={handleDeploy}
-                    disabled={isDeploying}
-                    className="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isDeploying ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Deploying...
-                      </>
-                    ) : (
-                      <>
-                        Launch Twin <Rocket className="ml-2 w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
+            <button
+              onClick={() => setStep(2)}
+              className="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              Next Step
+            </button>
           </div>
         ) : (
           <div className="space-y-6">
@@ -423,6 +326,13 @@ export function CreateAgent() {
               </div>
             </div>
 
+            {generatedTweet && (
+              <div className="mt-4 p-4 bg-white/5 rounded-lg">
+                <h3 className="text-lg font-medium text-white">Generated Tweet:</h3>
+                <p className="text-white">{generatedTweet}</p>
+              </div>
+            )}
+
             {config.description && (
               <div className="bg-white/5 p-4 rounded-lg">
                 <h3 className="text-sm font-medium text-purple-300 mb-2">Twin's Mission</h3>
@@ -439,29 +349,20 @@ export function CreateAgent() {
             </div>
 
             <button
-              onClick={handleGenerateResponse}
-              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+              onClick={handleDeploy}
+              disabled={isDeploying}
+              className="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Generate Tweet
+              {isDeploying ? (
+                <>
+                  <span className="animate-spin">🔄</span> Deploying...
+                </>
+              ) : (
+                <>
+                  Launch Twin <Rocket className="ml-2 w-4 h-4" />
+                </>
+              )}
             </button>
-
-            {generatedTweet && (
-              <div className="mt-4 p-4 bg-white/5 rounded-lg">
-                <h3 className="text-lg font-medium text-white">Generated Tweet:</h3>
-                <p className="text-white">{generatedTweet}</p>
-              </div>
-            )}
-
-            {fetchedTweets.length > 0 && (
-              <div className="mt-4 p-4 bg-white/5 rounded-lg">
-                <h3 className="text-lg font-medium text-white">Fetched Tweets:</h3>
-                <ul className="text-white">
-                  {fetchedTweets.map((tweet, index) => (
-                    <li key={index} className="mt-2">{tweet}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         )}
       </div>

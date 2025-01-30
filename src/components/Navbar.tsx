@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Twitter, ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bot, Check, AlertCircle } from 'lucide-react';
 
 export interface Notification {
@@ -6,6 +6,7 @@ export interface Notification {
   type: 'create' | 'buy' | 'sell';
   message: string;
   twitterHandle: string;
+  twinName: string;
   timestamp: number;
 }
 

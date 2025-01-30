@@ -7,7 +7,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ChartOptions,
+  TooltipItem
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { TokenShare } from '../store/marketplace';
@@ -68,7 +70,7 @@ export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
     ],
   };
 
-  const options = {
+  const options : ChartOptions<'line'> = {
     responsive: true,
     plugins: {
       legend: {
@@ -79,7 +81,7 @@ export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
         titleColor: '#fff',
         bodyColor: '#fff',
         callbacks: {
-          label: (context: any) => `${context.dataset.label}: ${context.raw}`,
+          label: (context: TooltipItem<"line">) => `${context.dataset.label}: ${context.raw}`,
         },
       },
     },
@@ -109,7 +111,7 @@ export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
   return (
     <div className="w-full h-48 bg-white/5 rounded-lg p-4">
       {cumulativeData.length > 0 ? (
-        <Line data={data} options={options as any} />
+        <Line data={data} options={options} />
       ) : (
         <div className="h-full flex items-center justify-center text-gray-400">
           No investment data available

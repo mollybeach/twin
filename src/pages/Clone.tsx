@@ -10,7 +10,9 @@ export function Clone() {
   const [isCloning, setIsCloning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cloneResult, setCloneResult] = useState<{
+    id: string;
     twitterHandle: string;
+    twinName: string;
     personality: string;
     description: string;
     profileImage: string;
@@ -84,10 +86,12 @@ export function Clone() {
 
     const newTwin = {
       twitterHandle: `${agent1.twitterHandle}_${agent2.twitterHandle}`,
+      twinName: `${agent1.twinName}_${agent2.twinName}`,
       personality: `${agent1.personality} + ${agent2.personality}`,
       description: `A fusion of @${agent1.twitterHandle} and @${agent2.twitterHandle}. Combining the best of both twins!`,
       profileImage: agent1.profileImage,
       price: totalPrice,
+      id: `${agent1.id}_${agent2.id}`
     };
 
     setCloneResult(newTwin);
@@ -100,14 +104,51 @@ export function Clone() {
     try {
       setIsCloning(true);
       setError(null);
-      
+      const agent1 = agents.find(a => a.id === selectedAgents[0]);
+      const agent2 = agents.find(a => a.id === selectedAgents[1]);
+
+      if (!agent1 || !agent2) {
+        setError('Selected agents not found.');
+        setIsCloning(false);
+        return;
+      }
+
       // Create the new clone
       const newAgentId = await addAgent({
+        id: `${agent1.id}_${agent2.id}`,  
+        createdAt: new Date(),
+        stats: {
+          replies: 0,
+          interactions: 0
+        },
         twitterHandle: cloneResult.twitterHandle,
         personality: cloneResult.personality,
         description: cloneResult.description,
         profileImage: cloneResult.profileImage,
-        price: cloneResult.price
+        price: cloneResult.price,
+        twinName: cloneResult.twinName,
+        verification: {
+          isVerified: false,
+          verificationDate: undefined
+        },
+        analytics: {
+          impressions: 0,
+          engagementRate: 0,
+          clickThroughRate: 0,
+          dailyImpressions: [],
+          topInteractions: [],
+          reachByPlatform: [],
+          demographics: [],
+          peakHours: [],
+          cryptoHoldings: []
+        },
+
+        tokenShares: {
+          totalShares: 1000,
+          availableShares: 1000,
+          pricePerShare: cloneResult.price / 1000,
+          shareholders: []
+        }
       });
       
       // Reset state

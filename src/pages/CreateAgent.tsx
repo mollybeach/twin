@@ -59,13 +59,9 @@ export function CreateAgent() {
       // Log the response for debugging
       console.log('Response from OpenAI:', response);
       
-      // Attempt to parse the response as JSON
-      try {
-        return JSON.parse(response); // Ensure the response is valid JSON
-      } catch (jsonError) {
-        console.error('Failed to parse response as JSON:', jsonError);
-        throw new Error('Response from OpenAI is not valid JSON');
-      }
+      // Since the response is plain text, you can return it directly or process it as needed
+      // If you need to return an object, you can create a structure based on the response
+      return { generatedText: response }; // Example structure
     } catch (error) {
       console.error('Failed to train model:', error);
       throw new Error('Failed to train model with tweets.');
@@ -180,7 +176,7 @@ export function CreateAgent() {
         }]
       }));
     } catch (error) {
-      console.error('Error generating response:', error);
+      console.error('Failed to generate response:', error);
     }
   };
 

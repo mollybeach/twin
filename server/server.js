@@ -5,6 +5,15 @@ require('dotenv').config({ path: '../.env' });
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
+import { createClient } from 'edgedb';
+import edgeql from '@/dbschema/edgeql-js';
+
+export const edgeDBCloudClient = createClient({
+    instanceName: 'mollybeach/rug-watch-dog-db',
+    secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN
+});
+
+export const localClient = createClient();
 
 const app = express();
 const port = 3002;
@@ -81,3 +90,13 @@ app.get('/api/tweets', async(req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
+
+// Run Query
+// Run Query
+const query = edgeql.select(edgeql.Agent, (agent) => ({
+    twinHandle: agent.twinHandle, // Use the agent variable
+    twitterHandle: agent.twitterHandle, // Use the agent variable
+}));
+
+const result = await edgeDBCloudClient.query(query);
+console.log(result);

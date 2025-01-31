@@ -10,7 +10,12 @@ export const generateResponse = async (prompt: string): Promise<string> => {
         
         // Check if the response contains the expected structure
         if (response.data && response.data.choices && response.data.choices.length > 0) {
-            return response.data.choices[0].text.trim(); // Adjust based on your OpenAI API response structure
+            const text = response.data.choices[0].message?.content || response.data.choices[0].text; // Adjust based on your OpenAI API response structure
+            if (text) {
+                return text.trim(); // Ensure text is defined before trimming
+            } else {
+                throw new Error('Response text is undefined');
+            }
         } else {
             throw new Error('Unexpected response structure from OpenAI');
         }

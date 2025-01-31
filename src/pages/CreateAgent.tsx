@@ -55,7 +55,17 @@ export function CreateAgent() {
   const trainModelWithTweets = async (tweets: FetchedTweetsType[]): Promise<Record<string, unknown>> => {
     try {
       const response = await generateResponse(tweets.map(tweet => tweet.text).join(' '));
-      return JSON.parse(response); // Ensure the response is valid JSON
+      
+      // Log the response for debugging
+      console.log('Response from OpenAI:', response);
+      
+      // Attempt to parse the response as JSON
+      try {
+        return JSON.parse(response); // Ensure the response is valid JSON
+      } catch (jsonError) {
+        console.error('Failed to parse response as JSON:', jsonError);
+        throw new Error('Response from OpenAI is not valid JSON');
+      }
     } catch (error) {
       console.error('Failed to train model:', error);
       throw new Error('Failed to train model with tweets.');
@@ -236,7 +246,7 @@ export function CreateAgent() {
                     setConfig({ ...config, twitterHandle: e.target.value });
                   }}
                   className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
-                  placeholder="twinuser"
+                  placeholder="twitter username to train your twin on"
                 />
               </div>
             </div>

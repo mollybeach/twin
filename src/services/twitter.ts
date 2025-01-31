@@ -22,14 +22,9 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
 export const fetchTweets = async (username: string): Promise<string[]> => {
   try {
     console.log(`Fetching tweets for username: ${username}`); // Log the username
-    console.log('Twitter Bearer Token:', process.env.REACT_APP_TWITTER_BEARER_TOKEN);
-    const response = await axios.get(`https://api.twitter.com/2/tweets`, {
+    const response = await axios.get(`http://localhost:3002/api/tweets`, {
       params: {
         username: username,
-        max_results: 5, // Limit the number of tweets to 5
-      },
-      headers: {
-        Authorization: `Bearer ${process.env.REACT_APP_TWITTER_BEARER_TOKEN}`, // Use REACT_APP_ prefix
       },
     });
     console.log('Response:', response.data); // Log the response data

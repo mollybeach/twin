@@ -48,15 +48,29 @@ app.post('/generate', async(req, res) => {
     }
 });
 
-app.post('/fetchTweets', async(req, res) => {
-    const { twitterHandle } = req.body;
+app.get('/api/tweets', async(req, res) => {
+    const { username } = req.query;
     try {
-        const response = await axios.get(`https://api.twitter.com/2/tweets?username=${twitterHandle}`, {
+        // Get user ID from username
+        const userResponse = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
             headers: {
-                'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+                Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`, // Use your actual token
             },
         });
-        res.json(response.data.data);
+
+        const userId = userResponse.data.data.id; // Get the user ID
+
+        // Fetch tweets using the user ID
+        const response = await axios.get(`https://api.twitter.com/2/users/${userId}/tweets`, {
+            params: {
+                max_results: 5, // Limit the number of tweets to 5
+            },
+            headers: {
+                Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+            },
+        });
+
+        res.json(response.data);
     } catch (error) {
         console.error('Error fetching tweets:', error);
         res.status(500).send('Error fetching tweets');

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Twitter, ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge } from 'lucide-react';
+import { ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge, Twitter } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { ThemeToggle } from './ThemeToggle';
 import { TokenStats } from './TokenStats';
@@ -8,7 +8,7 @@ import { TokenStats } from './TokenStats';
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ id: string; twitterHandle: string; personality: string }>>([]);
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; twinHandle: string; personality: string }>>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -39,11 +39,11 @@ export function Navbar() {
     }
 
     const filtered = agents.filter(agent => 
-      agent.twitterHandle.toLowerCase().includes(query.toLowerCase()) ||
+      agent.twinHandle.toLowerCase().includes(query.toLowerCase()) ||
       agent.personality.toLowerCase().includes(query.toLowerCase())
-    ).map(({ id, twitterHandle, personality }) => ({
+    ).map(({ id, twinHandle, personality }) => ({
       id,
-      twitterHandle,
+      twinHandle,
       personality
     }));
 
@@ -116,7 +116,7 @@ export function Navbar() {
                             onClick={() => handleSelectResult(result.id)}
                             className="w-full px-4 py-2 text-left hover:bg-white/5 transition-colors flex items-center justify-between"
                           >
-                            <span className="text-white">@{result.twitterHandle}</span>
+                            <span className="text-white">@{result.twinHandle}</span>
                             <span className="text-sm text-purple-300">{result.personality}</span>
                           </button>
                         ))}

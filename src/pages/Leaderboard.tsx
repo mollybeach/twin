@@ -61,7 +61,7 @@ export function Leaderboard() {
                       <div className="relative">
                         <img
                           src={agent.profileImage}
-                          alt={agent.twitterHandle}
+                          alt={agent.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         {agent.verification.isVerified && (
@@ -69,7 +69,7 @@ export function Leaderboard() {
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twitterHandle}</div>
+                        <div className="text-white font-medium">@{agent.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
                           {agent.analytics.engagementRate.toFixed(1)}% engagement
                         </div>
@@ -103,7 +103,7 @@ export function Leaderboard() {
                         <div className="relative">
                           <img
                             src={agent.profileImage}
-                            alt={agent.twitterHandle}
+                            alt={agent.twinHandle}
                             className="w-12 h-12 rounded-full object-cover"
                           />
                           {agent.verification.isVerified && (
@@ -111,7 +111,7 @@ export function Leaderboard() {
                           )}
                         </div>
                         <div>
-                          <div className="text-white font-medium">@{agent.twitterHandle}</div>
+                          <div className="text-white font-medium">@{agent.twinHandle}</div>
                           <div className="text-purple-300 text-sm">
                             ${marketValue.toFixed(2)} value
                           </div>
@@ -143,7 +143,7 @@ export function Leaderboard() {
                       <div className="relative">
                         <img
                           src={agent.profileImage}
-                          alt={agent.twitterHandle}
+                          alt={agent.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         {agent.verification.isVerified && (
@@ -151,7 +151,7 @@ export function Leaderboard() {
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twitterHandle}</div>
+                        <div className="text-white font-medium">@{agent.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
                           {agent.stats.interactions.toLocaleString()} interactions
                         </div>
@@ -182,7 +182,7 @@ export function Leaderboard() {
                       <div className="relative">
                         <img
                           src={agent.profileImage}
-                          alt={agent.twitterHandle}
+                          alt={agent.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         {agent.verification.isVerified && (
@@ -190,7 +190,7 @@ export function Leaderboard() {
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twitterHandle}</div>
+                        <div className="text-white font-medium">@{agent.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
                           {agent.analytics.impressions.toLocaleString()} views
                         </div>

@@ -1,15 +1,9 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Coins } from 'lucide-react';
-
-interface TokenStats {
-  price: number;
-  change24h: number;
-  volume24h: number;
-  marketCap: number;
-}
+import type { TokenStatsType } from '../types/types';
 
 export function TokenStats() {
-  const [stats, setStats] = React.useState<TokenStats>({
+  const [stats, setStats] = React.useState<TokenStatsType>({
     price: 12.84,
     change24h: 5.67,
     volume24h: 2450000,

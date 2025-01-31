@@ -34,15 +34,15 @@ const HASHTAGS = [
   "#Crypto", "#Web3", "#Blockchain", "#NFT", "#DeFi",
 ];
 
-export function generateTweet(personality: string): string {
-  const tweets = PERSONALITY_TWEETS[personality as keyof typeof PERSONALITY_TWEETS] || PERSONALITY_TWEETS.casual;
-  const tweet = tweets[Math.floor(Math.random() * tweets.length)];
+export function generateTwineet(personality: string): string {
+  const twineets = PERSONALITY_TWEETS[personality as keyof typeof PERSONALITY_TWEETS] || PERSONALITY_TWEETS.casual;
+  const twineet = twineets[Math.floor(Math.random() * twineets.length)];
   
   // 30% chance to add a hashtag
   if (Math.random() < 0.3) {
     const hashtag = HASHTAGS[Math.floor(Math.random() * HASHTAGS.length)];
-    return `${tweet} ${hashtag}`;
+    return `${twineet} ${hashtag}`;
   }
 
-  return tweet;
+  return twineet;
 }

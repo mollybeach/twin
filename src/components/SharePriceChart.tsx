@@ -7,10 +7,11 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ChartOptions
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { TokenShare } from '../store/marketplace';
+import { SharePriceChartPropsType } from '../types/types';
 
 ChartJS.register(
   CategoryScale,
@@ -23,13 +24,7 @@ ChartJS.register(
   Filler
 );
 
-interface SharePriceChartProps {
-  shareholders: TokenShare[];
-  pricePerShare: number;
-  isExpanded: boolean;
-}
-
-export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: SharePriceChartProps) {
+export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: SharePriceChartPropsType) {
   // Sort shareholders by purchase date
   const sortedTransactions = [...shareholders].sort(
     (a, b) => new Date(a.purchaseDate).getTime() - new Date(b.purchaseDate).getTime()
@@ -82,7 +77,7 @@ export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: Sha
         titleColor: '#fff',
         bodyColor: '#fff',
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { parsed: { y: number } }) {
             return `$${context.parsed.y.toFixed(4)}`;
           }
         }
@@ -110,7 +105,7 @@ export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: Sha
         },
         ticks: {
           color: '#a855f7',
-          callback: function(value: any) {
+          callback: function(value: number) {
             return '$' + value.toFixed(4);
           },
         },
@@ -125,7 +120,7 @@ export function SharePriceChart({ shareholders, pricePerShare, isExpanded }: Sha
   return (
     <div className={`w-full ${isExpanded ? 'h-32' : 'h-16'} transition-all duration-300`}>
       {priceHistory.length > 0 ? (
-        <Line data={data} options={options as any} />
+        <Line data={data} options={options as unknown as ChartOptions<'line'> } />
       ) : (
         <div className="h-full flex items-center justify-center text-purple-300 text-sm">
           No price history available

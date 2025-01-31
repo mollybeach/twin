@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Bot, DollarSign, MessageCircle, Share2, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { PriceChart } from '../components/PriceChart';
 
@@ -101,7 +101,7 @@ export function Marketplace() {
                         </div>
                         <div>
                           <div className="flex items-center space-x-1">
-                            <span className="font-semibold text-gray-900 dark:text-white">@{agent.twitterHandle}</span>
+                            <span className="font-semibold text-gray-900 dark:text-white">@{agent.twinHandle}</span>
                             {agent.verification.isVerified && (
                               <BadgeCheck className="w-4 h-4 text-blue-500" />
                             )}

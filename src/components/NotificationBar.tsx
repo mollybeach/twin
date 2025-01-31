@@ -1,22 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Bot, Check, AlertCircle } from 'lucide-react';
+import { NotificationType, NotificationBarPropsType } from '../types/types';
 
-export interface Notification {
-  id: string;
-  type: 'create' | 'buy' | 'sell';
-  message: string;
-  twitterHandle: string;
-  twinName: string;
-  timestamp: number;
-}
 
-interface NotificationBarProps {
-  notification: Notification | null;
-  onClose: () => void;
-}
-
-export function NotificationBar({ notification }: NotificationBarProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+export function NotificationBar({ notification }: NotificationBarPropsType) {
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [flashIndex, setFlashIndex] = useState(0);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { 
   Wallet, 
@@ -27,7 +27,7 @@ export function PortfolioPage() {
     const value = shares * agent.tokenShares.pricePerShare;
     return {
       id: agent.id,
-      twitterHandle: agent.twitterHandle,
+      twinHandle: agent.twinHandle,
       shares,
       value,
       pricePerShare: agent.tokenShares.pricePerShare,
@@ -143,7 +143,7 @@ export function PortfolioPage() {
                   <option value="">All Twins</option>
                   {holdings.map((holding) => (
                     <option key={holding.id} value={holding.id}>
-                      @{holding.twitterHandle}
+                      @{holding.twinHandle}
                     </option>
                   ))}
                 </select>
@@ -173,10 +173,10 @@ export function PortfolioPage() {
                           <div className="flex items-center space-x-3">
                             <img
                               src={agent.profileImage}
-                              alt={agent.twitterHandle}
+                              alt={agent.twinHandle}
                               className="w-8 h-8 rounded-full"
                             />
-                            <span>@{agent.twitterHandle}</span>
+                            <span>@{agent.twinHandle}</span>
                           </div>
                         </td>
                         <td className="py-4">
@@ -236,7 +236,7 @@ export function PortfolioPage() {
                     <div className="relative">
                       <img
                         src={holding.profileImage}
-                        alt={holding.twitterHandle}
+                        alt={holding.twinHandle}
                         className="w-16 h-16 rounded-full object-cover"
                       />
                       {holding.isVerified && (
@@ -244,7 +244,7 @@ export function PortfolioPage() {
                       )}
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">@{holding.twitterHandle}</h3>
+                      <h3 className="text-xl font-bold text-white">@{holding.twinHandle}</h3>
                       <p className="text-purple-300">{holding.personality}</p>
                     </div>
                   </Link>

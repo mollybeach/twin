@@ -1,12 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { ThemeStoreType } from '../types/types';
 
-interface ThemeStore {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-}
-
-export const useThemeStore = create<ThemeStore>()(
+export const useThemeStore = create<ThemeStoreType>()(
   persist(
     (set) => ({
       theme: 'dark',

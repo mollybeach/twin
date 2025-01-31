@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, PersistStorage, StorageValue } from 'zustand/middleware';
-import { Notification } from '../components/NotificationBar';
+import { AgentType, TransactionType, AnalyticsType, NotificationType, MarketplaceStoreType } from '../types/types';
 
 // Storage limit (4.5MB to stay safely under 5MB limit)
 const STORAGE_LIMIT = 4.5 * 1024 * 1024;
@@ -11,7 +11,7 @@ const estimateStorageSize = (data: unknown): number => {
 };
 
 // Helper function to clean up old data
-const cleanupOldData = (agents: Agent[]): Agent[] => {
+const cleanupOldData = (agents: AgentType[]): AgentType[] => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -51,7 +51,7 @@ const createCustomStorage = (): PersistStorage<unknown> => {
           
           // If still too large, start removing oldest agents
           while (estimateStorageSize(state) > STORAGE_LIMIT && state.agents.length > 0) {
-            state.agents.sort((a: Agent, b: Agent) => 
+            state.agents.sort((a: AgentType, b: AgentType) => 
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
             state.agents.shift();
@@ -75,83 +75,7 @@ const createCustomStorage = (): PersistStorage<unknown> => {
   };
 };
 
-export interface TokenShare {
-  userId: string;
-  shares: number;
-  purchasePrice: number;
-  purchaseDate: string;
-}
-
-export interface Transaction {
-  id: string;
-  agentId: string;
-  type: 'buy' | 'sell';
-  shares: number;
-  pricePerShare: number;
-  totalAmount: number;
-  timestamp: string;
-}
-
-export interface Analytics {
-  impressions: number;
-  engagementRate: number;
-  clickThroughRate: number;
-  dailyImpressions: { date: string; count: number }[];
-  topInteractions: { type: string; count: number }[];
-  reachByPlatform: { platform: string; count: number }[];
-  demographics: { age: string; percentage: number }[];
-  peakHours: { hour: number; engagement: number }[];
-  cryptoHoldings: {
-    symbol: string;
-    amount: number;
-    value: number;
-    change24h: number;
-  }[];
-}
-
-export interface Agent {
-  id: string;
-  createdAt: Date;
-  twitterHandle: string;
-  twinName: string;
-  personality: string;
-  description: string;
-  price: number;
-  profileImage: string;
-  stats: {
-    replies: number;
-    interactions: number;
-  };
-  tokenShares: {
-    totalShares: number;
-    availableShares: number;
-    pricePerShare: number;
-    shareholders: TokenShare[];
-  };
-  verification: {
-    isVerified: boolean;
-    verificationDate?: string;
-  };
-  analytics: Analytics;
-  modelData?: Record<string, unknown>;
-}
-
-interface MarketplaceStore {
-  agents: Agent[];
-  transactions: Transaction[];
-  notification: Notification | null;
-  setNotification: (notification: Notification | null) => void;
-  addAgent: (agent: Agent) => Promise<string>;
-  buyShares: (agentId: string, shares: number) => Promise<void>;
-  sellShares: (agentId: string, shares: number) => Promise<void>;
-  verifyAgent: (agentId: string) => Promise<boolean>;
-  getUserShares: (agentId: string) => number;
-  getAgents: () => Agent[];
-  updateAnalytics: (agentId: string) => void;
-  getTransactionHistory: (agentId?: string) => Transaction[];
-}
-
-const generateDummyAnalytics = (): Analytics => {
+const generateDummyAnalytics = (): AnalyticsType   => {
   const now = new Date();
   const dailyImpressions = Array.from({ length: 30 }, (_, i) => ({
     date: new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -192,7 +116,7 @@ const generateDummyAnalytics = (): Analytics => {
     dailyImpressions,
     topInteractions: [
       { type: 'Likes', count: Math.floor(Math.random() * 500) + 100 },
-      { type: 'Retweets', count: Math.floor(Math.random() * 300) + 50 },
+      { type: 'Retwineets', count: Math.floor(Math.random() * 300) + 50 },
       { type: 'Replies', count: Math.floor(Math.random() * 200) + 30 },
       { type: 'Quotes', count: Math.floor(Math.random() * 100) + 20 }
     ],
@@ -216,53 +140,36 @@ const generateDummyAnalytics = (): Analytics => {
   };
 };
 
-export const useMarketplaceStore = create<MarketplaceStore>()(
+export const useMarketplaceStore = create<MarketplaceStoreType>()(
   persist(
     (set, get) => ({
       agents: [],
       transactions: [],
       notification: null,
-      setNotification: (notification) => set({ notification }),
-      addAgent: async (agent) => {
-        const notification: Notification = {
+      setNotification: (notification: NotificationType | null) => set({ notification }),
+      addAgent: async (agent: AgentType): Promise<string> => {
+        const notification: NotificationType = {
           id: crypto.randomUUID(),
           type: 'create',
-          message: `Created new AI Twin @${agent.twinName}`,
+          message: `Agent ${agent.twinHandle} created successfully!`,
+          twinHandle: agent.twinHandle,
           twitterHandle: agent.twitterHandle,
-          twinName: agent.twinName,
           timestamp: Date.now(),
         };
 
         set((state) => ({
-          agents: [...state.agents, {
-            ...agent,
-            id: crypto.randomUUID(),
-            createdAt: new Date(),
-            stats: {
-              replies: 0,
-              interactions: 0,
-            },
-            tokenShares: {
-              totalShares: 1000,
-              availableShares: 1000,
-              pricePerShare: agent.price / 1000,
-              shareholders: [],
-            },
-            verification: {
-              isVerified: false,
-            },
-            analytics: generateDummyAnalytics(),
-          }],
+          agents: [...state.agents, agent],
           notification,
         }));
-        return notification.id;
+
+        return agent.id;
       },
       buyShares: async (agentId: string, sharesToBuy: number) => {
         const agent = get().agents.find(a => a.id === agentId);
         if (!agent) return;
 
         set((state) => {
-          const transaction: Transaction = {
+          const transaction: TransactionType = {
             id: crypto.randomUUID(),
             agentId,
             type: 'buy',
@@ -272,12 +179,12 @@ export const useMarketplaceStore = create<MarketplaceStore>()(
             timestamp: new Date().toISOString(),
           };
 
-          const notification: Notification = {
+          const notification: NotificationType = {
             id: crypto.randomUUID(),
             type: 'buy',
-            message: `Bought ${sharesToBuy} shares of @${agent.twitterHandle}`,
+            message: `Bought ${sharesToBuy} shares of @${agent.twinHandle}`,
             twitterHandle: agent.twitterHandle,
-            twinName: agent.twinName,
+            twinHandle: agent.twinHandle,
             timestamp: Date.now(),
           };
 
@@ -311,7 +218,7 @@ export const useMarketplaceStore = create<MarketplaceStore>()(
         if (!agent) return;
 
         set((state) => {
-          const transaction: Transaction = {
+          const transaction: TransactionType = {
             id: crypto.randomUUID(),
             agentId,
             type: 'sell',
@@ -321,11 +228,11 @@ export const useMarketplaceStore = create<MarketplaceStore>()(
             timestamp: new Date().toISOString(),
           };
 
-          const notification: Notification = {
+          const notification: NotificationType = {
             id: crypto.randomUUID(),
             type: 'sell',
             message: `Sold ${sharesToSell} shares of @${agent.twitterHandle}`,
-            twinName: agent.twinName,
+            twinHandle: agent.twinHandle,
             twitterHandle: agent.twitterHandle,
             timestamp: Date.now(),
           };

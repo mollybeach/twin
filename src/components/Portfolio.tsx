@@ -18,18 +18,9 @@ import {
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SharePriceChart } from './SharePriceChart';
+import { TradeModalPropsType } from '../types/types';
 
-interface TradeModalProps {
-  agentId: string;
-  twitterHandle: string;
-  currentShares: number;
-  availableShares: number;
-  pricePerShare: number;
-  isSelling: boolean;
-  onClose: () => void;
-}
-
-function TradeModal({ agentId, twitterHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalProps) {
+function TradeModal({ agentId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
   const [shares, setShares] = useState<number>(1);
   const { buyShares, sellShares } = useMarketplaceStore();
 
@@ -58,7 +49,7 @@ function TradeModal({ agentId, twitterHandle, currentShares, availableShares, pr
         </button>
 
         <h3 className="text-xl font-bold text-white mb-4">
-          {isSelling ? 'Sell' : 'Buy'} @{twitterHandle} Shares
+          {isSelling ? 'Sell' : 'Buy'} @{twinHandle} Shares
         </h3>
 
         <div className="space-y-4">
@@ -117,7 +108,7 @@ export function Portfolio() {
   const [isExpanded, setIsExpanded] = useState(true);
   const [tradeModal, setTradeModal] = useState<{
     agentId: string;
-    twitterHandle: string;
+    twinHandle: string;
     currentShares: number;
     availableShares: number;
     pricePerShare: number;
@@ -133,7 +124,7 @@ export function Portfolio() {
     const value = shares * agent.tokenShares.pricePerShare;
     return {
       id: agent.id,
-      twitterHandle: agent.twitterHandle,
+      twinHandle: agent.twinHandle,
       shares,
       value,
       pricePerShare: agent.tokenShares.pricePerShare,
@@ -247,7 +238,7 @@ export function Portfolio() {
                             <div className="relative">
                               <img
                                 src={holding.profileImage}
-                                alt={holding.twitterHandle}
+                                alt={holding.twinHandle}
                                 className="w-10 h-10 rounded-full object-cover"
                               />
                               {holding.isVerified && (
@@ -256,7 +247,7 @@ export function Portfolio() {
                             </div>
                             <div>
                               <div className="flex items-center">
-                                <span className="font-medium text-white">@{holding.twitterHandle}</span>
+                                <span className="font-medium text-white">@{holding.twinHandle}</span>
                               </div>
                               <p className="text-sm text-purple-300">
                                 {holding.shares.toLocaleString()} shares
@@ -296,7 +287,7 @@ export function Portfolio() {
                           <button
                             onClick={() => setTradeModal({
                               agentId: holding.id,
-                              twitterHandle: holding.twitterHandle,
+                              twinHandle: holding.twinHandle,
                               currentShares: holding.shares,
                               availableShares: holding.availableShares,
                               pricePerShare: holding.pricePerShare,
@@ -310,7 +301,7 @@ export function Portfolio() {
                           <button
                             onClick={() => setTradeModal({
                               agentId: holding.id,
-                              twitterHandle: holding.twitterHandle,
+                              twinHandle: holding.twinHandle,
                               currentShares: holding.shares,
                               availableShares: holding.availableShares,
                               pricePerShare: holding.pricePerShare,
@@ -339,7 +330,7 @@ export function Portfolio() {
                   <div className="relative">
                     <img
                       src={holding.profileImage}
-                      alt={holding.twitterHandle}
+                      alt={holding.twinHandle}
                       className="w-12 h-12 rounded-full object-cover border-2 border-white/10"
                     />
                     {holding.isVerified && (
@@ -348,7 +339,7 @@ export function Portfolio() {
                   </div>
                   {/* Tooltip */}
                   <div className="absolute left-full ml-2 px-3 py-2 bg-white/10 backdrop-blur-lg rounded-lg text-white text-sm whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                    <p className="font-medium">@{holding.twitterHandle}</p>
+                    <p className="font-medium">@{holding.twinHandle}</p>
                     <p className="text-purple-300">${holding.value.toLocaleString()}</p>
                   </div>
                 </Link>

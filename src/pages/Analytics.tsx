@@ -41,11 +41,11 @@ export function AnalyticsPage() {
           <div className="flex items-center space-x-4">
             <img
               src={agent.profileImage}
-              alt={agent.twitterHandle}
+              alt={agent.twinHandle}
               className="w-16 h-16 rounded-full object-cover"
             />
             <div>
-              <h1 className="text-2xl font-bold text-white">@{agent.twitterHandle}</h1>
+              <h1 className="text-2xl font-bold text-white">@{agent.twinHandle}</h1>
               <p className="text-purple-300">{agent.personality} Twin</p>
             </div>
           </div>

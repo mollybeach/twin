@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { GitMerge, Dna, Sparkles, Bot, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AgentType } from '../types/types';
 
 export function Clone() {
   const { agents, addAgent } = useMarketplaceStore();
@@ -11,8 +12,8 @@ export function Clone() {
   const [error, setError] = useState<string | null>(null);
   const [cloneResult, setCloneResult] = useState<{
     id: string;
+    twinHandle: string;
     twitterHandle: string;
-    twinName: string;
     personality: string;
     description: string;
     profileImage: string;
@@ -71,8 +72,8 @@ export function Clone() {
     if (selectedAgents.length !== 2) return;
 
     setIsCloning(true);
-    const agent1 = agents.find(a => a.id === selectedAgents[0]);
-    const agent2 = agents.find(a => a.id === selectedAgents[1]);
+    const agent1 = agents.find((a: AgentType) => a.id === selectedAgents[0]);
+    const agent2 = agents.find((a: AgentType) => a.id === selectedAgents[1]);
 
     if (!agent1 || !agent2) return;
 
@@ -81,17 +82,42 @@ export function Clone() {
 
     // Calculate base price as average of both agents' share prices
     const basePrice = (agent1.tokenShares.pricePerShare + agent2.tokenShares.pricePerShare) / 2;
-    // Multiply by total shares to get the total price
-    const totalPrice = basePrice * 1000; // 1000 is the default total shares
+    const totalPrice = basePrice * 1000; // Example calculation
 
-    const newTwin = {
+    const newTwin: AgentType = {
+      id: `${agent1.id}_${agent2.id}`,
+      createdAt: new Date(),
       twitterHandle: `${agent1.twitterHandle}_${agent2.twitterHandle}`,
-      twinName: `${agent1.twinName}_${agent2.twinName}`,
+      twinHandle: `${agent1.twinHandle}_${agent2.twinHandle}`,
       personality: `${agent1.personality} + ${agent2.personality}`,
       description: `A fusion of @${agent1.twitterHandle} and @${agent2.twitterHandle}. Combining the best of both twins!`,
       profileImage: agent1.profileImage,
       price: totalPrice,
-      id: `${agent1.id}_${agent2.id}`
+      stats: { replies: 0, interactions: 0, uptime: '0h 0m' }, // Ensure uptime is included
+      tokenShares: {
+        totalShares: 1000,
+        availableShares: 1000,
+        pricePerShare: totalPrice / 1000,
+        shareholders: []
+      },
+      verification: {
+        isVerified: false,
+        verificationDate: undefined
+      },
+      analytics: {
+        impressions: 0,
+        engagementRate: 0,
+        clickThroughRate: 0,
+        dailyImpressions: [],
+        topInteractions: [],
+        reachByPlatform: [],
+        demographics: [],
+        peakHours: [],
+        cryptoHoldings: []
+      },
+      modelData: {},
+      fetchedTweets: [],
+      twineets: []
     };
 
     setCloneResult(newTwin);
@@ -119,14 +145,15 @@ export function Clone() {
         createdAt: new Date(),
         stats: {
           replies: 0,
-          interactions: 0
+          interactions: 0,
+          uptime: '0h 0m'
         },
+        twinHandle: cloneResult.twinHandle,
         twitterHandle: cloneResult.twitterHandle,
         personality: cloneResult.personality,
         description: cloneResult.description,
         profileImage: cloneResult.profileImage,
         price: cloneResult.price,
-        twinName: cloneResult.twinName,
         verification: {
           isVerified: false,
           verificationDate: undefined
@@ -148,7 +175,10 @@ export function Clone() {
           availableShares: 1000,
           pricePerShare: cloneResult.price / 1000,
           shareholders: []
-        }
+        },
+        twineets: [],
+        fetchedTweets: [],
+        modelData: {}
       });
       
       // Reset state
@@ -205,11 +235,11 @@ export function Clone() {
                     <div className="flex items-center space-x-4">
                       <img
                         src={agent.profileImage}
-                        alt={agent.twitterHandle}
+                        alt={agent.twinHandle}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div>
-                        <div className="text-white font-medium">@{agent.twitterHandle}</div>
+                        <div className="text-white font-medium">@{agent.twinHandle}</div>
                         <div className="text-purple-300 text-sm">{agent.personality}</div>
                       </div>
                     </div>
@@ -257,7 +287,7 @@ export function Clone() {
 
             {draggedAgent && (
               <div className="dragged-agent-info">
-                <p>Currently dragging: {agents.find(a => a.id === draggedAgent)?.twitterHandle}</p>
+                <p>Currently dragging: {agents.find(a => a.id === draggedAgent)?.twinHandle}</p>
               </div>
             )}
 
@@ -292,11 +322,11 @@ export function Clone() {
                 <div className="flex items-center space-x-6">
                   <img
                     src={cloneResult.profileImage}
-                    alt={cloneResult.twitterHandle}
+                    alt={cloneResult.twinHandle}
                     className="w-24 h-24 rounded-full object-cover"
                   />
                   <div>
-                    <div className="text-white font-medium text-lg">@{cloneResult.twitterHandle}</div>
+                    <div className="text-white font-medium text-lg">@{cloneResult.twinHandle}</div>
                     <div className="text-purple-300">{cloneResult.personality}</div>
                     <p className="text-purple-200 mt-2">{cloneResult.description}</p>
                   </div>

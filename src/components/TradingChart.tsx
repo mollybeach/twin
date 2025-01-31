@@ -1,13 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { createChart, ColorType, IChartApi } from 'lightweight-charts';
-import { Transaction } from '../store/marketplace';
+import { TradingChartPropsType } from '../types/types';
 
-interface TradingChartProps {
-  transactions: Transaction[];
-  pricePerShare: number;
-}
-
-export function TradingChart({ transactions, pricePerShare }: TradingChartProps) {
+export function TradingChart({ transactions, pricePerShare }: TradingChartPropsType) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
 

@@ -12,7 +12,7 @@ import {
   TooltipItem
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { TokenShare } from '../store/marketplace';
+import { PriceChartPropsType } from '../types/types';
 
 ChartJS.register(
   CategoryScale,
@@ -25,12 +25,7 @@ ChartJS.register(
   Filler
 );
 
-interface PriceChartProps {
-  shareholders: TokenShare[];
-  pricePerShare: number;
-}
-
-export function PriceChart({ shareholders, pricePerShare }: PriceChartProps) {
+export function PriceChart({ shareholders, pricePerShare }: PriceChartPropsType) {
   // Sort shareholders by purchase date
   const sortedTransactions = [...shareholders].sort(
     (a, b) => new Date(a.purchaseDate).getTime() - new Date(b.purchaseDate).getTime()

@@ -4,61 +4,42 @@ import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
 import { generateResponse } from '../services/openaiService';
 import { fetchTweets } from '../services/twitter';
-
-interface AgentConfig {
-  twitterHandle: string;
-  twinName: string;
-  personality: string;
-  description: string;
-  autoReply: boolean;
-  price: number;
-  isListed: boolean;
-  profileImage: string;
-  modelData?: Record<string, unknown>;
-}
-
-interface AgentStats {
-  replies: number;
-  interactions: number;
-  uptime: string;
-}
+import { AgentConfigType, FetchedTweetsType, TwineetType } from '../types/types';
 
 export function CreateAgent() {
   const navigate = useNavigate();
   const addAgent = useMarketplaceStore((state) => state.addAgent);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<AgentConfig>({
+  const [config, setConfig] = useState<AgentConfigType>({
+    agentId: '',
     twitterHandle: '',
-    twinName: '',
+    twinHandle: '',
     personality: 'friendly',
     description: '',
     autoReply: true,
     price: 1000,
     isListed: false,
-    profileImage: 'https://i.imgur.com/HDQ3OTC.png', // Default avatar,
-    modelData: {}
+    profileImage: 'https://i.imgur.com/HDQ3OTC.png', // Default avatar
+    modelData: {},
+    fetchedTweets: [],
+    twineets: [],
+    stats: { replies: 0, interactions: 0, uptime: '0h 0m' } // Initialize stats
   });
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
-  const [agentStats, setAgentStats] = useState<AgentStats>({
-    replies: 0,
-    interactions: 0,
-    uptime: '0h 0m',
-  });
-  const [generatedTweet, setGeneratedTweet] = useState<string | null>(null);
-  const [fetchedTweets, setFetchedTweets] = useState<string[]>([]);
+  const [generatedTwineet, setGeneratedTwineet] = useState<string | null>(null);
 
   const handleFetchTweets = async () => {
     try {
       const tweets = await fetchTweets(config.twitterHandle);
-      setFetchedTweets(tweets);
+      setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
       
       // Send tweets to OpenAI for training the model
       const modelData = await trainModelWithTweets(tweets);
       
-      // Update the agent data with the model information
+      // Update the agent data with the model information and fetchedTweets
       await handleGenerateResponse(tweets, modelData); // Pass model data to the response handler
     } catch (error) {
       if (error instanceof Error) {
@@ -71,11 +52,10 @@ export function CreateAgent() {
     }
   };
 
-  // Function to send tweets to OpenAI and get the model data
-  const trainModelWithTweets = async (tweets: string[]): Promise<Record<string, unknown>> => {
+  const trainModelWithTweets = async (tweets: FetchedTweetsType[]): Promise<Record<string, unknown>> => {
     try {
-      const response = await generateResponse(tweets.join(' ')); // Adjust based on your OpenAI API
-      return response; // Return the model data
+      const response = await generateResponse(tweets.map(tweet => tweet.text).join(' '));
+      return JSON.parse(response); // Ensure the response is valid JSON
     } catch (error) {
       console.error('Failed to train model:', error);
       throw new Error('Failed to train model with tweets.');
@@ -94,16 +74,13 @@ export function CreateAgent() {
       const newAgentId = await addAgent({
         id: crypto.randomUUID(),
         createdAt: new Date(),
-        twinName: config.twinName,
+        twinHandle: config.twinHandle,
         twitterHandle: config.twitterHandle,
         personality: config.personality,
         description: config.description,
         price: config.price,
         profileImage: config.profileImage,
-        stats: {
-          replies: 0,
-          interactions: 0
-        },
+        stats: config.stats,
         tokenShares: {
           totalShares: 0,
           availableShares: 0,
@@ -125,11 +102,19 @@ export function CreateAgent() {
           peakHours: [],
           cryptoHoldings: []
         },
-        modelData: {}
+        modelData: {},
+        fetchedTweets: config.fetchedTweets,
+        twineets: [] // Initialize twineets as an empty array
       });
-      
+
+      // Generate multiple twineets and save them to twineets
+      const generatedTwineets = await generateMultipleTwineets(newAgentId);
+      setConfig(prev => ({
+        ...prev,
+        twineets: generatedTwineets
+      }));
+
       setIsDeployed(true);
-      startStatsSimulation();
       // Navigate to the new agent's analytics page after a short delay
       setTimeout(() => {
         navigate(`/analytics/${newAgentId}`);
@@ -142,30 +127,50 @@ export function CreateAgent() {
     }
   };
 
-  const startStatsSimulation = () => {
-    let minutes = 0;
-    const interval = setInterval(() => {
-      minutes += 1;
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      setAgentStats(prev => ({
-        replies: prev.replies + Math.floor(Math.random() * 2),
-        interactions: prev.interactions + Math.floor(Math.random() * 3),
-        uptime: `${hours}h ${mins}m`,
-      }));
-    }, 60000);
-
-    return () => clearInterval(interval);
+  const generateMultipleTwineets = async (agentId: string): Promise<TwineetType[]> => {
+    const twineets: TwineetType[] = [];
+    for (let i = 0; i < 5; i++) { // Generate 5 twineets
+      const content = await generateResponse(`Generate a twineet for a ${config.personality} AI agent.`);
+      const newTwineet: TwineetType = {
+        id: crypto.randomUUID(),
+        agentId: agentId,
+        content: content,
+        timestamp: new Date().toISOString(),
+        likes: 0,
+        retwineets: 0,
+        replies: 0,
+        isLiked: false,
+        isRetwineeted: false,
+      };
+      twineets.push(newTwineet);
+    }
+    return twineets;
   };
 
-  const handleGenerateResponse = async (tweets: string[], modelData: Record<string, unknown>) => {
-    const prompt = `Based on the following tweets: ${tweets.join(', ')}, generate a tweet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
+  const handleGenerateResponse = async (tweets: FetchedTweetsType[], modelData: Record<string, unknown>) => {
+    const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
     try {
       const response = await generateResponse(prompt);
       console.log('Generated response:', response);
-      setGeneratedTweet(response);
+      setGeneratedTwineet(response);
+      
+      // Save the generated twineet to twineets
+      setConfig(prev => ({
+        ...prev,
+        twineets: [...(prev.twineets || []), {
+          id: crypto.randomUUID(),
+          agentId: config.agentId,
+          content: response,
+          timestamp: new Date().toISOString(),
+          likes: 0,
+          retwineets: 0,
+          replies: 0,
+          isLiked: false,
+          isRetwineeted: false,
+        }]
+      }));
     } catch (error) {
-      console.error('Failed to generate response:', error);
+      console.error('Error generating response:', error);
     }
   };
 
@@ -207,9 +212,9 @@ export function CreateAgent() {
               </label>
               <input
                 type="text"
-                value={config.twinName}
+                value={config.twinHandle}
                 onChange={(e) => {
-                  setConfig({ ...config, twinName: e.target.value });
+                  setConfig({ ...config, twinHandle: e.target.value });
                 }}
                 className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-3 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
                 placeholder="Enter your Twin's name"
@@ -243,17 +248,6 @@ export function CreateAgent() {
             >
               Fetch Tweets <Rocket className="ml-2 w-4 h-4" />
             </button>
-
-            {fetchedTweets.length > 0 && (
-              <div className="mt-4 p-4 bg-white/5 rounded-lg">
-                <h3 className="text-lg font-medium text-white">Fetched Tweets:</h3>
-                <ul className="text-white">
-                  {fetchedTweets.map((tweet, index) => (
-                    <li key={index} className="mt-2">{tweet}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-purple-300">
@@ -304,32 +298,32 @@ export function CreateAgent() {
               </div>
               <p className="text-lg font-medium text-white">Twin is Live!</p>
               <p className="text-sm text-purple-300">
-                @{config.twitterHandle} • {config.personality} Mode
+                @{config.twinHandle} • {config.personality} Mode
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/5 p-4 rounded-lg text-center">
                 <MessageCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{agentStats.replies}</div>
+                <div className="text-2xl font-bold text-white">{config.stats.replies}</div>
                 <div className="text-xs text-purple-300">Replies</div>
               </div>
               <div className="bg-white/5 p-4 rounded-lg text-center">
                 <Users className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{agentStats.interactions}</div>
+                <div className="text-2xl font-bold text-white">{config.stats.interactions}</div>
                 <div className="text-xs text-purple-300">Friends</div>
               </div>
               <div className="bg-white/5 p-4 rounded-lg text-center">
                 <Activity className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{agentStats.uptime}</div>
+                <div className="text-2xl font-bold text-white">{config.stats.uptime}</div>
                 <div className="text-xs text-purple-300">Uptime</div>
               </div>
             </div>
 
-            {generatedTweet && (
+            {generatedTwineet && (
               <div className="mt-4 p-4 bg-white/5 rounded-lg">
-                <h3 className="text-lg font-medium text-white">Generated Tweet:</h3>
-                <p className="text-white">{generatedTweet}</p>
+                <h3 className="text-lg font-medium text-white">Generated Twineet:</h3>
+                <p className="text-white">{generatedTwineet}</p>
               </div>
             )}
 

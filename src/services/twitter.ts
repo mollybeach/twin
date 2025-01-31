@@ -1,11 +1,8 @@
 import axios from 'axios';
+import { FetchedTweetsType } from '../types/types';
+import { VerificationResponseType } from '../types/types';
 
-interface VerificationResponse {
-  verified: boolean;
-  error?: string;
-}
-
-export async function verifyTwitterAccount(handle: string): Promise<VerificationResponse> {
+export async function verifyTwitterAccount(handle: string): Promise<VerificationResponseType> {
   // Simulated API call to Twitter's OAuth endpoint
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -19,7 +16,7 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
   });
 }
 
-export const fetchTweets = async (username: string): Promise<string[]> => {
+export const fetchTweets = async (username: string): Promise<FetchedTweetsType[]> => {
   try {
     console.log(`Fetching tweets for username: ${username}`); // Log the username
     const response = await axios.get(`http://localhost:3002/api/tweets`, {
@@ -28,7 +25,12 @@ export const fetchTweets = async (username: string): Promise<string[]> => {
       },
     });
     console.log('Response:', response.data); // Log the response data
-    return response.data.data.map((tweet: { text: string }) => tweet.text);
+    // Map the response data to the Tweet format
+    return response.data.data.map((tweet: { id: string; text: string; edit_history_tweet_ids: string[] }) => ({
+      id: tweet.id,
+      text: tweet.text,
+      edit_history_tweet_ids: tweet.edit_history_tweet_ids,
+    }));
   } catch (error) {
     console.error('Error fetching tweets:', error);
     throw new Error('Failed to fetch tweets. Please check the username and try again.');

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +12,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import { Analytics as AnalyticsType } from '../store/marketplace';
+import { AnalyticsPropsType } from '../types/types';
 import { TrendingUp, Users, Clock, Target, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { TradingChart } from './TradingChart';
 import { useMarketplaceStore } from '../store/marketplace';
@@ -31,15 +30,10 @@ ChartJS.register(
   Filler
 );
 
-interface AnalyticsProps {
-  analytics: AnalyticsType;
-  agentId: string;
-}
-
-export function Analytics({ analytics, agentId }: AnalyticsProps) {
+export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
   const { getTransactionHistory, agents } = useMarketplaceStore();
   const transactions = getTransactionHistory(agentId);
-  const agent = agents.find(a => a.id === agentId);
+  const agent = agents.find((a: { id: string }) => a.id === agentId);
 
   // Ensure analytics data exists with default values if needed
   const safeAnalytics = {

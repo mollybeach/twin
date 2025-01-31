@@ -4,27 +4,57 @@ import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
 import { generateResponse } from '../services/openaiService';
 import { fetchTweets } from '../services/twitter';
-import { AgentConfigType, FetchedTweetsType, TwineetType } from '../types/types';
+import {  AgentType, FetchedTweetsType, TwineetType } from '../types/types';
 
 export function CreateAgent() {
   const navigate = useNavigate();
   const addAgent = useMarketplaceStore((state) => state.addAgent);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<AgentConfigType>({
+  const [config, setConfig] = useState<AgentType>({
     agentId: '',
-    twitterHandle: '',
+    createdAt: new Date(),
     twinHandle: '',
+    twitterHandle: '',
+    profileImage: 'https://i.imgur.com/HDQ3OTC.png', 
     personality: 'friendly',
     description: '',
     autoReply: true,
     price: 1000,
     isListed: false,
-    profileImage: 'https://i.imgur.com/HDQ3OTC.png', // Default avatar
     modelData: {},
     fetchedTweets: [],
     twineets: [],
-    stats: { replies: 0, interactions: 0, uptime: '0h 0m' } // Initialize stats
+    stats: { 
+      agentId: '',
+      replies: 0, 
+      interactions: 0, 
+      uptime: '0h 0m' 
+    },
+    tokenShares: {
+      agentId: '',
+      totalShares: 0,
+      availableShares: 0,
+      pricePerShare: 0,
+      shareholders: []
+    },
+    verification: {
+      agentId: '',
+      isVerified: false,
+      verificationDate: new Date()
+    },
+    analytics: {
+      agentId: '',
+      impressions: 0,
+      engagementRate: 0,
+      clickThroughRate: 0,
+      dailyImpressions: [],
+      topInteractions: [],
+      reachByPlatform: [],
+      demographics: [],
+      peakHours: [],
+      cryptoHoldings: []
+    }
   });
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
@@ -77,27 +107,37 @@ export function CreateAgent() {
     setIsDeploying(true);
     setDeployError(null);
     try {
-      const newAgentId = await addAgent({
-        id: crypto.randomUUID(),
+      const newAgent: AgentType = {
+        agentId: 'some-id',
         createdAt: new Date(),
-        twinHandle: config.twinHandle,
-        twitterHandle: config.twitterHandle,
-        personality: config.personality,
-        description: config.description,
-        price: config.price,
-        profileImage: config.profileImage,
-        stats: config.stats,
+        twinHandle: 'twinHandle',
+        twitterHandle: 'twitterHandle',
+        personality: 'friendly',
+        description: 'A friendly agent.',
+        price: 100,
+        profileImage: 'path/to/image.png',
+        autoReply: false,
+        isListed: true,
+        stats: {
+          agentId: 'some-id',
+          replies: 0,
+          interactions: 0,
+          uptime: '0h 0m',
+        },
         tokenShares: {
-          totalShares: 0,
-          availableShares: 0,
-          pricePerShare: 0,
-          shareholders: []
+          agentId: 'some-id',
+          totalShares: 100,
+          availableShares: 100,
+          pricePerShare: 1,
+          shareholders: [],
         },
         verification: {
+          agentId: 'some-id',
           isVerified: false,
-          verificationDate: undefined
+          verificationDate: new Date(),
         },
         analytics: {
+          agentId: 'some-id',
           impressions: 0,
           engagementRate: 0,
           clickThroughRate: 0,
@@ -106,15 +146,17 @@ export function CreateAgent() {
           reachByPlatform: [],
           demographics: [],
           peakHours: [],
-          cryptoHoldings: []
+          cryptoHoldings: [],
         },
         modelData: {},
-        fetchedTweets: config.fetchedTweets,
-        twineets: [] // Initialize twineets as an empty array
-      });
+        fetchedTweets: [],
+        twineets: [],
+      };
+
+      const addedAgent = await addAgent(newAgent);
 
       // Generate multiple twineets and save them to twineets
-      const generatedTwineets = await generateMultipleTwineets(newAgentId);
+      const generatedTwineets = await generateMultipleTwineets(addedAgent);
       setConfig(prev => ({
         ...prev,
         twineets: generatedTwineets
@@ -123,7 +165,7 @@ export function CreateAgent() {
       setIsDeployed(true);
       // Navigate to the new agent's analytics page after a short delay
       setTimeout(() => {
-        navigate(`/analytics/${newAgentId}`);
+        navigate(`/analytics/${addedAgent}`);
       }, 2000);
     } catch (error) {
       console.error('Failed to deploy Twin:', error);
@@ -138,7 +180,6 @@ export function CreateAgent() {
     for (let i = 0; i < 5; i++) { // Generate 5 twineets
       const content = await generateResponse(`Generate a twineet for a ${config.personality} AI agent.`);
       const newTwineet: TwineetType = {
-        id: crypto.randomUUID(),
         agentId: agentId,
         content: content,
         timestamp: new Date().toISOString(),

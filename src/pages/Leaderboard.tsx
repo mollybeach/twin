@@ -53,8 +53,8 @@ export function Leaderboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {getTopThree(byEngagement).map((agent, index) => (
                   <Link
-                    key={agent.id}
-                    to={`/analytics/${agent.id}`}
+                    key={agent.agentId}
+                    to={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
@@ -95,8 +95,8 @@ export function Leaderboard() {
                     agent.tokenShares.pricePerShare;
                   return (
                     <Link
-                      key={agent.id}
-                      to={`/analytics/${agent.id}`}
+                      key={agent.agentId}
+                      to={`/analytics/${agent.agentId}`}
                       className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
@@ -135,8 +135,8 @@ export function Leaderboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {getTopThree(byInteractions).map((agent, index) => (
                   <Link
-                    key={agent.id}
-                    to={`/analytics/${agent.id}`}
+                    key={agent.agentId}
+                    to={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
@@ -174,8 +174,8 @@ export function Leaderboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {getTopThree(byImpressions).map((agent, index) => (
                   <Link
-                    key={agent.id}
-                    to={`/analytics/${agent.id}`}
+                    key={agent.agentId}
+                    to={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">

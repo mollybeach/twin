@@ -1,70 +1,65 @@
 // path: src/types/types.tsx
 
+
 export interface AnalyticsType {
-    impressions: number;
-    engagementRate: number;
+    agentId: string;
     clickThroughRate: number;
-    dailyImpressions: { date: string; count: number }[];
-    topInteractions: { type: string; count: number }[];
-    reachByPlatform: { platform: string; count: number }[];
-    demographics: { age: string; percentage: number }[];
-    peakHours: { hour: number; engagement: number }[];
-    cryptoHoldings: {
-        symbol: string;
-        amount: number;
-        value: number;
-        change24h: number;
-    }[];
+    engagementRate: number;
+    impressions: number;
+    cryptoHoldings: CryptoHoldingType[];
+    demographics: DemographicsType[];
+    dailyImpressions: DailyImpressionsType[];
+    peakHours: PeakHoursType[];
+    reachByPlatform: ReachByPlatformType[];
+    topInteractions: TopInteractionsType[];
 }
 
 export interface AgentType {
-    id: string;
+    agentId: string;
+    autoReply: boolean;
     createdAt: Date;
-    twitterHandle: string;
-    twinHandle: string;
-    personality: string;
     description: string;
+    personality: string;
     price: number;
     profileImage: string;
-    stats: AgentStatsType;
-    tokenShares: {
-        totalShares: number;
-        availableShares: number;
-        pricePerShare: number;
-        shareholders: TokenShareType[];
-    };
-    verification: {
-        isVerified: boolean;
-        verificationDate?: string;
-    };
+    isListed: boolean;
+    twinHandle: string;
+    twitterHandle: string;
     analytics: AnalyticsType;
-    modelData?: Record<string, unknown>;
     fetchedTweets?: FetchedTweetsType[];
+    modelData?: Record<string, unknown>;
+    stats: AgentStatsType;
+    tokenShares: TokenShareType
     twineets?: TwineetType[];
+    verification: VerificationResponseType;
 }
 
 export interface AgentStatsType {
-    replies: number;
+    agentId: string;
     interactions: number;
+    replies: number;
     uptime: string;
 } 
 
-export interface AgentConfigType {
+export interface CryptoHoldingType {
     agentId: string;
-    twitterHandle: string;
-    twinHandle: string;
-    personality: string;
-    description: string;
-    autoReply: boolean;
-    price: number;
-    isListed: boolean;
-    profileImage: string;
-    modelData?: Record<string, unknown>;
-    fetchedTweets?: FetchedTweetsType[];
-    twineets: TwineetType[];
-    stats: AgentStatsType;
+    amount: number;
+    symbol: string;
+    value: number;
+    change24h: number;
 }
 
+export interface DailyImpressionsType {
+    agentId: string;
+    count: number;
+    date: string;
+}
+
+export interface DemographicsType {
+    agentId: string;
+    age: string;
+    percentage: number;
+}
 
 export interface MarketplaceStoreType {
     agents: AgentType[];
@@ -82,32 +77,52 @@ export interface MarketplaceStoreType {
 }
 
 export interface NotificationType {
-    id: string;
-    type: 'create' | 'buy' | 'sell';
+    agentId: string;
+    kind: 'create' | 'buy' | 'sell';
     message: string;
     twitterHandle: string;
     twinHandle: string;
     timestamp: number;
 }
 
-export interface TokenShareType {
-    userId: string;
-    shares: number;
-    purchasePrice: number;
-    purchaseDate: string;
+export interface PeakHoursType {
+    agentId: string;
+    engagement: number;
+    hour: number;
 }
 
 export interface TokenStatsType {
+    agentId: string;
     price: number;
     change24h: number;
     volume24h: number;
     marketCap: number;
 }
 
-export interface TransactionType {
-    id: string;
+export interface TokenShareType {
     agentId: string;
-    type: 'buy' | 'sell';
+    totalShares: number;
+    availableShares: number;
+    pricePerShare: number;
+    shareholders: UserTokenShareType[];
+};
+
+export interface TopInteractionsType {
+    agentId: string;
+    kind: string;
+    count: number;
+}
+
+export interface UserTokenShareType {
+    agentId: string;
+    userId: string;
+    shares: number;
+    purchasePrice: number;
+    purchaseDate: string;
+}
+export interface TransactionType {
+    agentId: string;
+    kind: 'buy' | 'sell';
     shares: number;
     pricePerShare: number;
     totalAmount: number;
@@ -115,13 +130,18 @@ export interface TransactionType {
 }
 
 export interface FetchedTweetsType {
-    id: string;
+    agentId: string;
     text: string;
     edit_history_tweet_ids: string[];
 }
 
-export interface TwineetType {
-    id: string;             
+export interface ReachByPlatformType {
+    agentId: string;
+    platform: string;
+    count: number;
+}
+
+export interface TwineetType {          
     agentId: string;
     content: string;
     timestamp: string;
@@ -133,19 +153,22 @@ export interface TwineetType {
 }
 
 export interface VerificationResponseType {
-    verified: boolean;
+    agentId: string;
+    isVerified: boolean;
+    verificationDate: Date;
     error?: string;
 }
 
 // PROPS 
 
 export interface AnalyticsPropsType {
-    analytics: AnalyticsType;
     agentId: string;
+    analytics: AnalyticsType;
 }
 
 
 export interface NotificationBarPropsType {
+    agentId: string;
     notification: NotificationType | null;
     onClose: () => void;
 }
@@ -163,17 +186,20 @@ export interface TradeModalPropsType {
 
 
 export interface PriceChartPropsType {
-    shareholders: TokenShareType[];
+    agentId: string;
+    shareholders: UserTokenShareType[];
     pricePerShare: number;
 }
 
 export interface SharePriceChartPropsType {
-    shareholders: TokenShareType[];
+    agentId: string;
+    shareholders: UserTokenShareType[];
     pricePerShare: number;
     isExpanded: boolean;
 }
 
 export interface TradingChartPropsType {
+    agentId: string;
     transactions: TransactionType[];
     pricePerShare: number;
 }

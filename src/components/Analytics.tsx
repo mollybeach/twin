@@ -14,7 +14,7 @@ import {
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { AnalyticsPropsType } from '../types/types';
 import { TrendingUp, Users, Clock, Target, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { TradingChart } from './TradingChart';
+import TradingChart from './TradingChart';
 import { useMarketplaceStore } from '../store/marketplace';
 
 ChartJS.register(
@@ -33,7 +33,7 @@ ChartJS.register(
 export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
   const { getTransactionHistory, agents } = useMarketplaceStore();
   const transactions = getTransactionHistory(agentId);
-  const agent = agents.find((a: { id: string }) => a.id === agentId);
+  const agent = agents.find((a: { agentId: string }) => a.agentId === agentId);
 
   // Ensure analytics data exists with default values if needed
   const safeAnalytics = {
@@ -156,6 +156,7 @@ export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
         
         {transactions.length > 0 && agent ? (
           <TradingChart
+            agentId={agent.agentId}
             transactions={transactions}
             pricePerShare={agent.tokenShares.pricePerShare}
           />
@@ -190,8 +191,8 @@ export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
           <h3 className="text-lg font-semibold text-white mb-4">Top Interactions</h3>
           <div className="space-y-4">
             {safeAnalytics.topInteractions.map((interaction) => (
-              <div key={interaction.type} className="flex items-center justify-between">
-                <span className="text-purple-300">{interaction.type}</span>
+              <div key={interaction.kind} className="flex items-center justify-between">
+                <span className="text-purple-300">{interaction.kind}</span>
                 <div className="flex-1 mx-4">
                   <div className="h-2 bg-white/5 rounded-full">
                     <div

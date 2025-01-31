@@ -23,10 +23,10 @@ export function PortfolioPage() {
   const [showTransactions, setShowTransactions] = useState(false);
 
   const holdings = agents.map(agent => {
-    const shares = getUserShares(agent.id);
+    const shares = getUserShares(agent.agentId);
     const value = shares * agent.tokenShares.pricePerShare;
     return {
-      id: agent.id,
+      id: agent.agentId,
       twinHandle: agent.twinHandle,
       shares,
       value,
@@ -164,11 +164,11 @@ export function PortfolioPage() {
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {transactions.map((transaction) => {
-                    const agent = agents.find(a => a.id === transaction.agentId);
+                    const agent = agents.find(a => a.agentId === transaction.agentId);
                     if (!agent) return null;
 
                     return (
-                      <tr key={transaction.id} className="text-white">
+                      <tr key={transaction.agentId} className="text-white">
                         <td className="py-4">
                           <div className="flex items-center space-x-3">
                             <img
@@ -181,14 +181,14 @@ export function PortfolioPage() {
                         </td>
                         <td className="py-4">
                           <span className={`inline-flex items-center space-x-1 ${
-                            transaction.type === 'buy' ? 'text-green-400' : 'text-red-400'
+                            transaction.kind === 'buy' ? 'text-green-400' : 'text-red-400'
                           }`}>
-                            {transaction.type === 'buy' ? (
+                            {transaction.kind === 'buy' ? (
                               <ArrowDownToLine className="w-4 h-4" />
                             ) : (
                               <ArrowUpToLine className="w-4 h-4" />
                             )}
-                            <span>{transaction.type === 'buy' ? 'Buy' : 'Sell'}</span>
+                            <span>{transaction.kind === 'buy' ? 'Buy' : 'Sell'}</span>
                           </span>
                         </td>
                         <td className="py-4">{transaction.shares}</td>
@@ -258,7 +258,8 @@ export function PortfolioPage() {
 
                 <div className="mb-6">
                   <SharePriceChart
-                    shareholders={agents.find(a => a.id === holding.id)?.tokenShares.shareholders || []}
+                    agentId={holding.id}
+                    shareholders={agents.find(a => a.agentId === holding.id)?.tokenShares.shareholders || []}
                     pricePerShare={holding.pricePerShare}
                     isExpanded={true}
                   />

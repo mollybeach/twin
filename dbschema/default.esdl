@@ -1,14 +1,74 @@
 module default {
-    # Define the TokenShare type
-    type TokenShare {
+    type CryptoHolding {
+        required property agentId -> str;
+        required property amount -> decimal;
+        required property symbol -> str;
+        required property change24h -> decimal;
+        required property value -> decimal;
+    }
+
+    type Demographics {
+        required property agentId -> str;
+        required property age -> str;
+        required property percentage -> decimal;
+    }
+
+    type DailyImpressions {
+        required property agentId -> str;
+        required property date -> str;
+        required property count -> int16;
+    }
+
+    type PeakHours {
+        required property agentId -> str;
+        required property hour -> int16;
+        required property engagement -> decimal;
+    }
+
+    type ReachByPlatform {
+        required property agentId -> str;
+        required property platform -> str;
+        required property count -> int16;
+    }
+
+    type TopInteractions {
+        required property agentId -> str;
+        required property kind -> str;
+        required property count -> int16;
+    }
+
+    type Analytics {
+        required property agentId -> str;
+        required property clickThroughRate -> decimal;
+        required property engagementRate -> decimal;
+        required property impressions -> int16;
+        required link cryptoHoldings -> CryptoHolding;
+        required link demographics -> Demographics;
+        required link dailyImpressions -> DailyImpressions;
+        required link peakHours -> PeakHours;
+        required link reachByPlatform -> ReachByPlatform;
+        required link topInteractions -> TopInteractions;
+    }
+
+    type UserTokenShare {
+        required property agentId -> str;
         required property userId -> str;
         required property shares -> int16;
         required property purchasePrice -> decimal;
         required property purchaseDate -> datetime;
     }
 
+    type TokenShare {
+        required property agentId -> str;
+        required property totalShares -> int16;
+        required property availableShares -> int16;
+        required property pricePerShare -> decimal;
+        required link shareholders -> UserTokenShare;
+    }
+
     # Define the TokenStats type
     type TokenStats {
+        required property agentId -> str;
         required property price -> decimal;
         required property change24h -> decimal;
         required property volume24h -> decimal;
@@ -21,7 +81,7 @@ module default {
     # Define the Transaction type
     type Transaction {
         required property agentId -> str;
-        required property type -> TransactionType;
+        required property kind -> TransactionType;
         required property shares -> int16;
         required property pricePerShare -> decimal;
         required property totalAmount -> decimal;
@@ -32,6 +92,7 @@ module default {
 
     # Define the FetchedTweet type
     type FetchedTweet {
+        required property agentId -> str;
         required property text -> str;
         required property edit_history_tweet_ids -> array<str>;
         required property timestamp -> datetime {
@@ -63,47 +124,39 @@ module default {
         }
     }
 
+    type Verification {
+        required property agentId -> str;
+        required property isVerified -> bool;
+        required property verificationDate -> datetime;
+    }
+
     # Define the AgentStats type
     type AgentStats {
+        required property agentId -> str;
         required property replies -> int16;
         required property interactions -> int16;
         required property uptime -> str;
     }
 
-    # Define the AgentConfig type
-    type AgentConfig {
+    # Define the Agent type
+    type Agent {
         required property agentId -> str {
             constraint exclusive
         }
-        required property twinHandle -> str;
-        required property twitterHandle -> str;
-        required property personality -> str;
-        required property description -> str;
-        required property autoReply -> bool;
-        required property price -> decimal;
-        required property isListed -> bool;
-        required property profileImage -> str;
-        required property modelData -> json;
-        required link twineets -> Twineet;
-        required link fetchedTweets -> FetchedTweet;
-        required link stats -> AgentStats;
-    }
-
-    # Define the Agent type
-    type Agent {
         required property createdAt -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }
         required property twinHandle -> str;
         required property twitterHandle -> str;
+        required property profileImage -> str;
         required property personality -> str;
         required property description -> str;
+        required property autoReply -> bool;
+        required property isListed -> bool;
         required property price -> decimal;
-        required property profileImage -> str;
         required link stats -> AgentStats;
-        required link tokenShares -> TokenShare;
-        required property verification -> json;
-        required property analytics -> json;
+        required link verification -> Verification;
+        required link analytics -> Analytics;
         required property modelData -> json;
         required link twineets -> Twineet;
         required link fetchedTweets -> FetchedTweet;
@@ -113,7 +166,8 @@ module default {
 
     # Define the Notification type
     type Notification {
-        required property type -> NotificationType;
+        required property agentId -> str;
+        required property kind -> NotificationType;
         required property message -> str;
         required property twinHandle -> str;
         required property twitterHandle -> str;

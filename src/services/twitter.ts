@@ -8,9 +8,19 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
     setTimeout(() => {
       // For demo purposes, verify all handles except "invalid_user"
       if (handle === 'invalid_user') {
-        resolve({ verified: false, error: 'Account not found' });
+        resolve({ 
+          agentId: '',
+          isVerified: false, 
+          verificationDate: new Date(),
+          error: 'Account not found' 
+        });
       } else {
-        resolve({ verified: true });
+        resolve({ 
+          agentId: '',
+          isVerified: true, 
+          verificationDate: new Date(),
+          error: '' 
+        });
       }
     }, 1000);
   });

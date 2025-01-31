@@ -9,7 +9,7 @@ import { createClient } from 'edgedb';
 import edgeql from '@/dbschema/edgeql-js';
 
 export const edgeDBCloudClient = createClient({
-    instanceName: 'mollybeach/rug-watch-dog-db',
+    instanceName: 'mollybeach/twindb',
     secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN
 });
 

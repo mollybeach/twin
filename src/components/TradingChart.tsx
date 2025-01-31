@@ -1,87 +1,32 @@
-import { useEffect, useRef } from 'react';
-import { createChart, ColorType, IChartApi } from 'lightweight-charts';
+import React from 'react';
+import { Line } from 'react-chartjs-2';
 import { TradingChartPropsType } from '../types/types';
+import { useMarketplaceStore } from '../store/marketplace';
 
-export function TradingChart({ transactions, pricePerShare }: TradingChartPropsType) {
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
+const TradingChart: React.FC<TradingChartPropsType> = ({ agentId }) => {
+    // Fetch the relevant data for the specific agent using agentId
+    const { getTransactionHistory } = useMarketplaceStore();
+    const transactionHistory = getTransactionHistory(agentId);
 
-  useEffect(() => {
-    if (!chartContainerRef.current) return;
-
-    // Process data for the chart
-    const chartData = transactions
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-      .map(t => ({
-        time: new Date(t.timestamp).toISOString(),
-        value: t.pricePerShare,
-      }));
-
-    // Add current price as the latest point
-    chartData.push({
-      time: new Date().toISOString(),
-      value: pricePerShare,
-    });
-
-    // Create chart
-    const chart = createChart(chartContainerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#d1d5db',
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
-      },
-      width: chartContainerRef.current.clientWidth,
-      height: 400,
-      timeScale: {
-        timeVisible: true,
-        secondsVisible: false,
-      },
-    });
-
-    // Add price series
-    const lineSeries = chart.addLineSeries({
-      color: '#8b5cf6',
-      lineWidth: 2,
-      crosshairMarkerVisible: true,
-      crosshairMarkerRadius: 6,
-      lineType: 2,
-    });
-
-    // Add area series for the gradient effect
-    const areaSeries = chart.addAreaSeries({
-      lineColor: '#8b5cf6',
-      topColor: 'rgba(139, 92, 246, 0.3)',
-      bottomColor: 'rgba(139, 92, 246, 0)',
-      lineWidth: 2,
-    });
-
-    lineSeries.setData(chartData);
-    areaSeries.setData(chartData);
-
-    // Handle resize
-    const handleResize = () => {
-      if (chartContainerRef.current && chart) {
-        chart.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-        });
-      }
+    // Prepare data for the chart
+    const chartData = {
+        labels: transactionHistory.map(t => new Date(t.timestamp).toLocaleDateString()),
+        datasets: [
+            {
+                label: 'Price per Share',
+                data: transactionHistory.map(t => t.pricePerShare),
+                borderColor: 'rgba(75,192,192,1)',
+                fill: false,
+            },
+        ],
     };
 
-    window.addEventListener('resize', handleResize);
-    chartRef.current = chart;
+    return (
+        <div>
+            <h2>Trading Chart for Agent {agentId}</h2>
+            <Line data={chartData} />
+        </div>
+    );
+};
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
-    };
-  }, [transactions, pricePerShare]);
-
-  return (
-    <div className="w-full bg-gray-900/50 rounded-lg p-4">
-      <div ref={chartContainerRef} />
-    </div>
-  );
-}
+export default TradingChart;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, PersistStorage, StorageValue } from 'zustand/middleware';
-import { AgentType, TransactionType, AnalyticsType, NotificationType, MarketplaceStoreType } from '../types/types';
+import { AgentType, TransactionType, AnalyticsType, MarketplaceStoreType, UserTokenShareType } from '../types/types';
 
 // Storage limit (4.5MB to stay safely under 5MB limit)
 const STORAGE_LIMIT = 4.5 * 1024 * 1024;
@@ -75,33 +75,38 @@ const createCustomStorage = (): PersistStorage<unknown> => {
   };
 };
 
-const generateDummyAnalytics = (): AnalyticsType   => {
+const generateDummyAnalytics = (agentId: string): AnalyticsType => {
   const now = new Date();
   const dailyImpressions = Array.from({ length: 30 }, (_, i) => ({
+    agentId,
     date: new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     count: Math.floor(Math.random() * 1000) + 100
   }));
 
   const cryptoHoldings = [
     {
+      agentId,
       symbol: 'BTC',
       amount: Math.random() * 2,
       value: Math.random() * 50000 + 30000,
       change24h: (Math.random() * 10) - 5
     },
     {
+      agentId,
       symbol: 'ETH',
       amount: Math.random() * 20,
       value: Math.random() * 3000 + 1500,
       change24h: (Math.random() * 10) - 5
     },
     {
+      agentId,
       symbol: 'SOL',
       amount: Math.random() * 200,
       value: Math.random() * 100 + 50,
       change24h: (Math.random() * 10) - 5
     },
     {
+      agentId,
       symbol: 'DOGE',
       amount: Math.random() * 10000,
       value: Math.random() * 0.2 + 0.1,
@@ -110,163 +115,119 @@ const generateDummyAnalytics = (): AnalyticsType   => {
   ];
 
   return {
+    agentId,
     impressions: Math.floor(Math.random() * 10000) + 1000,
     engagementRate: Math.random() * 5 + 1,
     clickThroughRate: Math.random() * 2 + 0.5,
     dailyImpressions,
     topInteractions: [
-      { type: 'Likes', count: Math.floor(Math.random() * 500) + 100 },
-      { type: 'Retwineets', count: Math.floor(Math.random() * 300) + 50 },
-      { type: 'Replies', count: Math.floor(Math.random() * 200) + 30 },
-      { type: 'Quotes', count: Math.floor(Math.random() * 100) + 20 }
+      { agentId, kind: 'Likes', count: Math.floor(Math.random() * 500) + 100 },
+      { agentId, kind: 'Retwineets', count: Math.floor(Math.random() * 300) + 50 },
+      { agentId, kind: 'Replies', count: Math.floor(Math.random() * 200) + 30 },
+      { agentId, kind: 'Quotes', count: Math.floor(Math.random() * 100) + 20 }
     ],
     reachByPlatform: [
-      { platform: 'Mobile', count: Math.floor(Math.random() * 6000) + 2000 },
-      { platform: 'Desktop', count: Math.floor(Math.random() * 3000) + 1000 },
-      { platform: 'Tablet', count: Math.floor(Math.random() * 1000) + 500 }
+      { agentId, platform: 'Mobile', count: Math.floor(Math.random() * 6000) + 2000 },
+      { agentId, platform: 'Desktop', count: Math.floor(Math.random() * 3000) + 1000 },
+      { agentId, platform: 'Tablet', count: Math.floor(Math.random() * 1000) + 500 }
     ],
     demographics: [
-      { age: '18-24', percentage: Math.random() * 20 + 10 },
-      { age: '25-34', percentage: Math.random() * 25 + 15 },
-      { age: '35-44', percentage: Math.random() * 20 + 10 },
-      { age: '45-54', percentage: Math.random() * 15 + 5 },
-      { age: '55+', percentage: Math.random() * 10 + 5 }
+      { agentId, age: '18-24', percentage: Math.random() * 20 + 10 },
+      { agentId, age: '25-34', percentage: Math.random() * 25 + 15 },
+      { agentId, age: '35-44', percentage: Math.random() * 20 + 10 },
+      { agentId, age: '45-54', percentage: Math.random() * 15 + 5 },
+      { agentId, age: '55+', percentage: Math.random() * 10 + 5 }
     ],
     peakHours: Array.from({ length: 24 }, (_, i) => ({
+      agentId,
       hour: i,
       engagement: Math.floor(Math.random() * 100) + 20
     })),
-    cryptoHoldings
+    cryptoHoldings: cryptoHoldings
   };
 };
 
-export const useMarketplaceStore = create<MarketplaceStoreType>()(
+// Create the marketplace store
+const useMarketplaceStore = create<MarketplaceStoreType>()(
   persist(
     (set, get) => ({
       agents: [],
       transactions: [],
       notification: null,
-      setNotification: (notification: NotificationType | null) => set({ notification }),
-      addAgent: async (agent: AgentType): Promise<string> => {
-        const notification: NotificationType = {
-          id: crypto.randomUUID(),
-          type: 'create',
-          message: `Agent ${agent.twinHandle} created successfully!`,
-          twinHandle: agent.twinHandle,
-          twitterHandle: agent.twitterHandle,
-          timestamp: Date.now(),
+      setNotification: (notification) => set({ notification }),
+      addAgent: async (agent: AgentType) => {
+        set((state) => ({
+          agents: [...state.agents, {
+            ...agent,
+            verification: {
+              agentId: agent.agentId,
+              isVerified: false,
+              verificationDate: new Date(),
+            },
+          }],
+        }));
+        return agent.agentId; // Return agentId instead of id
+      },
+      buyShares: async (agentId: string, shares: number) => {
+        const agent = get().agents.find(a => a.agentId === agentId);
+        if (!agent) return;
+
+        const newUserTokenShare: UserTokenShareType = {
+          agentId,
+          userId: 'demo-user',
+          shares,
+          purchasePrice: agent.tokenShares.pricePerShare,
+          purchaseDate: new Date().toISOString(),
         };
 
         set((state) => ({
-          agents: [...state.agents, agent],
-          notification,
+          agents: state.agents.map(a => 
+            a.agentId === agentId
+              ? {
+                  ...a,
+                  tokenShares: {
+                    ...a.tokenShares,
+                    availableShares: a.tokenShares.availableShares - shares,
+                    shareholders: [...a.tokenShares.shareholders, newUserTokenShare],
+                  },
+                }
+              : a
+          ),
         }));
-
-        return agent.id;
       },
-      buyShares: async (agentId: string, sharesToBuy: number) => {
-        const agent = get().agents.find(a => a.id === agentId);
+      sellShares: async (agentId: string, shares: number) => {
+        const agent = get().agents.find(a => a.agentId === agentId);
         if (!agent) return;
 
-        set((state) => {
-          const transaction: TransactionType = {
-            id: crypto.randomUUID(),
-            agentId,
-            type: 'buy',
-            shares: sharesToBuy,
-            pricePerShare: agent.tokenShares.pricePerShare,
-            totalAmount: agent.tokenShares.pricePerShare * sharesToBuy,
-            timestamp: new Date().toISOString(),
-          };
+        const transaction: TransactionType = {
+          agentId,
+          kind: 'sell',
+          shares,
+          pricePerShare: agent.tokenShares.pricePerShare,
+          totalAmount: agent.tokenShares.pricePerShare * shares,
+          timestamp: new Date().toISOString(),
+        };
 
-          const notification: NotificationType = {
-            id: crypto.randomUUID(),
-            type: 'buy',
-            message: `Bought ${sharesToBuy} shares of @${agent.twinHandle}`,
-            twitterHandle: agent.twitterHandle,
-            twinHandle: agent.twinHandle,
-            timestamp: Date.now(),
-          };
-
-          return {
-            agents: state.agents.map((a) => {
-              if (a.id === agentId && a.tokenShares.availableShares >= sharesToBuy) {
-                return {
+        set((state) => ({
+          agents: state.agents.map(a => 
+            a.agentId === agentId
+              ? {
                   ...a,
                   tokenShares: {
                     ...a.tokenShares,
-                    availableShares: a.tokenShares.availableShares - sharesToBuy,
-                    shareholders: [...a.tokenShares.shareholders, {
-                      userId: 'demo-user',
-                      shares: sharesToBuy,
-                      purchasePrice: a.tokenShares.pricePerShare,
-                      purchaseDate: new Date().toISOString(),
-                    }],
-                    pricePerShare: a.tokenShares.pricePerShare * 1.01,
+                    availableShares: a.tokenShares.availableShares + shares,
                   },
-                };
-              }
-              return a;
-            }),
-            transactions: [transaction, ...state.transactions],
-            notification,
-          };
-        });
-      },
-      sellShares: async (agentId: string, sharesToSell: number) => {
-        const agent = get().agents.find(a => a.id === agentId);
-        if (!agent) return;
-
-        set((state) => {
-          const transaction: TransactionType = {
-            id: crypto.randomUUID(),
-            agentId,
-            type: 'sell',
-            shares: sharesToSell,
-            pricePerShare: agent.tokenShares.pricePerShare,
-            totalAmount: agent.tokenShares.pricePerShare * sharesToSell,
-            timestamp: new Date().toISOString(),
-          };
-
-          const notification: NotificationType = {
-            id: crypto.randomUUID(),
-            type: 'sell',
-            message: `Sold ${sharesToSell} shares of @${agent.twitterHandle}`,
-            twinHandle: agent.twinHandle,
-            twitterHandle: agent.twitterHandle,
-            timestamp: Date.now(),
-          };
-
-          return {
-            agents: state.agents.map((a) => {
-              if (a.id === agentId) {
-                return {
-                  ...a,
-                  tokenShares: {
-                    ...a.tokenShares,
-                    availableShares: a.tokenShares.availableShares + sharesToSell,
-                    shareholders: [...a.tokenShares.shareholders, {
-                      userId: 'demo-user',
-                      shares: -sharesToSell,
-                      purchasePrice: a.tokenShares.pricePerShare,
-                      purchaseDate: new Date().toISOString(),
-                    }],
-                    pricePerShare: a.tokenShares.pricePerShare * 0.99,
-                  },
-                };
-              }
-              return a;
-            }),
-            transactions: [transaction, ...state.transactions],
-            notification,
-          };
-        });
+                }
+              : a
+          ),
+          transactions: [transaction, ...state.transactions],
+        }));
       },
       verifyAgent: async (agentId: string) => {
         let success = false;
         set((state) => ({
           agents: state.agents.map((agent) => {
-            if (agent.id === agentId && !agent.verification.isVerified) {
+            if (agent.agentId === agentId && !agent.verification.isVerified) {
               const userShares = agent.tokenShares.shareholders
                 .filter(s => s.userId === 'demo-user')
                 .reduce((sum, s) => sum + s.shares, 0);
@@ -278,8 +239,9 @@ export const useMarketplaceStore = create<MarketplaceStoreType>()(
                 return {
                   ...agent,
                   verification: {
+                    agentId: agentId,
                     isVerified: true,
-                    verificationDate: new Date().toISOString(),
+                    verificationDate: new Date(),
                   },
                   tokenShares: {
                     ...agent.tokenShares,
@@ -294,7 +256,7 @@ export const useMarketplaceStore = create<MarketplaceStoreType>()(
         return success;
       },
       getUserShares: (agentId: string) => {
-        const agent = get().agents.find(a => a.id === agentId);
+        const agent = get().agents.find(a => a.agentId === agentId);
         if (!agent) return 0;
 
         return agent.tokenShares.shareholders
@@ -305,8 +267,8 @@ export const useMarketplaceStore = create<MarketplaceStoreType>()(
       updateAnalytics: (agentId: string) => {
         set((state) => ({
           agents: state.agents.map(agent => 
-            agent.id === agentId
-              ? { ...agent, analytics: generateDummyAnalytics() }
+            agent.agentId === agentId
+              ? { ...agent, analytics: generateDummyAnalytics(agentId) }
               : agent
           )
         }));
@@ -325,3 +287,5 @@ export const useMarketplaceStore = create<MarketplaceStoreType>()(
     }
   )
 );
+
+export { useMarketplaceStore };

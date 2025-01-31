@@ -10,15 +10,7 @@ export function Clone() {
   const [draggedAgent, setDraggedAgent] = useState<string | null>(null);
   const [isCloning, setIsCloning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cloneResult, setCloneResult] = useState<{
-    id: string;
-    twinHandle: string;
-    twitterHandle: string;
-    personality: string;
-    description: string;
-    profileImage: string;
-    price: number;
-  } | null>(null);
+  const [cloneResult, setCloneResult] = useState<AgentType | null>(null);
   const navigate = useNavigate();
 
   const handleDragStart = (agentId: string, e: React.DragEvent) => {
@@ -72,8 +64,8 @@ export function Clone() {
     if (selectedAgents.length !== 2) return;
 
     setIsCloning(true);
-    const agent1 = agents.find((a: AgentType) => a.id === selectedAgents[0]);
-    const agent2 = agents.find((a: AgentType) => a.id === selectedAgents[1]);
+    const agent1 = agents.find((a: AgentType) => a.agentId === selectedAgents[0]);
+    const agent2 = agents.find((a: AgentType) => a.agentId === selectedAgents[1]);
 
     if (!agent1 || !agent2) return;
 
@@ -85,7 +77,7 @@ export function Clone() {
     const totalPrice = basePrice * 1000; // Example calculation
 
     const newTwin: AgentType = {
-      id: `${agent1.id}_${agent2.id}`,
+      agentId: `${agent1.agentId}_${agent2.agentId}`,
       createdAt: new Date(),
       twitterHandle: `${agent1.twitterHandle}_${agent2.twitterHandle}`,
       twinHandle: `${agent1.twinHandle}_${agent2.twinHandle}`,
@@ -93,18 +85,26 @@ export function Clone() {
       description: `A fusion of @${agent1.twitterHandle} and @${agent2.twitterHandle}. Combining the best of both twins!`,
       profileImage: agent1.profileImage,
       price: totalPrice,
-      stats: { replies: 0, interactions: 0, uptime: '0h 0m' }, // Ensure uptime is included
+      stats: { 
+        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        replies: 0, 
+        interactions: 0, 
+        uptime: '0h 0m' 
+      },
       tokenShares: {
+        agentId: `${agent1.agentId}_${agent2.agentId}`,
         totalShares: 1000,
         availableShares: 1000,
         pricePerShare: totalPrice / 1000,
         shareholders: []
       },
       verification: {
+        agentId: `${agent1.agentId}_${agent2.agentId}`,
         isVerified: false,
-        verificationDate: undefined
+        verificationDate: new Date()
       },
       analytics: {
+        agentId: `${agent1.agentId}_${agent2.agentId}`,
         impressions: 0,
         engagementRate: 0,
         clickThroughRate: 0,
@@ -117,7 +117,9 @@ export function Clone() {
       },
       modelData: {},
       fetchedTweets: [],
-      twineets: []
+      twineets: [],
+      autoReply: false,
+      isListed: true
     };
 
     setCloneResult(newTwin);
@@ -130,8 +132,8 @@ export function Clone() {
     try {
       setIsCloning(true);
       setError(null);
-      const agent1 = agents.find(a => a.id === selectedAgents[0]);
-      const agent2 = agents.find(a => a.id === selectedAgents[1]);
+      const agent1 = agents.find(a => a.agentId === selectedAgents[0]);
+      const agent2 = agents.find(a => a.agentId === selectedAgents[1]);
 
       if (!agent1 || !agent2) {
         setError('Selected agents not found.');
@@ -141,9 +143,10 @@ export function Clone() {
 
       // Create the new clone
       const newAgentId = await addAgent({
-        id: `${agent1.id}_${agent2.id}`,  
+        agentId: `${agent1.agentId}_${agent2.agentId}`,  
         createdAt: new Date(),
         stats: {
+          agentId: `${agent1.agentId}_${agent2.agentId}`,
           replies: 0,
           interactions: 0,
           uptime: '0h 0m'
@@ -155,10 +158,12 @@ export function Clone() {
         profileImage: cloneResult.profileImage,
         price: cloneResult.price,
         verification: {
+          agentId: `${agent1.agentId}_${agent2.agentId}`,
           isVerified: false,
-          verificationDate: undefined
+          verificationDate: new Date()
         },
         analytics: {
+          agentId: `${agent1.agentId}_${agent2.agentId}`,
           impressions: 0,
           engagementRate: 0,
           clickThroughRate: 0,
@@ -171,6 +176,7 @@ export function Clone() {
         },
 
         tokenShares: {
+          agentId: `${agent1.agentId}_${agent2.agentId}`,
           totalShares: 1000,
           availableShares: 1000,
           pricePerShare: cloneResult.price / 1000,
@@ -178,7 +184,9 @@ export function Clone() {
         },
         twineets: [],
         fetchedTweets: [],
-        modelData: {}
+        modelData: {},
+        autoReply: false,
+        isListed: true
       });
       
       // Reset state
@@ -222,12 +230,12 @@ export function Clone() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {agents.map((agent) => (
                   <div
-                    key={agent.id}
+                    key={agent.agentId}
                     draggable
-                    onDragStart={(e) => handleDragStart(agent.id, e)}
+                    onDragStart={(e) => handleDragStart(agent.agentId, e)}
                     onDragEnd={handleDragEnd}
                     className={`agent-card bg-white/5 backdrop-blur-lg rounded-lg p-4 transition-all ${
-                      selectedAgents.includes(agent.id)
+                      selectedAgents.includes(agent.agentId)
                         ? 'ring-2 ring-purple-400 bg-white/10'
                         : 'hover:bg-white/10'
                     }`}
@@ -262,7 +270,7 @@ export function Clone() {
               >
                 {selectedAgents[0] && (
                   <img
-                    src={agents.find(a => a.id === selectedAgents[0])?.profileImage}
+                    src={agents.find(a => a.agentId === selectedAgents[0])?.profileImage}
                     alt="Left Twin"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -277,7 +285,7 @@ export function Clone() {
               >
                 {selectedAgents[1] && (
                   <img
-                    src={agents.find(a => a.id === selectedAgents[1])?.profileImage}
+                    src={agents.find(a => a.agentId === selectedAgents[1])?.profileImage}
                     alt="Right Twin"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -287,7 +295,7 @@ export function Clone() {
 
             {draggedAgent && (
               <div className="dragged-agent-info">
-                <p>Currently dragging: {agents.find(a => a.id === draggedAgent)?.twinHandle}</p>
+                <p>Currently dragging: {agents.find(a => a.agentId === draggedAgent)?.twinHandle}</p>
               </div>
             )}
 

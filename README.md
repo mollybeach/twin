@@ -9,7 +9,8 @@ TwinAI is an innovative platform that allows users to create AI-powered digital 
 ## Features
 
 - **Create Your Twin**: Users can create a digital alter ego by registering their social media handle (e.g., Twitter/X). The platform verifies the handle's availability through the X API.
-  
+
+- **Twineet Generation**: The platform generates twineets based on any existing twitter account + chosen personality traits.
 - **AI Learning**: Each Twin learns from the original account's social media activity, adapting its personality and responses based on historical data.
 
 - **Personality Customization**: Users can define their Twin's personality traits, such as being aggressive or conservative, which influences its trading behavior and interactions.

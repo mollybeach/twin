@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, PersistStorage, StorageValue } from 'zustand/middleware';
-import { AgentType, TransactionType, AnalyticsType, MarketplaceStoreType, UserTokenShareType } from '../types/types';
+import { persist } from 'zustand/middleware';
+import { AgentType, TransactionType, NotificationType, UserTokenShareType, AnalyticsType, MarketplaceStoreType } from '../types/types';
 
 // Storage limit (4.5MB to stay safely under 5MB limit)
 const STORAGE_LIMIT = 4.5 * 1024 * 1024;
@@ -16,12 +16,12 @@ const cleanupOldData = (agents: AgentType[]): AgentType[] => {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   return agents
-    .filter(agent => new Date(agent.createdAt) > thirtyDaysAgo)
-    .map(agent => ({
+    .filter((agent) => new Date(agent.createdAt) > thirtyDaysAgo)
+    .map((agent) => ({
       ...agent,
       tokenShares: {
         ...agent.tokenShares,
-        shareholders: agent.tokenShares.shareholders.slice(-20) // Keep only last 20 transactions
+        shareholders: agent.tokenShares.shareholders.slice(-20), // Keep only last 20 transactions
       },
       analytics: {
         ...agent.analytics,
@@ -29,89 +29,60 @@ const cleanupOldData = (agents: AgentType[]): AgentType[] => {
         topInteractions: agent.analytics.topInteractions.slice(0, 5), // Keep only top 5
         demographics: agent.analytics.demographics.slice(0, 5), // Keep only top 5 age groups
         peakHours: agent.analytics.peakHours.slice(0, 24), // Keep only 24 hours
-        cryptoHoldings: agent.analytics.cryptoHoldings.slice(0, 4) // Keep only top 4 holdings
-      }
+        cryptoHoldings: agent.analytics.cryptoHoldings.slice(0, 4), // Keep only top 4 holdings
+      },
     }));
 };
 
 // Custom storage with error handling and size checks
-const createCustomStorage = (): PersistStorage<unknown> => {
-  const storage = createJSONStorage(() => {
-    const storedData = localStorage.getItem('marketplace-storage');
-    return storedData ? JSON.parse(storedData) : { agents: [], transactions: [] }; // Initialize as empty if not found
-  });
-  
+const createCustomStorage = () => {
   return {
-    ...storage,
-    setItem: (name: string, value: StorageValue<unknown>) => {
+    getItem: (name: string) => {
+      const storedData = localStorage.getItem(name);
+      return storedData ? JSON.parse(storedData) : { agents: [], transactions: [], notifications: [] };
+    },
+    setItem: (name: string, value: unknown) => {
       try {
-        if (estimateStorageSize(value) > STORAGE_LIMIT) {
-          const state = JSON.parse(value as unknown as string);
+        let state = JSON.parse(value as string);
+
+        // Clean up old data if storage exceeds the limit
+        if (estimateStorageSize(state) > STORAGE_LIMIT) {
           state.agents = cleanupOldData(state.agents);
-          
-          // If still too large, start removing oldest agents
+
+          // Remove oldest agents if still too large
           while (estimateStorageSize(state) > STORAGE_LIMIT && state.agents.length > 0) {
-            state.agents.sort((a: AgentType, b: AgentType) => 
+            state.agents.sort((a: AgentType, b: AgentType) =>
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
             state.agents.shift();
           }
-          
-          value = JSON.stringify(state) as unknown as StorageValue<unknown>;
+
+          state = JSON.stringify(state);
         }
-        
-        // Ensure storage is defined and value is a string before setting it
-        if (storage && typeof value === 'string') {
-          storage.setItem(name, value);
-        } else {
-          console.error('Storage is undefined or value is not a string:', value);
-        }
+
+        localStorage.setItem(name, state);
       } catch (error) {
         console.error('Storage error:', error);
       }
     },
-    getItem: storage ? storage.getItem : () => null,
-    removeItem: storage ? storage.removeItem : () => null
+    removeItem: (name: string) => localStorage.removeItem(name),
   };
 };
 
+// Generate dummy analytics for an agent
 const generateDummyAnalytics = (agentId: string): AnalyticsType => {
   const now = new Date();
   const dailyImpressions = Array.from({ length: 30 }, (_, i) => ({
     agentId,
     date: new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    count: Math.floor(Math.random() * 1000) + 100
+    count: Math.floor(Math.random() * 1000) + 100,
   }));
 
   const cryptoHoldings = [
-    {
-      agentId,
-      symbol: 'BTC',
-      amount: Math.random() * 2,
-      value: Math.random() * 50000 + 30000,
-      change24h: (Math.random() * 10) - 5
-    },
-    {
-      agentId,
-      symbol: 'ETH',
-      amount: Math.random() * 20,
-      value: Math.random() * 3000 + 1500,
-      change24h: (Math.random() * 10) - 5
-    },
-    {
-      agentId,
-      symbol: 'SOL',
-      amount: Math.random() * 200,
-      value: Math.random() * 100 + 50,
-      change24h: (Math.random() * 10) - 5
-    },
-    {
-      agentId,
-      symbol: 'DOGE',
-      amount: Math.random() * 10000,
-      value: Math.random() * 0.2 + 0.1,
-      change24h: (Math.random() * 10) - 5
-    }
+    { agentId, symbol: 'BTC', amount: Math.random() * 2, value: Math.random() * 50000 + 30000, change24h: Math.random() * 10 - 5 },
+    { agentId, symbol: 'ETH', amount: Math.random() * 20, value: Math.random() * 3000 + 1500, change24h: Math.random() * 10 - 5 },
+    { agentId, symbol: 'SOL', amount: Math.random() * 200, value: Math.random() * 100 + 50, change24h: Math.random() * 10 - 5 },
+    { agentId, symbol: 'DOGE', amount: Math.random() * 10000, value: Math.random() * 0.2 + 0.1, change24h: Math.random() * 10 - 5 },
   ];
 
   return {
@@ -124,26 +95,26 @@ const generateDummyAnalytics = (agentId: string): AnalyticsType => {
       { agentId, kind: 'Likes', count: Math.floor(Math.random() * 500) + 100 },
       { agentId, kind: 'Retwineets', count: Math.floor(Math.random() * 300) + 50 },
       { agentId, kind: 'Replies', count: Math.floor(Math.random() * 200) + 30 },
-      { agentId, kind: 'Quotes', count: Math.floor(Math.random() * 100) + 20 }
+      { agentId, kind: 'Quotes', count: Math.floor(Math.random() * 100) + 20 },
     ],
     reachByPlatform: [
       { agentId, platform: 'Mobile', count: Math.floor(Math.random() * 6000) + 2000 },
       { agentId, platform: 'Desktop', count: Math.floor(Math.random() * 3000) + 1000 },
-      { agentId, platform: 'Tablet', count: Math.floor(Math.random() * 1000) + 500 }
+      { agentId, platform: 'Tablet', count: Math.floor(Math.random() * 1000) + 500 },
     ],
     demographics: [
       { agentId, age: '18-24', percentage: Math.random() * 20 + 10 },
       { agentId, age: '25-34', percentage: Math.random() * 25 + 15 },
       { agentId, age: '35-44', percentage: Math.random() * 20 + 10 },
       { agentId, age: '45-54', percentage: Math.random() * 15 + 5 },
-      { agentId, age: '55+', percentage: Math.random() * 10 + 5 }
+      { agentId, age: '55+', percentage: Math.random() * 10 + 5 },
     ],
     peakHours: Array.from({ length: 24 }, (_, i) => ({
       agentId,
       hour: i,
-      engagement: Math.floor(Math.random() * 100) + 20
+      engagement: Math.floor(Math.random() * 100) + 20,
     })),
-    cryptoHoldings: cryptoHoldings
+    cryptoHoldings,
   };
 };
 
@@ -153,23 +124,27 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
     (set, get) => ({
       agents: [],
       transactions: [],
-      notification: null,
-      setNotification: (notification) => set({ notification }),
+      notifications: [],
+      notification: null, // Added missing 'notification' property
+      setNotification: (notification: NotificationType | null) => set({ notification }),
       addAgent: async (agent: AgentType) => {
         set((state) => ({
-          agents: [...state.agents, {
-            ...agent,
-            verification: {
-              agentId: agent.agentId,
-              isVerified: false,
-              verificationDate: new Date(),
+          agents: [
+            ...state.agents,
+            {
+              ...agent,
+              verification: {
+                agentId: agent.agentId,
+                isVerified: false,
+                verificationDate: new Date(),
+              },
             },
-          }],
+          ],
         }));
-        return agent.agentId; // Return agentId instead of id
+        return agent.agentId;
       },
       buyShares: async (agentId: string, shares: number) => {
-        const agent = get().agents.find(a => a.agentId === agentId);
+        const agent = get().agents.find((a) => a.agentId === agentId);
         if (!agent) return;
 
         const newUserTokenShare: UserTokenShareType = {
@@ -181,7 +156,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
         };
 
         set((state) => ({
-          agents: state.agents.map(a => 
+          agents: state.agents.map((a) =>
             a.agentId === agentId
               ? {
                   ...a,
@@ -196,7 +171,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
         }));
       },
       sellShares: async (agentId: string, shares: number) => {
-        const agent = get().agents.find(a => a.agentId === agentId);
+        const agent = get().agents.find((a) => a.agentId === agentId);
         if (!agent) return;
 
         const transaction: TransactionType = {
@@ -209,7 +184,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
         };
 
         set((state) => ({
-          agents: state.agents.map(a => 
+          agents: state.agents.map((a) =>
             a.agentId === agentId
               ? {
                   ...a,
@@ -229,11 +204,11 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           agents: state.agents.map((agent) => {
             if (agent.agentId === agentId && !agent.verification.isVerified) {
               const userShares = agent.tokenShares.shareholders
-                .filter(s => s.userId === 'demo-user')
+                .filter((s) => s.userId === 'demo-user')
                 .reduce((sum, s) => sum + s.shares, 0);
-              
+
               const userValue = userShares * agent.tokenShares.pricePerShare;
-              
+
               if (userValue >= 100) {
                 success = true;
                 return {
@@ -256,27 +231,27 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
         return success;
       },
       getUserShares: (agentId: string) => {
-        const agent = get().agents.find(a => a.agentId === agentId);
+        const agent = get().agents.find((a) => a.agentId === agentId);
         if (!agent) return 0;
 
         return agent.tokenShares.shareholders
-          .filter(s => s.userId === 'demo-user')
+          .filter((s) => s.userId === 'demo-user')
           .reduce((sum, s) => sum + s.shares, 0);
       },
       getAgents: () => get().agents,
       updateAnalytics: (agentId: string) => {
         set((state) => ({
-          agents: state.agents.map(agent => 
+          agents: state.agents.map((agent) =>
             agent.agentId === agentId
               ? { ...agent, analytics: generateDummyAnalytics(agentId) }
               : agent
-          )
+          ),
         }));
       },
       getTransactionHistory: (agentId?: string) => {
         const state = get();
         return state.transactions
-          .filter(t => !agentId || t.agentId === agentId)
+          .filter((t) => !agentId || t.agentId === agentId)
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       },
     }),

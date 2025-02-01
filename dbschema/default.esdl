@@ -159,8 +159,10 @@ module default {
         required link verification -> Verification;
         required link analytics -> Analytics;
         required property modelData -> json;
-        required link twineets -> Twineet;
-        required link fetchedTweets -> FetchedTweet;
+        # Change these to multi links to allow arrays
+        multi link twineets -> Twineet;
+        multi link fetchedTweets -> FetchedTweet; 
+        
     }
 
     scalar type NotificationType extending enum<'create', 'buy', 'sell'>;
@@ -175,12 +177,5 @@ module default {
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }
-    }
-
-    # Define the MarketplaceStore type
-    type MarketplaceStore {
-        required link agents -> Agent;
-        required link transactions -> Transaction;
-        required link notification -> Notification;
     }
 }

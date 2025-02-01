@@ -18,7 +18,7 @@ export function Marketplace() {
       return;
     }
     
-    const agent = agents.find(a => a.id === agentId);
+    const agent = agents.find(a => a.agentId === agentId);
     if (!agent) return;
     
     if (sharesToBuy > agent.tokenShares.availableShares) {
@@ -75,12 +75,12 @@ export function Marketplace() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {agents.map((agent) => {
-              const userShares = getUserShares(agent.id);
+              const userShares = getUserShares(agent.agentId);
               const userValue = userShares * agent.tokenShares.pricePerShare;
               
               return (
                 <div
-                  key={agent.id}
+                  key={agent.agentId}
                   className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative rainbow-border"
                 >
                   <div className="absolute inset-0 marketplace-card-bg"></div>
@@ -135,6 +135,7 @@ export function Marketplace() {
                         </div>
                       </div>
                       <PriceChart
+                        agentId={agent.agentId}
                         shareholders={agent.tokenShares.shareholders}
                         pricePerShare={agent.tokenShares.pricePerShare}
                       />
@@ -169,7 +170,7 @@ export function Marketplace() {
                     {!agent.verification.isVerified && userValue >= VERIFICATION_FEE && (
                       <div className="mb-4">
                         <button
-                          onClick={() => handleVerification(agent.id)}
+                          onClick={() => handleVerification(agent.agentId)}
                           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
                         >
                           <BadgeCheck className="w-4 h-4" />
@@ -181,14 +182,14 @@ export function Marketplace() {
                       </div>
                     )}
 
-                    {verificationError && selectedAgent === agent.id && (
+                    {verificationError && selectedAgent === agent.agentId && (
                       <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-md flex items-start space-x-2">
                         <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-red-600 dark:text-red-400">{verificationError}</p>
                       </div>
                     )}
 
-                    {selectedAgent === agent.id ? (
+                    {selectedAgent === agent.agentId ? (
                       <div className="space-y-3">
                         <div className="flex items-center space-x-2">
                           <input
@@ -204,7 +205,7 @@ export function Marketplace() {
                             placeholder="Number of shares"
                           />
                           <button
-                            onClick={() => isSellingShares ? handleSellShares(agent.id) : handleBuyShares(agent.id)}
+                            onClick={() => isSellingShares ? handleSellShares(agent.agentId) : handleBuyShares(agent.agentId)}
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center"
                           >
                             {isSellingShares ? (
@@ -243,7 +244,7 @@ export function Marketplace() {
                       <div className="space-y-2">
                         <button
                           onClick={() => {
-                            setSelectedAgent(agent.id);
+                            setSelectedAgent(agent.agentId);
                             setIsSellingShares(false);
                           }}
                           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
@@ -254,7 +255,7 @@ export function Marketplace() {
                         {userShares > 0 && (
                           <button
                             onClick={() => {
-                              setSelectedAgent(agent.id);
+                              setSelectedAgent(agent.agentId);
                               setIsSellingShares(true);
                             }}
                             className="w-full border border-blue-500 text-blue-500 py-2 px-4 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 flex items-center justify-center space-x-2"

@@ -133,6 +133,7 @@ export interface FetchedTweetsType {
     agentId: string;
     text: string;
     edit_history_tweet_ids: string[];
+    timestamp: string;
 }
 
 export interface ReachByPlatformType {

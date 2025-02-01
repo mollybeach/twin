@@ -1,6 +1,7 @@
 module default {
+    scalar type AgentIdType extending str;
     type CryptoHolding {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property amount -> decimal;
         required property symbol -> str;
         required property change24h -> decimal;
@@ -8,37 +9,37 @@ module default {
     }
 
     type Demographics {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property age -> str;
         required property percentage -> decimal;
     }
 
     type DailyImpressions {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property date -> str;
         required property count -> int16;
     }
 
     type PeakHours {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property hour -> int16;
         required property engagement -> decimal;
     }
 
     type ReachByPlatform {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property platform -> str;
         required property count -> int16;
     }
 
     type TopInteractions {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property kind -> str;
         required property count -> int16;
     }
 
     type Analytics {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property clickThroughRate -> decimal;
         required property engagementRate -> decimal;
         required property impressions -> int16;
@@ -51,7 +52,7 @@ module default {
     }
 
     type UserTokenShare {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property userId -> str;
         required property shares -> int16;
         required property purchasePrice -> decimal;
@@ -59,7 +60,7 @@ module default {
     }
 
     type TokenShare {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property totalShares -> int16;
         required property availableShares -> int16;
         required property pricePerShare -> decimal;
@@ -68,7 +69,7 @@ module default {
 
     # Define the TokenStats type
     type TokenStats {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property price -> decimal;
         required property change24h -> decimal;
         required property volume24h -> decimal;
@@ -80,7 +81,7 @@ module default {
 
     # Define the Transaction type
     type Transaction {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property kind -> TransactionType;
         required property shares -> int16;
         required property pricePerShare -> decimal;
@@ -92,7 +93,7 @@ module default {
 
     # Define the FetchedTweet type
     type FetchedTweet {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property text -> str;
         required property edit_history_tweet_ids -> array<str>;
         required property timestamp -> datetime {
@@ -102,7 +103,7 @@ module default {
 
     # Define the Twineet type
     type Twineet {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property content -> str;
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
@@ -125,14 +126,14 @@ module default {
     }
 
     type Verification {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property isVerified -> bool;
         required property verificationDate -> datetime;
     }
 
     # Define the AgentStats type
     type AgentStats {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property replies -> int16;
         required property interactions -> int16;
         required property uptime -> str;
@@ -140,7 +141,7 @@ module default {
 
     # Define the Agent type
     type Agent {
-        required property agentId -> str {
+        required property agentId -> AgentIdType { 
             constraint exclusive
         }
         required property createdAt -> datetime {
@@ -166,7 +167,7 @@ module default {
 
     # Define the Notification type
     type Notification {
-        required property agentId -> str;
+        required property agentId -> AgentIdType;
         required property kind -> NotificationType;
         required property message -> str;
         required property twinHandle -> str;

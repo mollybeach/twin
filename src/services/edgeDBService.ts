@@ -22,7 +22,7 @@ export async function insertFetchedTweetsAndTwineets(agentId: string, fetchedTwe
 
     // Insert twineets
     for (const twineet of twineets) {
-        const insertTwineet = edgeql.insert(someModule.Twineet, {
+        const insertTwineet = edgeql.insert(edgeql.Twineet, {
             agentId: agentId,
             content: twineet.content,
             timestamp: new Date().toISOString(), // Ensure the timestamp is in the correct format

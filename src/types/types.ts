@@ -208,4 +208,3 @@ export interface ThemeStoreType {
     theme: 'light' | 'dark';
     toggleTheme: () => void;
 }
-

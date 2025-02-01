@@ -8,10 +8,10 @@
         "build": "vite build",
         "lint": "eslint .",
         "preview": "vite preview",
-        "mg-cloud-gen": "edgedb migration create && edgedb migrate && edgedb migrate -I mollybeach/twindb && npm generate edgeql-js && edgedb migrate -I mollybeach/twindb && npm generate edgeql-js",
-        "generate-edgeql": "edgedb generate edgeql-js"
+        "mg-cloud-gen": "edgedb migration create && edgedb migrate && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js"
     },
     "dependencies": {
+        "@edgedb/generate": "^0.5.6",
         "axios": "^1.7.9",
         "chart.js": "^4.4.2",
         "dotenv": "^16.4.7",

@@ -15,7 +15,8 @@ export async function insertFetchedTweetsAndTwineets(agentId: string, fetchedTwe
         const insertTweet = edgeql.insert(edgeql.FetchedTweet, {
             text: tweet.text,
             edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-            timestamp: new Date().toISOString(), // Ensure the timestamp is in the correct format
+            timestamp: new Date(),
+            agentId: agentId
         });
         await insertTweet.run(edgeDBCloudClient);
     }
@@ -25,7 +26,7 @@ export async function insertFetchedTweetsAndTwineets(agentId: string, fetchedTwe
         const insertTwineet = edgeql.insert(edgeql.Twineet, {
             agentId: agentId,
             content: twineet.content,
-            timestamp: new Date().toISOString(), // Ensure the timestamp is in the correct format
+            timestamp: new Date(),
             likes: twineet.likes,
             retwineets: twineet.retwineets,
             replies: twineet.replies,

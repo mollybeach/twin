@@ -38,3 +38,5 @@ coverage/
 
 # Miscellaneous
 *.tgz
+
+dbschema/edgeql-js

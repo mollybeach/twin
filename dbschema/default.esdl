@@ -64,7 +64,7 @@ module default {
         required property totalShares -> int16;
         required property availableShares -> int16;
         required property pricePerShare -> decimal;
-        required multi shareholders -> UserTokenShare;
+        required multi link shareholders -> UserTokenShare;
     }
 
     # Define the TokenStats type
@@ -160,11 +160,11 @@ module default {
         required link analytics -> Analytics;
         required property modelData -> json;
         # Change these to multi links to allow arrays
-        required multi twineets -> Twineet;
-        required multi fetchedTweets -> FetchedTweet; 
+        required multi link twineets -> Twineet;
+        required multi link fetchedTweets -> FetchedTweet; 
         required link tokenShares -> TokenShare; 
         required link tokenStats -> TokenStats;
-        required multi transactions -> Transaction;
+        required multi link transactions -> Transaction;
     }
 
     scalar type NotificationType extending enum<'create', 'buy', 'sell'>;

@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
 import { TwineetType } from '../types/types';
-import { generateResponse } from '../services/openaiService';
-import { fetchTwineets } from '../services/edgeDBService';
 
 export function Home() {
   const agents = useMarketplaceStore((state) => state.agents);
@@ -14,7 +12,11 @@ export function Home() {
   useEffect(() => {
     const fetchAndDisplayTwineets = async () => {
       try {
-        const fetchedTwineets = await fetchTwineets();
+        const response = await fetch('/api/twineets'); // Fetch from the API
+        if (!response.ok) {
+          throw new Error('Failed to fetch twineets');
+        }
+        const fetchedTwineets = await response.json();
         setTwineets(fetchedTwineets);
       } catch (error) {
         console.error('Error fetching twineets:', error);

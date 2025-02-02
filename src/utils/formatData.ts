@@ -1,5 +1,5 @@
 // path: src/utils/formatData.ts
-
+/*
 import edgeql from '../../dbschema/edgeql-js';
 import {
     UserTokenShareType,
@@ -61,7 +61,7 @@ function formatAgent(agent: AgentType) {
         stats: formatAgentStats(agent.stats),
         tokenShares: formatTokenShare(agent.tokenShares),
         tokenStats: formatTokenStats(agent.tokenStats),
-        transaction: agent.transaction?.map(formatTransaction) || [],
+        transactions: agent.transaction?.map(formatTransaction) || [],
     };
 }
 
@@ -230,4 +230,4 @@ export {
     formatVerification,
     formatTransaction,
     defaultUserTokenShare,
-};
+};*/

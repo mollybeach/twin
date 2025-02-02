@@ -340,7 +340,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
 
 export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
     const formattedFetchedTweet = formatFetchedTweet(fetchedTweet);
-    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
         filter: edgeql.op(agent.agentId, '=', agentId),
         set: {
             fetchedTweets: {
@@ -354,7 +354,7 @@ export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedT
 
 export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
     const formattedTwineet = formatTwineet(twineet);
-    const twineetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+    const twineetsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
         filter: edgeql.op(agent.agentId, '=', agentId),
         set: {
             twineets: {
@@ -368,7 +368,7 @@ export async function insertTwineet(agentId: string, twineet: TwineetType): Prom
 
 export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
     const formattedTransaction = formatTransaction(transaction);
-    const transactionsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+    const transactionsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
         filter: edgeql.op(agent.agentId, '=', agentId), 
         set: {
             transactions: {
@@ -397,7 +397,7 @@ export async function fetchTwineets(): Promise<TwineetType[]> {
 }
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
-    const twineetsQuery = edgeql.select(edgeql.Twineet, (twineet) => ({
+    const twineetsQuery = edgeql.select(edgeql.Twineet, (twineet: TwineetType) => ({
         filter_single: edgeql.op(twineet.agentId, '=', agentId),
     }));
     const result = await twineetsQuery.run(edgeDBCloudClient);

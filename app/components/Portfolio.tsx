@@ -2,23 +2,16 @@
 import { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { 
-  Wallet, 
   TrendingUp, 
   ChevronRight, 
   BadgeCheck, 
   ChevronLeft, 
   ChevronRight as ChevronRightIcon,
-  Home,
-  ShoppingBag,
-  Trophy,
-  PlusCircle,
   ArrowDownToLine,
   ArrowUpToLine,
-  X,
-  GitMerge
+  X
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { SharePriceChart } from './SharePriceChart';
 import { TradeModalPropsType } from '../types/types';
 
@@ -118,7 +111,6 @@ export function Portfolio() {
   } | null>(null);
   
   const { agents, getUserShares } = useMarketplaceStore();
-  const router = useRouter();
 
   const holdings = agents.map(agent => {
     const shares = getUserShares(agent.agentId);

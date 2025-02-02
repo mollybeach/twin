@@ -335,7 +335,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         transactions: transactionsQuery,
     });
 
-    await insertAgentQuery.run(edgeDBCloudClient);
+    await (await insertAgentQuery).run(edgeDBCloudClient);
 }
 
 export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
@@ -349,7 +349,8 @@ export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedT
         },
     }));
 
-    await fetchedTweetsQuery.run(edgeDBCloudClient);
+    const fetchedTweetsQueryResult = await fetchedTweetsQuery;
+    await fetchedTweetsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
@@ -363,7 +364,8 @@ export async function insertTwineet(agentId: string, twineet: TwineetType): Prom
         },
     }));
 
-    await twineetsQuery.run(edgeDBCloudClient);
+    const twineetsQueryResult = await twineetsQuery;
+    await twineetsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
@@ -377,11 +379,12 @@ export async function insertTransaction(agentId: string, transaction: Transactio
         },
     }));
 
-    await transactionsQuery.run(edgeDBCloudClient);
+    const transactionsQueryResult = await transactionsQuery;
+    await transactionsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function fetchTwineets(): Promise<TwineetType[]> {
-    const twineetsQuery = edgeql.select(edgeql.Twineet, () => (  {
+    const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
         id: true,
         agentId: true,
         content: true,
@@ -392,19 +395,17 @@ export async function fetchTwineets(): Promise<TwineetType[]> {
         isLiked: true,
         isRetwineeted: true,
     }));
-    const result = await twineetsQuery.run(edgeDBCloudClient);
+    const result = await twineetsQuery;
     return result as TwineetType[];
 }
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
     const twineetsQuery = edgeql.select(edgeql.Twineet, (twineet: TwineetType) => ({
-        filter_single: edgeql.op(twineet.agentId, '=', agentId),
+        filter: edgeql.op(twineet.agentId, '=', agentId),
     }));
-    const result = await twineetsQuery.run(edgeDBCloudClient);
-    return result as unknown as TwineetType[];
+    const result = await twineetsQuery;
+    return result as TwineetType[];
 }   
-
-
 
 const app = express();
 const port = 3002;

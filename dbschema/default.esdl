@@ -6,7 +6,7 @@ module default {
         required property symbol -> str;
         required property change24h -> decimal;
         required property value -> decimal;
-    }
+    } 
 
     type Demographics {
         required property agentId -> AgentIdType;
@@ -54,7 +54,7 @@ module default {
     type UserTokenShare {
         required property agentId -> AgentIdType;
         required property userId -> str;
-        required property shares -> int16;
+        required property shares -> decimal;
         required property purchasePrice -> decimal;
         required property purchaseDate -> datetime;
     }
@@ -64,7 +64,7 @@ module default {
         required property totalShares -> int16;
         required property availableShares -> int16;
         required property pricePerShare -> decimal;
-        required link shareholders -> UserTokenShare;
+        required multi shareholders -> UserTokenShare;
     }
 
     # Define the TokenStats type
@@ -160,9 +160,11 @@ module default {
         required link analytics -> Analytics;
         required property modelData -> json;
         # Change these to multi links to allow arrays
-        multi link twineets -> Twineet;
-        multi link fetchedTweets -> FetchedTweet; 
-        
+        required multi twineets -> Twineet;
+        required multi fetchedTweets -> FetchedTweet; 
+        required link tokenShares -> TokenShare; 
+        required link tokenStats -> TokenStats;
+        required multi transactions -> Transaction;
     }
 
     scalar type NotificationType extending enum<'create', 'buy', 'sell'>;

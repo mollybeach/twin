@@ -119,7 +119,15 @@ export function Clone() {
       fetchedTweets: [],
       twineets: [],
       autoReply: false,
-      isListed: true
+      isListed: true,
+      tokenStats: {
+        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        price: totalPrice,
+        change24h: 0,
+        volume24h: 0,
+        marketCap: 0
+      },
+      transaction: []
     };
 
     setCloneResult(newTwin);
@@ -186,7 +194,15 @@ export function Clone() {
         fetchedTweets: [],
         modelData: {},
         autoReply: false,
-        isListed: true
+        isListed: true,
+        tokenStats: {
+          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          price: cloneResult.price,
+          change24h: 0,
+          volume24h: 0,
+          marketCap: 0
+        },
+        transaction: []
       });
       
       // Reset state

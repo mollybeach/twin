@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FetchedTweetsType } from '../types/types';
+import { FetchedTweetType } from '../types/types';
 import { VerificationResponseType } from '../types/types';
 
 export async function verifyTwitterAccount(handle: string): Promise<VerificationResponseType> {
@@ -26,7 +26,7 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
   });
 }
 
-export const fetchTweets = async (username: string): Promise<FetchedTweetsType[]> => {
+export const fetchTweets = async (username: string): Promise<FetchedTweetType[]> => {
   try {
     console.log(`Fetching tweets for username: ${username}`); // Log the username
     const response = await axios.get(`http://localhost:3002/api/tweets`, {

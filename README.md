@@ -6,6 +6,22 @@ TwinAI is an innovative platform that allows users to create AI-powered digital 
 
 ![Twin Demo](https://res.cloudinary.com/storagemanagementcontainer/image/upload/v1738080385/portfolio/twin-demo_xno51m.png)
 
+## Set Up
+
+```bash
+npm install
+npm run dev
+```
+
+```bash
+cd server
+npm install 
+npm run start
+```
+
+
+
+
 ## Features
 
 - **Create Your Twin**: Users can create a digital alter ego by registering their social media handle (e.g., Twitter/X). The platform verifies the handle's availability through the X API.

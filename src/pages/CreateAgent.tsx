@@ -4,7 +4,8 @@ import { useMarketplaceStore } from '../store/marketplace';
 import { useNavigate } from 'react-router-dom';
 import { generateResponse } from '../services/openaiService';
 import { fetchTweets } from '../services/twitter';
-import {  AgentType, FetchedTweetsType, TwineetType } from '../types/types';
+import {  AgentType, FetchedTweetType, TwineetType, } from '../types/types';
+import { insertAgent, insertFetchedTweet, insertTwineet } from '../services/edgeDBService';
 
 export function CreateAgent() {
   const navigate = useNavigate();
@@ -54,7 +55,15 @@ export function CreateAgent() {
       demographics: [],
       peakHours: [],
       cryptoHoldings: []
-    }
+    },
+    tokenStats: {
+      agentId: '',
+      price: 0,
+      change24h: 0,
+      volume24h: 0,
+      marketCap: 0
+    },
+    transaction: []
   });
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
@@ -82,7 +91,7 @@ export function CreateAgent() {
     }
   };
 
-  const trainModelWithTweets = async (tweets: FetchedTweetsType[]): Promise<Record<string, unknown>> => {
+  const trainModelWithTweets = async (tweets: FetchedTweetType[]): Promise<Record<string, unknown>> => {
     try {
       const response = await generateResponse(tweets.map(tweet => tweet.text).join(' '));
       
@@ -106,83 +115,101 @@ export function CreateAgent() {
 
     setIsDeploying(true);
     setDeployError(null);
+
     try {
+      const agentId = crypto.randomUUID();
       const newAgent: AgentType = {
-        agentId: 'some-id',
+        agentId: agentId,
         createdAt: new Date(),
-        twinHandle: 'twinHandle',
-        twitterHandle: 'twitterHandle',
-        personality: 'friendly',
-        description: 'A friendly agent.',
-        price: 100,
-        profileImage: 'path/to/image.png',
-        autoReply: false,
-        isListed: true,
+        twinHandle: config.twinHandle,
+        twitterHandle: config.twitterHandle,
+        profileImage: config.profileImage,
+        personality: config.personality,
+        description: config.description,
+        autoReply: config.autoReply,
+        isListed: config.isListed,
+        price: config.price,
+        analytics: {
+          agentId: agentId,
+          clickThroughRate: 0,
+          engagementRate: 0,
+          impressions: 0,
+          cryptoHoldings: [],
+          demographics: [],
+          dailyImpressions: [],
+          peakHours: [],
+          reachByPlatform: [],
+          topInteractions: [],
+        },
+        fetchedTweets: config.fetchedTweets || [],
+        twineets: [],
+        verification: {
+          agentId: agentId,
+          isVerified: false,
+          verificationDate: new Date(),
+        },
         stats: {
-          agentId: 'some-id',
+          agentId: agentId,
           replies: 0,
           interactions: 0,
           uptime: '0h 0m',
         },
         tokenShares: {
-          agentId: 'some-id',
-          totalShares: 100,
-          availableShares: 100,
-          pricePerShare: 1,
+          agentId: agentId,
+          totalShares: 0,
+          availableShares: 0,
+          pricePerShare: 0,
           shareholders: [],
         },
-        verification: {
-          agentId: 'some-id',
-          isVerified: false,
-          verificationDate: new Date(),
-        },
-        analytics: {
-          agentId: 'some-id',
-          impressions: 0,
-          engagementRate: 0,
-          clickThroughRate: 0,
-          dailyImpressions: [],
-          topInteractions: [],
-          reachByPlatform: [],
-          demographics: [],
-          peakHours: [],
-          cryptoHoldings: [],
-        },
         modelData: {},
-        fetchedTweets: [],
-        twineets: [],
+        tokenStats: {
+          agentId: agentId,
+          price: 0,
+          change24h: 0,
+          volume24h: 0,
+          marketCap: 0,
+        },
+        transaction: [],
       };
+      await insertAgent(newAgent);
+  
+      addAgent(newAgent);
 
-      const addedAgent = await addAgent(newAgent);
+      for (const tweet of (config.fetchedTweets || [])) {
+        await insertFetchedTweet(newAgent.agentId, tweet);
+      }
 
-      // Generate multiple twineets and save them to twineets
-      const generatedTwineets = await generateMultipleTwineets(addedAgent);
-      setConfig(prev => ({
-        ...prev,
-        twineets: generatedTwineets
-      }));
+      const generatedTwineets = await generateMultipleTwineets(newAgent.agentId);
+      for (const twineet of generatedTwineets) {
+        await insertTwineet(
+          newAgent.agentId,
+          twineet
+        );
+      }
 
       setIsDeployed(true);
-      // Navigate to the new agent's analytics page after a short delay
       setTimeout(() => {
-        navigate(`/analytics/${addedAgent}`);
+        navigate(`/analytics/${newAgent.agentId}`);
       }, 2000);
     } catch (error) {
       console.error('Failed to deploy Twin:', error);
       setDeployError('Failed to deploy Twin. Please try again later.');
     } finally {
-      setIsDeploying(false); // Reset deploying state
+      setIsDeploying(false);
     }
   };
 
   const generateMultipleTwineets = async (agentId: string): Promise<TwineetType[]> => {
     const twineets: TwineetType[] = [];
-    for (let i = 0; i < 5; i++) { // Generate 5 twineets
-      const content = await generateResponse(`Generate a twineet for a ${config.personality} AI agent.`);
+    for (let i = 0; i < 5; i++) {
+      const prompt = `Generate a twineet for a ${config.personality} AI agent based on the following tweets: ${config.fetchedTweets
+        .map((tweet) => tweet.text)
+        .join(', ')}`;
+      const content = await generateResponse(prompt);
       const newTwineet: TwineetType = {
         agentId: agentId,
         content: content,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         likes: 0,
         retwineets: 0,
         replies: 0,
@@ -193,8 +220,7 @@ export function CreateAgent() {
     }
     return twineets;
   };
-
-  const handleGenerateResponse = async (tweets: FetchedTweetsType[], modelData: Record<string, unknown>) => {
+  const handleGenerateResponse = async (tweets: FetchedTweetType[], modelData: Record<string, unknown>) => {
     const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
     try {
       const response = await generateResponse(prompt);
@@ -208,7 +234,7 @@ export function CreateAgent() {
           id: crypto.randomUUID(),
           agentId: config.agentId,
           content: response,
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
           likes: 0,
           retwineets: 0,
           replies: 0,

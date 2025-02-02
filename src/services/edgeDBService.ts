@@ -1,404 +1,224 @@
-// src/services/edgeDBService.ts
-import edgeql from '../../dbschema/edgeql-js';
-import { createClient } from 'edgedb';
-import {
-    AgentStatsType,
-   // AnalyticsType,
-    CryptoHoldingType,
-    DailyImpressionsType,
-    DemographicsType,
-    FetchedTweetsType,
-    PeakHoursType,
-    ReachByPlatformType,
-    TopInteractionsType,
-    TwineetType,
-    UserTokenShareType,
-    VerificationResponseType,
-} from '../types/types';
+import edgeql, { createClient } from '../../dbschema/edgeql-js'
 
 export const edgeDBCloudClient = createClient({
     instanceName: 'mollybeach/twindb',
     secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
 });
 
-export const localClient = createClient();
+import {
+    AgentType,
+    FetchedTweetType,
+    TwineetType,
+    TransactionType
+} from '../types/types';
 
-// Insert CryptoHolding
-export async function insertCryptoHolding(
-    agentId: string,
-    amount: string,
-    symbol: string,
-    change24h: string,
-    value: string
-) {
-const insertCryptoHolding = edgeql.insert(edgeql.CryptoHolding, {
-    agentId,
-    amount: edgeql.decimal(amount),
-    symbol,
-    change24h: edgeql.decimal(change24h),
-    value: edgeql.decimal(value),
-});
-    await insertCryptoHolding.run(edgeDBCloudClient);
-}
+import {
+    formatAgent,
+    formatTokenShare,
+    formatFetchedTweet,
+    formatTwineet,
+    formatCryptoHolding,
+    formatDailyImpressions,
+    formatDemographics,
+    formatPeakHours,
+    formatReachByPlatform,
+    formatTopInteractions,
+    formatVerification,
+    formatAgentStats,
+    formatAnalytics,
+    formatTokenStats,
+    formatTransaction,
+    formatUserTokenShare,
+} from '../utils/formatData';
 
-// Insert Demographics
-export async function insertDemographics(agentId: string, age: string, percentage: string) {
-  const insertDemographics = edgeql.insert(edgeql.Demographics, {
-    agentId,
-    age,
-    percentage: edgeql.decimal(percentage),
-});
-  await insertDemographics.run(edgeDBCloudClient);
-}
+// Function to insert an agent
+export async function insertAgent(agentData: AgentType): Promise<void> {
+    const formattedAgent = formatAgent(agentData);
+    const formattedAnalytics = formatAnalytics(agentData.analytics);
+    const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings[agentData.analytics.cryptoHoldings.length - 1]); // how do i make it the last index of the array
+    const formattedDemographics = formatDemographics(agentData.analytics.demographics[agentData.analytics.demographics.length - 1]);
+    const formattedDailyImpressions = formatDailyImpressions(agentData.analytics.dailyImpressions[agentData.analytics.dailyImpressions.length - 1]);
+    const formattedPeakHours = formatPeakHours(agentData.analytics.peakHours[agentData.analytics.peakHours.length - 1]);
+    const formattedReachByPlatform = formatReachByPlatform(agentData.analytics.reachByPlatform[agentData.analytics.reachByPlatform.length - 1]);
+    const formattedTopInteractions = formatTopInteractions(agentData.analytics.topInteractions[agentData.analytics.topInteractions.length - 1]);
+    const formattedFetchedTweets = formatFetchedTweet(agentData.fetchedTweets[agentData.fetchedTweets.length - 1]);
+    const formattedTwineets = formatTwineet(agentData.twineets[agentData.twineets.length - 1] || agentData.twineets[0]);
+    const formattedTransactions = formatTransaction(agentData.transaction[agentData.transaction.length - 1]);
+    const formattedTokenShares = formatTokenShare(agentData.tokenShares);
+    const formattedTokenStats = formatTokenStats(agentData.tokenStats); 
+    const formattedUserTokenShares = formatUserTokenShare(agentData.tokenShares.shareholders[agentData.tokenShares.shareholders.length - 1]);
 
-// Insert DailyImpressions
-export async function insertDailyImpressions(agentId: string, date: string, count: number) {
-  const insertDailyImpressions = edgeql.insert(edgeql.DailyImpressions, {
-    agentId,
-    date,
-    count,
-  });
-  await insertDailyImpressions.run(edgeDBCloudClient);
-}
-
-// Insert PeakHours
-export async function insertPeakHours(agentId: string, hour: number, engagement: string) {
-  const insertPeakHours = edgeql.insert(edgeql.PeakHours, {
-    agentId,
-    hour,
-    engagement: edgeql.decimal(engagement),
-  });
-  await insertPeakHours.run(edgeDBCloudClient);
-}
-
-// Insert ReachByPlatform
-export async function insertReachByPlatform(agentId: string, platform: string, count: number) {
-  const insertReachByPlatform = edgeql.insert(edgeql.ReachByPlatform, {
-    agentId,
-    platform,
-    count,
-  });
-  await insertReachByPlatform.run(edgeDBCloudClient);
-}
-
-// Insert TopInteractions
-export async function insertTopInteractions(agentId: string, kind: string, count: number) {
-  const insertTopInteractions = edgeql.insert(edgeql.TopInteractions, {
-    agentId,
-    kind,
-    count,
-  });
-  await insertTopInteractions.run(edgeDBCloudClient);
-}
-
-// Insert Analytics
-export async function insertAnalytics(
-    agentId: string,
-    clickThroughRate: string,
-    engagementRate: string,
-    impressions: number,
-    cryptoHoldings: CryptoHoldingType,
-    demographics: DemographicsType,
-    dailyImpressions: DailyImpressionsType,
-    peakHours: PeakHoursType,
-    reachByPlatform: ReachByPlatformType,
-    topInteractions: TopInteractionsType
-) {
-    const insertAnalytics = edgeql.insert(edgeql.Analytics, {
-        agentId,
-        clickThroughRate: edgeql.decimal(clickThroughRate),
-        engagementRate: edgeql.decimal(engagementRate),
-        impressions,
+    const analyticsQuery =  edgeql.insert(edgeql.Analytics, {
+        agentId: formattedAnalytics.agentId,
+        clickThroughRate: edgeql.decimal(formattedAnalytics.clickThroughRate.toString()),
+        engagementRate: edgeql.decimal(formattedAnalytics.engagementRate.toString()),
+        impressions: formattedAnalytics.impressions,
         cryptoHoldings: edgeql.insert(edgeql.CryptoHolding, {
-            agentId,
-            amount: edgeql.decimal(cryptoHoldings.amount.toString()),
-            symbol: cryptoHoldings.symbol,
-            change24h: edgeql.decimal(cryptoHoldings.change24h.toString()),
-            value: edgeql.decimal(cryptoHoldings.value.toString()),
+            agentId: formattedAnalytics.agentId,
+            amount: edgeql.decimal(formattedCryptoHoldings.amount.toString()),
+            symbol: formattedCryptoHoldings.symbol,
+            change24h: edgeql.decimal(formattedCryptoHoldings.change24h.toString()),
+            value: edgeql.decimal(formattedCryptoHoldings.value.toString()),
         }),
         demographics: edgeql.insert(edgeql.Demographics, {
-            agentId,
-            age: demographics.age,
-            percentage: edgeql.decimal(demographics.percentage.toString()),
+            agentId: formattedAnalytics.agentId,
+            age: formattedDemographics.age,
+            percentage: edgeql.decimal(formattedDemographics.percentage.toString()),
         }),
         dailyImpressions: edgeql.insert(edgeql.DailyImpressions, {
-            agentId,
-            date: dailyImpressions.date,
-            count: dailyImpressions.count,
+            agentId: formattedAnalytics.agentId,
+            date: formattedDailyImpressions.date,
+            count: formattedDailyImpressions.count,
         }),
         peakHours: edgeql.insert(edgeql.PeakHours, {
-            agentId,
-            hour: peakHours.hour,
-            engagement: edgeql.decimal(peakHours.engagement.toString()),
+            agentId: formattedAnalytics.agentId,
+            hour: formattedPeakHours.hour,
+            engagement: edgeql.decimal(formattedPeakHours.engagement.toString()),
         }),
         reachByPlatform: edgeql.insert(edgeql.ReachByPlatform, {
-            agentId,
-            platform: reachByPlatform.platform,
-            count: reachByPlatform.count,
+            agentId: formattedAnalytics.agentId,
+            platform: formattedReachByPlatform.platform,
+            count: formattedReachByPlatform.count,
         }),
         topInteractions: edgeql.insert(edgeql.TopInteractions, {
-            agentId,
-            kind: topInteractions.kind,
-            count: topInteractions.count,
-        }),
+            agentId: formattedAnalytics.agentId,
+            kind: formattedTopInteractions.kind,
+            count: formattedTopInteractions.count,
+        })
+    });
+    const fetchedTweetsQuery = edgeql.insert(edgeql.FetchedTweet, {
+        agentId: formattedFetchedTweets.agentId,
+        text: formattedFetchedTweets.text,
+        edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
+        timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweets.timestamp)), // Ensure this is a Date object
     });
 
-    await insertAnalytics.run(edgeDBCloudClient);
-}
-// Insert UserTokenShare
-export async function insertUserTokenShare(
-    agentId: string,
-    userId: string,
-    shares: number,
-    purchasePrice: string,
-    purchaseDate: Date
-) {
-const insertUserTokenShare = edgeql.insert(edgeql.UserTokenShare, {
-    agentId,
-    userId,
-    shares,
-    purchasePrice: edgeql.decimal(purchasePrice),
-    purchaseDate,
-});
-    await insertUserTokenShare.run(edgeDBCloudClient);
+    const twineetsQuery = edgeql.insert(edgeql.Twineet, {
+        agentId: formattedTwineets.agentId,
+        content: formattedTwineets.content,
+        timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineets.timestamp)), // Ensure this is a Date object
+    });
+
+    const transactionsQuery = edgeql.insert(edgeql.Transaction, {
+        agentId: formattedTransactions.agentId,
+        kind: formattedTransactions.kind,
+        shares: formattedTransactions.shares,
+        pricePerShare: edgeql.decimal(formattedTransactions.pricePerShare.toString()),
+        totalAmount: edgeql.decimal(formattedTransactions.totalAmount.toString()),
+        timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTransactions.timestamp)), // Ensure this is a Date object
+    });
+
+    const userTokenSharesQuery = edgeql.insert(edgeql.UserTokenShare, {
+        agentId: formattedUserTokenShares.agentId,
+        userId: formattedUserTokenShares.userId,
+        shares: formattedUserTokenShares.shares,
+        purchasePrice: edgeql.decimal(formattedUserTokenShares.purchasePrice.toString()),
+        purchaseDate: edgeql.cast(edgeql.datetime, new Date(formattedUserTokenShares.purchaseDate)), // Ensure this is a Date object
+    });
+
+    const tokenSharesQuery = edgeql.insert(edgeql.TokenShare, {
+        agentId: formattedTokenShares.agentId,
+        totalShares: formattedTokenShares.totalShares,
+        availableShares: formattedTokenShares.availableShares,
+        pricePerShare: edgeql.decimal(formattedTokenShares.pricePerShare.toString()),
+        shareholders: userTokenSharesQuery,
+    });
+
+    const tokenStatsQuery = edgeql.insert(edgeql.TokenStats, {
+        agentId: formattedTokenStats.agentId,
+        price: edgeql.decimal(formattedTokenStats.price.toString()),
+        change24h: edgeql.decimal(formattedTokenStats.change24h.toString()),
+        volume24h: formattedTokenStats.volume24h,
+        marketCap: formattedTokenStats.marketCap,
+    });
+    
+    const insertAgentQuery = edgeql.insert(edgeql.Agent, {
+        agentId: formattedAgent.agentId,
+        twinHandle: formattedAgent.twinHandle,
+        twitterHandle: formattedAgent.twitterHandle,
+        profileImage: formattedAgent.profileImage,
+        personality: formattedAgent.personality,
+        description: formattedAgent.description,
+        autoReply: formattedAgent.autoReply,
+        isListed: formattedAgent.isListed,
+        price: formattedAgent.price,
+        createdAt: edgeql.cast(edgeql.datetime, formattedAgent.createdAt),
+        analytics: analyticsQuery,
+        verification: edgeql.insert(edgeql.Verification, formatVerification(formattedAgent.verification)),
+        stats: edgeql.insert(edgeql.AgentStats, formatAgentStats(formattedAgent.stats)),
+        tokenShares: tokenSharesQuery,
+        fetchedTweets: fetchedTweetsQuery,
+        twineets: twineetsQuery,
+        tokenStats: tokenStatsQuery,
+        transactions: transactionsQuery,
+    });
+
+    await insertAgentQuery.run(edgeDBCloudClient);
 }
 
-// Insert TokenShare
-export async function insertTokenShare(
-    agentId: string,
-    totalShares: number,
-    availableShares: number,
-    pricePerShare: string,
-    shareholders: UserTokenShareType
-) {
-    const insertTokenShare = edgeql.insert(edgeql.TokenShare, {
-        agentId,
-        totalShares,
-        availableShares,
-        pricePerShare: edgeql.decimal(pricePerShare),
-        shareholders: edgeql.insert(edgeql.UserTokenShare, {
-            agentId,
-            userId: shareholders.userId,
-            shares: shareholders.shares,
-            purchasePrice: edgeql.decimal(shareholders.purchasePrice.toString()),
-            purchaseDate: new Date(shareholders.purchaseDate),
-        }),
-    });
-    await insertTokenShare.run(edgeDBCloudClient);
-}
-// Insert TokenStats
-export async function insertTokenStats(
-    agentId: string,
-    price: string,
-    change24h: string,
-    volume24h: string,
-    marketCap: string
-) {
-    const insertTokenStats = edgeql.insert(edgeql.TokenStats, {
-        agentId,
-        price: edgeql.decimal(price),
-        change24h: edgeql.decimal(change24h),
-        volume24h: edgeql.decimal(volume24h),
-        marketCap: edgeql.decimal(marketCap),
-    });
-    await insertTokenStats.run(edgeDBCloudClient);
+export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
+    const formattedFetchedTweet = formatFetchedTweet(fetchedTweet);
+    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+        filter: edgeql.op(agent.agentId, '=', agentId),
+        set: {
+            fetchedTweets: {
+                '+=': edgeql.insert(edgeql.FetchedTweet, formattedFetchedTweet),
+            },
+        },
+    }));
+
+    await fetchedTweetsQuery.run(edgeDBCloudClient);
 }
 
-// Insert Transaction
-export async function insertTransaction(
-    agentId: string,
-    kind: 'buy' | 'sell',
-    shares: number,
-    pricePerShare: string,
-    totalAmount: string
-) {
-    const insertTransaction = edgeql.insert(edgeql.Transaction, {
-        agentId,
-        kind,
-        shares,
-        pricePerShare: edgeql.decimal(pricePerShare),
-        totalAmount: edgeql.decimal(totalAmount),
-    });
-    await insertTransaction.run(edgeDBCloudClient);
+export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
+    const formattedTwineet = formatTwineet(twineet);
+    const twineetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+        filter: edgeql.op(agent.agentId, '=', agentId),
+        set: {
+            twineets: {
+                '+=': edgeql.insert(edgeql.Twineet, formattedTwineet),
+            },
+        },
+    }));
+
+    await twineetsQuery.run(edgeDBCloudClient);
 }
 
-// Insert FetchedTweet
-export async function insertFetchedTweet(agentId: string, text: string, editHistoryTweetIds: string[]) {
-    const insertFetchedTweet = edgeql.insert(edgeql.FetchedTweet, {
-        agentId,
-        text,
-        edit_history_tweet_ids: editHistoryTweetIds,
-        timestamp: new Date(),
-    });
-    await insertFetchedTweet.run(edgeDBCloudClient);
+export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
+    const formattedTransaction = formatTransaction(transaction);
+    const transactionsQuery = edgeql.update(edgeql.Agent, (agent) => ({
+        filter: edgeql.op(agent.agentId, '=', agentId), 
+        set: {
+            transactions: {
+                '+=': edgeql.insert(edgeql.Transaction, formattedTransaction),
+            },
+        },
+    }));
+
+    await transactionsQuery.run(edgeDBCloudClient);
 }
 
-// Insert Twineet
-export async function insertTwineet(
-    agentId: string,
-    content: string,
-    likes: number,
-    retwineets: number,
-    replies: number,
-    isLiked: boolean,
-    isRetwineeted: boolean
-) {
-    const insertTwineet = edgeql.insert(edgeql.Twineet, {
-        agentId,
-        content,
-        timestamp: new Date(),
-        likes,
-        retwineets,
-        replies,
-        isLiked,
-        isRetwineeted,
-    });
-    await insertTwineet.run(edgeDBCloudClient);
+export async function fetchTwineets(): Promise<TwineetType[]> {
+    const twineetsQuery = edgeql.select(edgeql.Twineet, () => (  {
+        id: true,
+        agentId: true,
+        content: true,
+        timestamp: true,
+        likes: true,
+        retwineets: true,
+        replies: true,
+        isLiked: true,
+        isRetwineeted: true,
+    }));
+    const result = await twineetsQuery.run(edgeDBCloudClient);
+    return result as TwineetType[];
 }
 
-// Insert Verification
-export async function insertVerification(agentId: string, isVerified: boolean, verificationDate: Date) {
-    const insertVerification = edgeql.insert(edgeql.Verification, {
-        agentId,
-        isVerified,
-        verificationDate,
-    });
-    await insertVerification.run(edgeDBCloudClient);
-}
+export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
+    const twineetsQuery = edgeql.select(edgeql.Twineet, (twineet) => ({
+        filter_single: edgeql.op(twineet.agentId, '=', agentId),
+    }));
+    const result = await twineetsQuery.run(edgeDBCloudClient);
+    return result as unknown as TwineetType[];
+}   
 
-// Insert AgentStats
-export async function insertAgentStats(agentId: string, replies: number, interactions: number, uptime: string) {
-    const insertAgentStats = edgeql.insert(edgeql.AgentStats, {
-        agentId,
-        replies,
-        interactions,
-        uptime,
-    });
-    await insertAgentStats.run(edgeDBCloudClient);
-}
-
-// Insert Agent
-export async function insertAgent(
-    agentId: string,
-    twinHandle: string,
-    twitterHandle: string,
-    profileImage: string,
-    personality: string,
-    description: string,
-    autoReply: boolean,
-    isListed: boolean,
-    price: string,
-    analytics: {
-        agentId: string,
-        clickThroughRate: string,
-        engagementRate: string,
-        impressions: number,
-        cryptoHoldings: CryptoHoldingType,
-        demographics: DemographicsType,
-        dailyImpressions: DailyImpressionsType,
-        peakHours: PeakHoursType,
-        reachByPlatform: ReachByPlatformType,
-        topInteractions: TopInteractionsType
-    },
-    fetchedTweets: FetchedTweetsType,
-    twineets: TwineetType,
-    verification: VerificationResponseType,
-    stats: AgentStatsType
-) {
-    const insertAgent = edgeql.insert(edgeql.Agent, {
-        agentId,
-        twinHandle,
-        twitterHandle,
-        profileImage,
-        personality,
-        description,
-        autoReply,
-        isListed,
-        price: edgeql.decimal(price),
-        analytics: edgeql.insert(edgeql.Analytics, {
-            agentId: analytics.agentId,
-            clickThroughRate: edgeql.decimal(analytics.clickThroughRate.toString()),
-            engagementRate: edgeql.decimal(analytics.engagementRate.toString()),
-            impressions: analytics.impressions,
-            cryptoHoldings: edgeql.insert(edgeql.CryptoHolding, {
-                agentId: analytics.agentId,
-                amount: edgeql.decimal(analytics.cryptoHoldings.amount.toString()),
-                symbol: analytics.cryptoHoldings.symbol,
-                change24h: edgeql.decimal(analytics.cryptoHoldings.change24h.toString()),
-                value: edgeql.decimal(analytics.cryptoHoldings.value.toString()),
-            }),
-            demographics: edgeql.insert(edgeql.Demographics, {
-                agentId: analytics.agentId,
-                age: analytics.demographics.age,
-                percentage: edgeql.decimal(analytics.demographics.percentage.toString()),
-            }),
-            dailyImpressions: edgeql.insert(edgeql.DailyImpressions, {
-                agentId: analytics.agentId,
-                date: analytics.dailyImpressions.date,
-                count: analytics.dailyImpressions.count,
-            }),
-            peakHours: edgeql.insert(edgeql.PeakHours, {
-                agentId: analytics.agentId,
-                hour: analytics.peakHours.hour,
-                engagement: edgeql.decimal(analytics.peakHours.engagement.toString()),
-            }),
-            reachByPlatform: edgeql.insert(edgeql.ReachByPlatform, {
-                agentId: analytics.agentId,
-                platform: analytics.reachByPlatform.platform,
-                count: analytics.reachByPlatform.count,
-            }),
-            topInteractions: edgeql.insert(edgeql.TopInteractions, {
-                agentId: analytics.agentId,
-                kind: analytics.topInteractions.kind,
-                count: analytics.topInteractions.count,
-            })
-        }),
-        fetchedTweets: edgeql.insert(edgeql.FetchedTweet, {
-            agentId: fetchedTweets.agentId,
-            text: fetchedTweets.text,
-            edit_history_tweet_ids: fetchedTweets.edit_history_tweet_ids,
-            timestamp: edgeql.datetime(new Date(fetchedTweets.timestamp).toISOString()),
-        }),
-        twineets: edgeql.insert(edgeql.Twineet, {
-            agentId: twineets.agentId,
-            content: twineets.content,
-            timestamp: edgeql.datetime(new Date(twineets.timestamp).toISOString()),
-            likes: twineets.likes,
-            retwineets: twineets.retwineets,
-            replies: twineets.replies,
-            isLiked: twineets.isLiked,
-            isRetwineeted: twineets.isRetwineeted,
-        }),
-        verification: edgeql.insert(edgeql.Verification, {
-            agentId: verification.agentId,
-            isVerified: verification.isVerified,
-            verificationDate: new Date(verification.verificationDate),
-        }),
-        stats: edgeql.insert(edgeql.AgentStats, {
-            agentId: stats.agentId,
-            replies: stats.replies,
-            interactions: stats.interactions,
-            uptime: stats.uptime,
-        }),
-    });
-    await insertAgent.run(edgeDBCloudClient);
-}
-
-// Insert Notification
-export async function insertNotification(
-    agentId: string,
-    kind: 'create' | 'buy' | 'sell',
-    message: string,
-    twinHandle: string,
-    twitterHandle: string
-) {
-    const insertNotification = edgeql.insert(edgeql.Notification, {
-        agentId,
-        kind,
-        message,
-        twinHandle,
-        twitterHandle,
-        timestamp: new Date(),
-    });
-    await insertNotification.run(edgeDBCloudClient);
-}

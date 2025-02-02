@@ -3,6 +3,7 @@ import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
 import { TwineetType } from '../types/types';
 import { generateResponse } from '../services/openaiService';
+import { fetchTwineets } from '../services/edgeDBService';
 
 export function Home() {
   const agents = useMarketplaceStore((state) => state.agents);
@@ -11,32 +12,16 @@ export function Home() {
   const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const generateTwineets = async () => {
-      const newTwineets: TwineetType[] = [];
-      for (const agent of agents) {
-        const prompt = `Generate a twineet for a ${agent.personality} AI agent named ${agent.twinHandle}.`;
-        try {
-          const response = await generateResponse(prompt);
-          const newTwineet: TwineetType = {
-            id: crypto.randomUUID(),
-            agentId: agent.id,
-            content: response,
-            timestamp: new Date().toISOString(),
-            likes: 0,
-            retwineets: 0,
-            replies: 0,
-            isLiked: false,
-            isRetwineeted: false,
-          };
-          newTwineets.push(newTwineet);
-        } catch (error) {
-          console.error('Error generating twineet:', error);
-        }
+    const fetchAndDisplayTwineets = async () => {
+      try {
+        const fetchedTwineets = await fetchTwineets();
+        setTwineets(fetchedTwineets);
+      } catch (error) {
+        console.error('Error fetching twineets:', error);
       }
-      setTwineets(newTwineets);
     };
 
-    generateTwineets();
+    fetchAndDisplayTwineets();
   }, [agents]);
 
   const handleLike = (twineetId: string) => {
@@ -153,7 +138,7 @@ export function Home() {
         ) : (
           <div className="divide-y divide-white/10">
             {filteredTwineets.map((twineet) => {
-              const agent = agents.find(a => a.id === twineet.agentId);
+              const agent = agents.find(a => a.agentId === twineet.agentId);
               if (!agent) return null;
 
               return (
@@ -171,16 +156,16 @@ export function Home() {
                         </span>
                         <Bot className="w-4 h-4 text-purple-400" />
                         <span className="text-purple-300">·</span>
-                        <span className="text-purple-300">{formatTimestamp(twineet.timestamp)}</span>
+                        <span className="text-purple-300">{formatTimestamp(twineet.timestamp.toISOString())}</span>
                         <button
-                          onClick={() => toggleFollow(agent.id)}
+                          onClick={() => toggleFollow(agent.agentId)}
                           className={`ml-2 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                            followedAgents.has(agent.id)
+                            followedAgents.has(agent.agentId)
                               ? 'bg-purple-500/50 text-white hover:bg-purple-500/70'
                               : 'border border-purple-500 text-purple-400 hover:bg-purple-500/10'
                           }`}
                         >
-                          {followedAgents.has(agent.id) ? 'Following' : 'Follow'}
+                          {followedAgents.has(agent.agentId) ? 'Following' : 'Follow'}
                         </button>
                         <button className="ml-auto text-purple-300 hover:text-purple-200">
                           <MoreHorizontal className="w-5 h-5" />
@@ -195,7 +180,7 @@ export function Home() {
                           <span>{twineet.replies}</span>
                         </button>
                         <button
-                          onClick={() => handleRetwineet(twineet.id)}
+                          onClick={() => handleRetwineet(twineet.id ?? '')}
                           className={`flex items-center space-x-2 ${
                             twineet.isRetwineeted ? 'text-green-400' : 'hover:text-green-400'
                           } group`}
@@ -206,7 +191,7 @@ export function Home() {
                           <span>{twineet.retwineets}</span>
                         </button>
                         <button
-                          onClick={() => handleLike(twineet.id)}
+                          onClick={() => handleLike(twineet.id ?? '')}
                           className={`flex items-center space-x-2 ${
                             twineet.isLiked ? 'text-pink-400' : 'hover:text-pink-400'
                           } group`}

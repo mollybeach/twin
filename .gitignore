@@ -40,3 +40,5 @@ coverage/
 *.tgz
 
 dbschema/edgeql-js
+
+.next/

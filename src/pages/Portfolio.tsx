@@ -14,13 +14,14 @@ import {
   History,
   Filter
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { SharePriceChart } from '../components/SharePriceChart';
 
 export function PortfolioPage() {
   const { agents, getUserShares, getTransactionHistory } = useMarketplaceStore();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [showTransactions, setShowTransactions] = useState(false);
+
 
   const holdings = agents.map(agent => {
     const shares = getUserShares(agent.agentId);
@@ -214,7 +215,7 @@ export function PortfolioPage() {
           <div className="text-center py-12 bg-white/10 backdrop-blur-lg rounded-lg">
             <p className="text-purple-300 mb-4">No shares owned yet</p>
             <Link
-              to="/marketplace"
+              href="/marketplace"
               className="inline-flex items-center px-6 py-3 bg-purple-500/50 text-white rounded-lg hover:bg-purple-500/70 transition-colors"
             >
               Browse Marketplace
@@ -230,7 +231,7 @@ export function PortfolioPage() {
               >
                 <div className="flex items-center justify-between mb-6">
                   <Link
-                    to={`/analytics/${holding.id}`}
+                    href={`/analytics/${holding.id}`}
                     className="flex items-center space-x-4 hover:opacity-80 transition-opacity"
                   >
                     <div className="relative">

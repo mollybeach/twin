@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
 import { ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge, Twitter } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { ThemeToggle } from './ThemeToggle';
@@ -8,10 +8,9 @@ import { TokenStats } from './TokenStats';
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ id: string; twinHandle: string; personality: string }>>([]);
+  const [searchResults, setSearchResults] = useState<Array<{ agentId: string; twinHandle: string; personality: string }>>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const agents = useMarketplaceStore((state) => state.agents);
 
   useEffect(() => {
@@ -41,8 +40,8 @@ export function Navbar() {
     const filtered = agents.filter(agent => 
       agent.twinHandle.toLowerCase().includes(query.toLowerCase()) ||
       agent.personality.toLowerCase().includes(query.toLowerCase())
-    ).map(({ id, twinHandle, personality }) => ({
-      id,
+    ).map(({ agentId, twinHandle, personality }) => ({
+      agentId,
       twinHandle,
       personality
     }));
@@ -54,7 +53,7 @@ export function Navbar() {
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    navigate(`/analytics/${agentId}`);
+    window.location.href = `/analytics/${agentId}`;
   };
 
   return (
@@ -62,13 +61,10 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <NavLink
-              to="/"
-              className="flex items-center"
-            >
+            <Link href="/" className="flex items-center">
               <Twitter className="h-6 w-6 text-purple-400" />
               <span className="ml-2 text-lg font-semibold text-white">Twin.fun</span>
-            </NavLink>
+            </Link>
 
             <div className="ml-6">
               <TokenStats />
@@ -112,8 +108,8 @@ export function Navbar() {
                       <div className="absolute mt-2 w-full bg-white/10 backdrop-blur-lg rounded-lg shadow-lg py-1 max-h-96 overflow-y-auto">
                         {searchResults.map((result) => (
                           <button
-                            key={result.id}
-                            onClick={() => handleSelectResult(result.id)}
+                            key={result.agentId}
+                            onClick={() => handleSelectResult(result.agentId)}
                             className="w-full px-4 py-2 text-left hover:bg-white/5 transition-colors flex items-center justify-between"
                           >
                             <span className="text-white">@{result.twinHandle}</span>
@@ -130,60 +126,24 @@ export function Navbar() {
             <ThemeToggle />
 
             <div className="hidden md:flex items-center space-x-2">
-              <NavLink
-                to="/marketplace"
-                className={({ isActive }) =>
-                  `flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                    isActive
-                      ? 'text-white bg-purple-500/50'
-                      : 'text-purple-200 hover:text-white hover:bg-white/5'
-                  } transition-colors`
-                }
-              >
+              <Link href="/marketplace" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <ShoppingBag className="h-5 w-5 mr-1.5" />
                 <span>Marketplace</span>
-              </NavLink>
-              <NavLink
-                to="/clone"
-                className={({ isActive }) =>
-                  `flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                    isActive
-                      ? 'text-white bg-purple-500/50'
-                      : 'text-purple-200 hover:text-white hover:bg-white/5'
-                  } transition-colors`
-                }
-              >
+              </Link>
+              <Link href="/clone" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <GitMerge className="h-5 w-5 mr-1.5" />
                 <span>Clone Lab</span>
-              </NavLink>
-              <NavLink
-                to="/leaderboard"
-                className={({ isActive }) =>
-                  `flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                    isActive
-                      ? 'text-white bg-purple-500/50'
-                      : 'text-purple-200 hover:text-white hover:bg-white/5'
-                  } transition-colors`
-                }
-              >
+              </Link>
+              <Link href="/leaderboard" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <Trophy className="h-5 w-5 mr-1.5" />
                 <span>Leaderboard</span>
-              </NavLink>
+              </Link>
               
               {/* Gold Create Twin Button */}
-              <NavLink
-                to="/create"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ml-4 ${
-                    isActive
-                      ? 'text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400'
-                      : 'text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500'
-                  } transition-colors shadow-lg hover:shadow-amber-500/20 border border-amber-300`
-                }
-              >
+              <Link href="/create" className="flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ml-4 text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-colors shadow-lg hover:shadow-amber-500/20 border border-amber-300">
                 <PlusCircle className="h-5 w-5 mr-1.5" />
                 <span className="font-semibold">Create Twin</span>
-              </NavLink>
+              </Link>
             </div>
 
             {/* Mobile menu button */}

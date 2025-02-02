@@ -7,7 +7,7 @@ import { Bot } from 'lucide-react';
 export function AnalyticsPage() {
   const { agentId } = useParams<{ agentId: string }>();
   const { agents, updateAnalytics } = useMarketplaceStore();
-  const agent = agents.find(a => a.id === agentId);
+  const agent = agents.find(a => a.agentId === agentId);
 
   React.useEffect(() => {
     if (agentId) {

@@ -5,7 +5,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { createClient } from 'edgedb';
-import edgeql from '../dbschema/edgeql-js'
+import edgeql from '@/dbschema/edgeql-js'
 import dotenv from 'dotenv';
 
 dotenv.config();

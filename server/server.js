@@ -5,22 +5,21 @@ require('dotenv').config({ path: '../.env' });
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
-import { createClient } from 'edgedb';
-import edgeql from '@/dbschema/edgeql-js';
+/*const { createClient } = require('edgedb');
+const edgeql = require('../dbschema/edgeql-js');
 
-export const edgeDBCloudClient = createClient({
+const edgeDBCloudClient = createClient({
     instanceName: 'mollybeach/twindb',
     secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN
 });
 
-export const localClient = createClient();
-
+const localClient = createClient();
+*/
 const app = express();
 const port = 3002;
 
 app.use(express.json());
 app.use(cors());
-
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
@@ -90,13 +89,16 @@ app.get('/api/tweets', async(req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
-
+/*
 // Run Query
-// Run Query
-const query = edgeql.select(edgeql.Agent, (agent) => ({
-    twinHandle: agent.twinHandle, // Use the agent variable
-    twitterHandle: agent.twitterHandle, // Use the agent variable
-}));
+const runQuery = async() => {
+    const query = edgeql.select(edgeql.Agent, (agent) => ({
+        twinHandle: agent.twinHandle, // Use the agent variable
+        twitterHandle: agent.twitterHandle, // Use the agent variable
+    }));
 
-const result = await edgeDBCloudClient.query(query);
-console.log(result);
+    const result = await edgeDBCloudClient.query(query);
+    console.log(result);
+};
+
+runQuery(); // Call the function to execute the query*/

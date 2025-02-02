@@ -1,3 +1,4 @@
+"use client";
 import { useState } from 'react';
 import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
@@ -5,7 +6,7 @@ import { PriceChart } from '../components/PriceChart';
 
 const VERIFICATION_FEE = 100;
 
-export function Marketplace() {
+export default function MarketplacePage() {
   const { agents, buyShares, sellShares, verifyAgent, getUserShares } = useMarketplaceStore();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);

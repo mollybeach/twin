@@ -4,6 +4,7 @@ import type { TokenStatsType } from '../types/types';
 
 export function TokenStats() {
   const [stats, setStats] = React.useState<TokenStatsType>({
+    agentId: '123',
     price: 12.84,
     change24h: 5.67,
     volume24h: 2450000,
@@ -16,6 +17,7 @@ export function TokenStats() {
         const priceChange = (Math.random() - 0.48) * 0.1;
         const newPrice = prev.price * (1 + priceChange);
         return {
+          agentId: '123',
           price: newPrice,
           change24h: prev.change24h + priceChange * 100,
           volume24h: prev.volume24h + (Math.random() - 0.5) * 10000,

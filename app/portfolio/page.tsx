@@ -1,3 +1,4 @@
+"use client";
 import { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { 
@@ -17,7 +18,7 @@ import {
 import Link from 'next/link';
 import { SharePriceChart } from '../components/SharePriceChart';
 
-export function PortfolioPage() {
+export default function PortfolioPage() {
   const { agents, getUserShares, getTransactionHistory } = useMarketplaceStore();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [showTransactions, setShowTransactions] = useState(false);

@@ -1,6 +1,6 @@
    // path: pages/api/agents.ts
     import { NextApiRequest, NextApiResponse } from 'next';
-    import { insertAgent } from '../../../server/index'; // Adjust the import based on your structure
+    import { insertAgent } from '../../server/index'; // Adjust the import based on your structure
     export default async function handler(req: NextApiRequest, res: NextApiResponse) {
         if (req.method === 'POST') {
             const newAgentData = req.body; // Get the new agent data from the request body

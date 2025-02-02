@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from 'react';
 import { Bot, Check, AlertCircle } from 'lucide-react';
 import { NotificationType, NotificationBarPropsType } from '../types/types';

@@ -1,8 +1,9 @@
+"use client";
 import { useMarketplaceStore } from '../store/marketplace';
 import { Trophy, TrendingUp, Users, MessageCircle, DollarSign, BadgeCheck, Bot } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
-export function Leaderboard() {
+export default function LeaderboardPage() {
   const agents = useMarketplaceStore((state) => state.agents);
 
   // Sort agents by different metrics
@@ -54,7 +55,7 @@ export function Leaderboard() {
                 {getTopThree(byEngagement).map((agent, index) => (
                   <Link
                     key={agent.agentId}
-                    to={`/analytics/${agent.agentId}`}
+                    href={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
@@ -96,7 +97,7 @@ export function Leaderboard() {
                   return (
                     <Link
                       key={agent.agentId}
-                      to={`/analytics/${agent.agentId}`}
+                      href={`/analytics/${agent.agentId}`}
                       className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
@@ -136,7 +137,7 @@ export function Leaderboard() {
                 {getTopThree(byInteractions).map((agent, index) => (
                   <Link
                     key={agent.agentId}
-                    to={`/analytics/${agent.agentId}`}
+                    href={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
@@ -175,7 +176,7 @@ export function Leaderboard() {
                 {getTopThree(byImpressions).map((agent, index) => (
                   <Link
                     key={agent.agentId}
-                    to={`/analytics/${agent.agentId}`}
+                    href={`/analytics/${agent.agentId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">

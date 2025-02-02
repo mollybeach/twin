@@ -1,17 +1,18 @@
+"use client";
 import React, { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { GitMerge, Dna, Sparkles, Bot, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { AgentType } from '../types/types';
 
-export function Clone() {
+export default function ClonePage() {
   const { agents, addAgent } = useMarketplaceStore();
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [draggedAgent, setDraggedAgent] = useState<string | null>(null);
   const [isCloning, setIsCloning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cloneResult, setCloneResult] = useState<AgentType | null>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleDragStart = (agentId: string, e: React.DragEvent) => {
     setDraggedAgent(agentId);
@@ -210,7 +211,7 @@ export function Clone() {
       setCloneResult(null);
       
       // Navigate to the new clone's analytics page
-      navigate(`/analytics/${newAgentId}`);
+      router.push(`/analytics/${newAgentId}`);
     } catch (error) {
       console.error('Failed to create clone:', error);
       setError('Failed to create clone. Please try again.');

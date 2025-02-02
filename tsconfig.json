@@ -19,16 +19,26 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/dbschema/*": ["dbschema/*"]
-    }
+      "@/*": [
+        "app/*"
+      ],
+      "@/dbschema/*": [
+        "dbschema/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/**/*",
-    "dbschema/**/*"
+    "app/**/*",
+    "dbschema/**/*",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { generateResponse } from '../services/openaiService';
 import { fetchTweets } from '../services/twitter';
 import {  AgentType, FetchedTweetType, TwineetType, } from '../types/types';
 import { defaultAgent } from '../utils/defaultData';
 
-export function CreateAgent() {
-  const navigate = useNavigate();
+export default function CreatePage() {
+  const router = useRouter();
   const addAgent = useMarketplaceStore((state) => state.addAgent);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
@@ -115,7 +115,7 @@ export function CreateAgent() {
 
       setIsDeployed(true);
       setTimeout(() => {
-        navigate(`/analytics/${config.agentId}`);
+        router.push(`/analytics/${config.agentId}`);
       }, 2000);
     } catch (error) {
       console.error('Failed to deploy Twin:', error);

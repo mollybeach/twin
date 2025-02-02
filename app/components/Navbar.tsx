@@ -1,9 +1,11 @@
+"use client";
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge, Twitter } from 'lucide-react';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useMarketplaceStore } from '@/store/marketplace';
 import { ThemeToggle } from './ThemeToggle';
 import { TokenStats } from './TokenStats';
+import { useRouter } from 'next/navigation';
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -12,6 +14,7 @@ export function Navbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const agents = useMarketplaceStore((state) => state.agents);
+  const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -53,7 +56,7 @@ export function Navbar() {
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    window.location.href = `/analytics/${agentId}`;
+    router.push(`/analytics/${agentId}`);
   };
 
   return (

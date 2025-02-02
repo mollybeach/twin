@@ -32,7 +32,7 @@ import {
     ReachByPlatformType,
     TopInteractionsType,
     TransactionType,
-} from '../src/types/types';
+} from '../app/types/types';
 // Function to format UserTokenShare
 function formatUserTokenShare(share: UserTokenShareType) {
     return {

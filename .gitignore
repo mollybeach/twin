@@ -5,9 +5,6 @@ node_modules/
 dist/
 build/
 
-# Vite cache
-.vite/
-
 # Logs
 logs
 *.log

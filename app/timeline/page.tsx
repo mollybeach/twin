@@ -1,9 +1,10 @@
+"use client";
 import { useEffect, useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
 import { TwineetType } from '../types/types';
 
-export function TimelinePage() {
+export default function TimelinePage() {
   const agents = useMarketplaceStore((state) => state.agents);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');

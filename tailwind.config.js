@@ -3,8 +3,8 @@ export default {
     content: [
         './app/**/*.{js,ts,jsx,tsx}', // Include all files in the app directory
         './components/**/*.{js,ts,jsx,tsx}', // Include all files in the components directory
-        './styles/**/*.{css}', // Include all CSS files in the styles directory
-        './public/**/*.{html}', // Include HTML files in the public directory if needed
+        './styles/**/*.css', // Include all CSS files in the styles directory
+        './public/**/*.html', // Include HTML files in the public directory if needed
     ],
     darkMode: 'class',
     theme: {

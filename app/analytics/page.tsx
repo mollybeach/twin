@@ -1,10 +1,11 @@
+"use client";
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useMarketplaceStore } from '../store/marketplace';
-import { Analytics as AnalyticsComponent } from '../components/Analytics';
+import { useParams } from 'next/navigation';
+import { useMarketplaceStore } from '@/store/marketplace';
+import { Analytics as AnalyticsComponent } from '@/components/Analytics';
 import { Bot } from 'lucide-react';
 
-export function AnalyticsPage() {
+export default function AnalyticsPage() {
   const { agentId } = useParams<{ agentId: string }>();
   const { agents, updateAnalytics } = useMarketplaceStore();
   const agent = agents.find(a => a.agentId === agentId);

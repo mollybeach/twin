@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';

@@ -6,12 +6,12 @@ export interface AnalyticsType {
     clickThroughRate: number;
     engagementRate: number;
     impressions: number;
-    cryptoHoldings: CryptoHoldingType[];
-    demographics: DemographicsType[];
-    dailyImpressions: DailyImpressionsType[];
-    peakHours: PeakHoursType[];
-    reachByPlatform: ReachByPlatformType[];
-    topInteractions: TopInteractionsType[];
+    cryptoHoldings: CryptoHoldingType;
+    demographics: DemographicsType;
+    dailyImpressions: DailyImpressionsType;
+    peakHours: PeakHoursType;
+    reachByPlatform: ReachByPlatformType;
+    topInteractions: TopInteractionsType;
 }
 
 export interface AgentType {

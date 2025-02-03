@@ -115,12 +115,12 @@ function formatAnalytics(analytics: AnalyticsType) {
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
         engagementRate: parseFloat(analytics.engagementRate.toString()), // Ensure this is a number
         impressions: analytics.impressions,
-        cryptoHoldings: analytics.cryptoHoldings.map(formatCryptoHolding),
-        demographics: analytics.demographics.map(formatDemographics),
-        dailyImpressions: analytics.dailyImpressions.map(formatDailyImpressions),
-        peakHours: analytics.peakHours.map(formatPeakHours),
-        reachByPlatform: analytics.reachByPlatform.map(formatReachByPlatform),
-        topInteractions: analytics.topInteractions.map(formatTopInteractions),
+        cryptoHoldings: formatCryptoHolding(analytics.cryptoHoldings),
+        demographics: formatDemographics(analytics.demographics),
+        dailyImpressions: formatDailyImpressions(analytics.dailyImpressions),
+        peakHours: formatPeakHours(analytics.peakHours),
+        reachByPlatform: formatReachByPlatform(analytics.reachByPlatform),
+        topInteractions: formatTopInteractions(analytics.topInteractions),
     };
 }
 
@@ -237,12 +237,12 @@ function formatTransaction(transaction: TransactionType) {
 export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedAgent = formatAgent(agentData);
     const formattedAnalytics = formatAnalytics(agentData.analytics);
-    const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings[agentData.analytics.cryptoHoldings.length - 1]); // how do i make it the last index of the array
-    const formattedDemographics = formatDemographics(agentData.analytics.demographics[agentData.analytics.demographics.length - 1]);
-    const formattedDailyImpressions = formatDailyImpressions(agentData.analytics.dailyImpressions[agentData.analytics.dailyImpressions.length - 1]);
-    const formattedPeakHours = formatPeakHours(agentData.analytics.peakHours[agentData.analytics.peakHours.length - 1]);
-    const formattedReachByPlatform = formatReachByPlatform(agentData.analytics.reachByPlatform[agentData.analytics.reachByPlatform.length - 1]);
-    const formattedTopInteractions = formatTopInteractions(agentData.analytics.topInteractions[agentData.analytics.topInteractions.length - 1]);
+    const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings);
+    const formattedDemographics = formatDemographics(agentData.analytics.demographics);
+    const formattedDailyImpressions = formatDailyImpressions(agentData.analytics.dailyImpressions);
+    const formattedPeakHours = formatPeakHours(agentData.analytics.peakHours);
+    const formattedReachByPlatform = formatReachByPlatform(agentData.analytics.reachByPlatform);
+    const formattedTopInteractions = formatTopInteractions(agentData.analytics.topInteractions);
     const formattedFetchedTweets = formatFetchedTweet(agentData.fetchedTweets[agentData.fetchedTweets.length - 1]);
     const formattedTwineets = formatTwineet(agentData.twineets[agentData.twineets.length - 1] || agentData.twineets[0]);
     const formattedTransactions = formatTransaction(agentData.transactions[agentData.transactions.length - 1]);

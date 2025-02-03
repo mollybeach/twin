@@ -43,12 +43,12 @@ module default {
         required property clickThroughRate -> decimal;
         required property engagementRate -> decimal;
         required property impressions -> int16;
-        required multi link cryptoHoldings -> CryptoHolding;
-        required multi link demographics -> Demographics;
-        required multi link dailyImpressions -> DailyImpressions;
-        required multi link peakHours -> PeakHours;
-        required multi link reachByPlatform -> ReachByPlatform;
-        required multi link topInteractions -> TopInteractions;
+        required link cryptoHoldings -> CryptoHolding;
+        required link demographics -> Demographics;
+        required link dailyImpressions -> DailyImpressions;
+        required link peakHours -> PeakHours;
+        required link reachByPlatform -> ReachByPlatform;
+        required link topInteractions -> TopInteractions;
     }
 
     type UserTokenShare {

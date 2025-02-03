@@ -86,26 +86,11 @@ export default function CreatePage() {
     config.stats.agentId = config.agentId;
     config.verification.agentId = config.agentId;
     config.analytics.agentId = config.agentId;
-    config.analytics.cryptoHoldings.forEach(cryptoHolding => {
-      cryptoHolding.agentId = config.agentId;
-    });
-    config.analytics.demographics.forEach(demographics => {
-      demographics.agentId = config.agentId;
-    });
-    config.analytics.dailyImpressions.forEach(dailyImpressions => {
-      dailyImpressions.agentId = config.agentId;
-    });
-
-    config.analytics.peakHours.forEach(peakHours => {
-      peakHours.agentId = config.agentId;
-    });
-    config.analytics.reachByPlatform.forEach(reachByPlatform => {
-      reachByPlatform.agentId = config.agentId;
-    });
-
-    config.analytics.topInteractions.forEach(topInteractions => {
-      topInteractions.agentId = config.agentId;
-    });
+    config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
+    config.analytics.dailyImpressions = config.analytics.dailyImpressions;
+    config.analytics.peakHours = config.analytics.peakHours;
+    config.analytics.reachByPlatform = config.analytics.reachByPlatform;
+    config.analytics.topInteractions = config.analytics.topInteractions;
 
     config.transactions.forEach(transaction => {
       transaction.agentId = config.agentId;
@@ -122,29 +107,17 @@ export default function CreatePage() {
     config.stats.agentId = config.agentId;
     config.verification.agentId = config.agentId;
     config.analytics.agentId = config.agentId;
-    config.analytics.cryptoHoldings.forEach(cryptoHolding => {
-      cryptoHolding.agentId = config.agentId;
-    });
+    config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
 
-    config.analytics.demographics.forEach(demographics => {
-      demographics.agentId = config.agentId;
-    });
+    config.analytics.demographics = config.analytics.demographics;
 
-    config.analytics.dailyImpressions.forEach(dailyImpressions => {
-      dailyImpressions.agentId = config.agentId;
-    });
+    config.analytics.dailyImpressions = config.analytics.dailyImpressions;
 
-    config.analytics.peakHours.forEach(peakHours => {
-      peakHours.agentId = config.agentId;
-    });
+    config.analytics.peakHours = config.analytics.peakHours;
 
-    config.analytics.reachByPlatform.forEach(reachByPlatform => {
-      reachByPlatform.agentId = config.agentId;
-    });
+    config.analytics.reachByPlatform = config.analytics.reachByPlatform;
 
-    config.analytics.topInteractions.forEach(topInteractions => {
-      topInteractions.agentId = config.agentId;
-    });
+    config.analytics.topInteractions = config.analytics.topInteractions;
 
     config.tokenStats.agentId = config.agentId;
     config.tokenStats.price = config.price;

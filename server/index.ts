@@ -340,8 +340,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         tokenStats: tokenStatsQuery,
         transactions: transactionsQuery,
     });
-    const insertAgentQueryResult = insertAgentQuery;
-    await insertAgentQueryResult.run(edgeDBCloudClient);
+    await insertAgentQuery.run(edgeDBCloudClient);
 }
 
 export async function fetchTwineets(): Promise<TwineetType[]> {

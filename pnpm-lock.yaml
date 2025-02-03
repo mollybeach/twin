@@ -35,9 +35,6 @@ importers:
       edgedb:
         specifier: ^1.5.12
         version: 1.5.12
-      eslint-plugin-next:
-        specifier: ^0.0.0
-        version: 0.0.0
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -102,6 +99,9 @@ importers:
       eslint:
         specifier: ^9.9.1
         version: 9.19.0(jiti@1.21.7)
+      eslint-plugin-next:
+        specifier: ^0.0.0
+        version: 0.0.0
       eslint-plugin-react:
         specifier: ^7.32.0
         version: 7.37.4(eslint@9.19.0(jiti@1.21.7))

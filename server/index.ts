@@ -38,7 +38,8 @@ import {
 // Function to format UserTokenShare
 
 const port = 3002;
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = true;
+//const isProduction = process.env.NODE_ENV === 'production';
 const url = isProduction 
     ? 'https://twin-three.vercel.app/' 
     : 'http://localhost:' + port + '/';

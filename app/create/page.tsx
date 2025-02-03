@@ -18,6 +18,7 @@ export default function CreatePage() {
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
   const [generatedTwineet, setGeneratedTwineet] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleFetchTweets = async () => {
     try {
@@ -29,6 +30,9 @@ export default function CreatePage() {
       
       // Update the agent data with the model information and fetchedTweets
       await handleGenerateResponse(tweets, modelData); // Pass model data to the response handler
+
+      // Set success message after fetching tweets
+      setSuccessMessage('Tweets fetched successfully!');
     } catch (error) {
       if (error instanceof Error) {
         console.error('Failed to fetch tweets:', error);
@@ -65,6 +69,95 @@ export default function CreatePage() {
     setIsDeploying(true);
     setDeployError(null);
 
+    config.agentId = crypto.randomUUID();
+    config.fetchedTweets.forEach(tweet => {
+      tweet.agentId = config.agentId;
+    }); 
+    config.twineets.forEach(twineet => {
+      twineet.agentId = config.agentId;
+    });
+
+    config.tokenShares.agentId = config.agentId;
+    config.tokenShares.shareholders.forEach(shareholder => {
+      shareholder.agentId = config.agentId;
+    });
+
+    config.tokenStats.agentId = config.agentId; 
+    config.stats.agentId = config.agentId;
+    config.verification.agentId = config.agentId;
+    config.analytics.agentId = config.agentId;
+    config.analytics.cryptoHoldings.forEach(cryptoHolding => {
+      cryptoHolding.agentId = config.agentId;
+    });
+    config.analytics.demographics.forEach(demographics => {
+      demographics.agentId = config.agentId;
+    });
+    config.analytics.dailyImpressions.forEach(dailyImpressions => {
+      dailyImpressions.agentId = config.agentId;
+    });
+
+    config.analytics.peakHours.forEach(peakHours => {
+      peakHours.agentId = config.agentId;
+    });
+    config.analytics.reachByPlatform.forEach(reachByPlatform => {
+      reachByPlatform.agentId = config.agentId;
+    });
+
+    config.analytics.topInteractions.forEach(topInteractions => {
+      topInteractions.agentId = config.agentId;
+    });
+
+    config.transactions.forEach(transaction => {
+      transaction.agentId = config.agentId;
+    });
+
+    config.modelData.agentId = config.agentId;
+
+    config.tokenShares.agentId = config.agentId;
+    config.tokenShares.shareholders.forEach(shareholder => {
+      shareholder.agentId = config.agentId;
+    });
+
+    config.tokenStats.agentId = config.agentId;
+    config.stats.agentId = config.agentId;
+    config.verification.agentId = config.agentId;
+    config.analytics.agentId = config.agentId;
+    config.analytics.cryptoHoldings.forEach(cryptoHolding => {
+      cryptoHolding.agentId = config.agentId;
+    });
+
+    config.analytics.demographics.forEach(demographics => {
+      demographics.agentId = config.agentId;
+    });
+
+    config.analytics.dailyImpressions.forEach(dailyImpressions => {
+      dailyImpressions.agentId = config.agentId;
+    });
+
+    config.analytics.peakHours.forEach(peakHours => {
+      peakHours.agentId = config.agentId;
+    });
+
+    config.analytics.reachByPlatform.forEach(reachByPlatform => {
+      reachByPlatform.agentId = config.agentId;
+    });
+
+    config.analytics.topInteractions.forEach(topInteractions => {
+      topInteractions.agentId = config.agentId;
+    });
+
+    config.tokenStats.agentId = config.agentId;
+    config.tokenStats.price = config.price;
+
+    config.tokenShares.agentId = config.agentId;
+
+    config.tokenShares.shareholders.forEach(shareholder => {
+      shareholder.agentId = config.agentId;
+    });
+
+    config.verification.agentId = config.agentId;
+
+    console.log(config);
     try {
       const response = await fetch('/api/agents', {
         method: 'POST',
@@ -75,7 +168,7 @@ export default function CreatePage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create agent');
+        throw new Error('Failed to create agent', { cause: response.statusText });
       }
 
       const result = await response.json();
@@ -208,7 +301,7 @@ export default function CreatePage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-purple-300">
-                Twin Name
+                Twin Handle
               </label>
               <input
                 type="text"
@@ -248,6 +341,12 @@ export default function CreatePage() {
             >
               Fetch Tweets <Rocket className="ml-2 w-4 h-4" />
             </button>
+
+            {successMessage && (
+              <div className="mt-2 text-green-500">
+                {successMessage}
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-purple-300">

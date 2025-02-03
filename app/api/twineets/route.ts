@@ -2,7 +2,7 @@
 
 // path: src/pages/api/twineets.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchTwineets } from '../../server/index'; // Adjust the import path as necessary
+import { fetchTwineets } from '../../../server/index'; // Adjust the import path as necessary
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {

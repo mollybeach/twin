@@ -64,12 +64,12 @@ const $AgentStats = $.makeType<$AgentStats>(_.spec, "ad134224-e04d-11ef-a4fa-99f
 const AgentStats: $.$expr_PathNode<$.TypeSet<$AgentStats, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($AgentStats, $.Cardinality.Many), null);
 
 export type $AnalyticsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "cryptoHoldings": $.LinkDesc<$CryptoHolding, $.Cardinality.One, {}, false, false,  false, false>;
-  "dailyImpressions": $.LinkDesc<$DailyImpressions, $.Cardinality.One, {}, false, false,  false, false>;
-  "demographics": $.LinkDesc<$Demographics, $.Cardinality.One, {}, false, false,  false, false>;
-  "peakHours": $.LinkDesc<$PeakHours, $.Cardinality.One, {}, false, false,  false, false>;
-  "reachByPlatform": $.LinkDesc<$ReachByPlatform, $.Cardinality.One, {}, false, false,  false, false>;
-  "topInteractions": $.LinkDesc<$TopInteractions, $.Cardinality.One, {}, false, false,  false, false>;
+  "cryptoHoldings": $.LinkDesc<$CryptoHolding, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "dailyImpressions": $.LinkDesc<$DailyImpressions, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "demographics": $.LinkDesc<$Demographics, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "peakHours": $.LinkDesc<$PeakHours, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "reachByPlatform": $.LinkDesc<$ReachByPlatform, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "topInteractions": $.LinkDesc<$TopInteractions, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "clickThroughRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "engagementRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;

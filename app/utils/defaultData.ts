@@ -40,10 +40,10 @@ export const defaultAgent: AgentType = {
             engagementRate: 0,
             clickThroughRate: 0,
             dailyImpressions: [],
-            topInteractions: [],
-            reachByPlatform: [],
-            demographics: [],
             peakHours: [],
+            reachByPlatform: [],
+            topInteractions: [],
+            demographics: [],
             cryptoHoldings: []
         },
         tokenStats: {

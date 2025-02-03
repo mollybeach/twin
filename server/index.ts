@@ -41,12 +41,42 @@ const url = process.env.NEXT_PUBLIC_URL;
 
 const app = express();
 
+const allowedOrigins = [
+    'http://localhost:3000', 
+    'http://localhost:3002', 
+    'https://twin-three.vercel.app'
+];
 app.use(express.json());
 app.use(cors({
-    origin: url
+    origin: allowedOrigins
 }));
 
 
+
+// Function to format Agent
+function formatAgent(agent: any): AgentType {
+    return {
+        agentId: agent.agentId,
+        twinHandle: agent.twinHandle,
+        twitterHandle: agent.twitterHandle,
+        profileImage: agent.profileImage,
+        personality: agent.personality,
+        description: agent.description,
+        autoReply: agent.autoReply,
+        isListed: agent.isListed,
+        price: parseFloat(agent.price), // Ensure price is a number
+        createdAt: new Date(agent.createdAt),
+        analytics: formatAnalytics(agent.analytics, agent.agentId),
+        fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
+        twineets: agent.twineets?.map(formatTwineet) || [],
+        verification: formatVerification(agent.verification),
+        stats: formatAgentStats(agent.stats),
+        tokenShares: formatTokenShare(agent.tokenShares),
+        tokenStats: formatTokenStats(agent.tokenStats),
+        transactions: agent.transactions?.map(formatTransaction) || [],
+        modelData: agent.modelData, // Ensure this is included
+    };
+}
 function formatUserTokenShare(share: UserTokenShareType) {
     return {
         agentId: share.agentId,
@@ -67,31 +97,6 @@ function formatTokenShare(tokenShare: TokenShareType) {
         shareholders: tokenShare?.shareholders?.map(formatUserTokenShare) || [],
     };
 }
-// Function to format Agent
-function formatAgent(agent: any): AgentType {
-    return {
-        agentId: agent.agentId,
-        twinHandle: agent.twinHandle,
-        twitterHandle: agent.twitterHandle,
-        profileImage: agent.profileImage,
-        personality: agent.personality,
-        description: agent.description,
-        autoReply: agent.autoReply,
-        isListed: agent.isListed,
-        price: parseFloat(agent.price), // Ensure price is a number
-        createdAt: new Date(agent.createdAt),
-        analytics: formatAnalytics(agent.analytics),
-        fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
-        twineets: agent.twineets?.map(formatTwineet) || [],
-        verification: formatVerification(agent.verification),
-        stats: formatAgentStats(agent.stats),
-        tokenShares: formatTokenShare(agent.tokenShares),
-        tokenStats: formatTokenStats(agent.tokenStats),
-        transactions: agent.transactions?.map(formatTransaction) || [],
-        modelData: agent.modelData, // Ensure this is included
-    };
-}
-
 function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
     return {
         agentId: cryptoHolding.agentId,
@@ -103,9 +108,10 @@ function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
 }
 
 // Function to format Analytics
-function formatAnalytics(analytics: AnalyticsType) {
+function formatAnalytics(analytics: AnalyticsType, agentId: string) {
+    console.log('analytics', analytics);
     return {
-        agentId: analytics.agentId,
+        agentId: agentId,
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
         engagementRate: parseFloat(analytics.engagementRate.toString()), // Ensure this is a number
         impressions: analytics.impressions,
@@ -230,7 +236,7 @@ function formatTransaction(transaction: TransactionType) {
 // Function to insert an agent
 export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedAgent = formatAgent(agentData);
-    const formattedAnalytics = formatAnalytics(agentData.analytics);
+    const formattedAnalytics = formatAnalytics(agentData.analytics, agentData.agentId);
     const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings[agentData.analytics.cryptoHoldings.length - 1]); // how do i make it the last index of the array
     const formattedDemographics = formatDemographics(agentData.analytics.demographics[agentData.analytics.demographics.length - 1]);
     const formattedDailyImpressions = formatDailyImpressions(agentData.analytics.dailyImpressions[agentData.analytics.dailyImpressions.length - 1]);
@@ -245,46 +251,46 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedUserTokenShares = formatUserTokenShare(agentData.tokenShares.shareholders[agentData.tokenShares.shareholders.length - 1]);
 
     const analyticsQuery =  edgeql.insert(Analytics, {
-        agentId: formattedAnalytics.agentId,
+        agentId: agentData.agentId,
         clickThroughRate: edgeql.decimal(formattedAnalytics.clickThroughRate.toString()),
         engagementRate: edgeql.decimal(formattedAnalytics.engagementRate.toString()),
         impressions: formattedAnalytics.impressions,
         cryptoHoldings: edgeql.insert(edgeql.CryptoHolding, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             amount: edgeql.decimal(formattedCryptoHoldings.amount.toString()),
             symbol: formattedCryptoHoldings.symbol,
             change24h: edgeql.decimal(formattedCryptoHoldings.change24h.toString()),
             value: edgeql.decimal(formattedCryptoHoldings.value.toString()),
         }),
         demographics: edgeql.insert( Demographics, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             age: formattedDemographics.age,
             percentage: edgeql.decimal(formattedDemographics.percentage.toString()),
         }),
         dailyImpressions: edgeql.insert(DailyImpressions, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             date: formattedDailyImpressions.date,
             count: formattedDailyImpressions.count,
         }),
         peakHours: edgeql.insert(edgeql.PeakHours, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             hour: formattedPeakHours.hour,
             engagement: edgeql.decimal(formattedPeakHours.engagement.toString()),
         }),
         reachByPlatform: edgeql.insert(ReachByPlatform, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             platform: formattedReachByPlatform.platform,
             count: formattedReachByPlatform.count,
         }),
         topInteractions: edgeql.insert(TopInteractions, {
-            agentId: formattedAnalytics.agentId,
+            agentId: agentData.agentId,
             kind: formattedTopInteractions.kind,
             count: formattedTopInteractions.count,
         })
     });
     
     const fetchedTweetsQuery = await edgeql.insert(FetchedTweet, {
-        agentId: formattedFetchedTweets.agentId,
+        agentId: agentData.agentId,
         text: formattedFetchedTweets.text,
         edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweets.timestamp)), // Ensure this is a Date object
@@ -292,14 +298,14 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
 
 
     const twineetsQuery = await edgeql.insert(Twineet, {
-        agentId: formattedTwineets.agentId,
+        agentId: agentData.agentId,
         content: formattedTwineets.content,
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineets.timestamp)), // Ensure this is a Date object
     });
 
 
     const transactionsQuery = await edgeql.insert(Transaction, {
-        agentId: formattedTransactions.agentId,
+        agentId: agentData.agentId,
         kind: formattedTransactions.kind,
         shares: formattedTransactions.shares,
         pricePerShare: edgeql.decimal(formattedTransactions.pricePerShare.toString()),
@@ -308,7 +314,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
 
     const userTokenSharesQuery = await edgeql.insert(UserTokenShare, {
-        agentId: formattedUserTokenShares.agentId,
+        agentId: agentData.agentId,
         userId: formattedUserTokenShares.userId,
         shares: edgeql.cast(edgeql.decimal, formattedUserTokenShares.shares),
         purchasePrice: edgeql.decimal(formattedUserTokenShares.purchasePrice.toString()),
@@ -316,7 +322,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
 
     const tokenSharesQuery = await edgeql.insert(TokenShare, {
-        agentId: formattedTokenShares.agentId,
+        agentId: agentData.agentId,
         totalShares: formattedTokenShares.totalShares,
         availableShares: formattedTokenShares.availableShares,
         pricePerShare: edgeql.decimal(formattedTokenShares.pricePerShare.toString()),
@@ -324,7 +330,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
 
     const tokenStatsQuery = await edgeql.insert(TokenStats, {
-        agentId: formattedTokenStats.agentId,
+        agentId: agentData.agentId,
         price: edgeql.decimal(formattedTokenStats.price.toString()),
         change24h: edgeql.decimal(formattedTokenStats.change24h.toString()),
         volume24h: edgeql.decimal(formattedTokenStats.volume24h.toString()),
@@ -332,7 +338,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
     
     const insertAgentQuery = await edgeql.insert(Agent, {
-        agentId: formattedAgent.agentId,
+        agentId: agentData.agentId,
         twinHandle: formattedAgent.twinHandle,
         twitterHandle: formattedAgent.twitterHandle,
         profileImage: formattedAgent.profileImage,

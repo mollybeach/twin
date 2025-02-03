@@ -6,6 +6,8 @@ import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
+//import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
+
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -340,29 +342,34 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     await (await insertAgentQuery).run(edgeDBCloudClient);
 }
 
+
 export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
     const formattedFetchedTweet = formatFetchedTweet(fetchedTweet);
-    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
-        filter: edgeql.op(agent.agentId, '=', agentId),
+    const fetchedTweetsQuery = edgeql.update(edgeql.FetchedTweet, (fetchedTweet) => ({
+        filter: edgeql.op(fetchedTweet.agentId, '=', agentId),
         set: {
-            fetchedTweets: {
-                '+=': edgeql.insert(edgeql.FetchedTweet, formattedFetchedTweet),
-            },
+            text: formattedFetchedTweet.text,
+            edit_history_tweet_ids: formattedFetchedTweet.edit_history_tweet_ids,
+            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweet.timestamp)), // Ensure this is a Date object
         },
     }));
 
-    const fetchedTweetsQueryResult = fetchedTweetsQuery
+    const fetchedTweetsQueryResult = fetchedTweetsQuery;
     await fetchedTweetsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
     const formattedTwineet = formatTwineet(twineet);
-    const twineetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
-        filter: edgeql.op(agent.agentId, '=', agentId),
+    const twineetsQuery = edgeql.update(edgeql.FetchedTweet, (fetchedTweet) => ({
+        filter: edgeql.op(fetchedTweet.agentId, '=', agentId),
         set: {
-            twineets: {
-                '+=': edgeql.insert(edgeql.Twineet, formattedTwineet),
-            },
+            content: formattedTwineet.content,
+            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineet.timestamp)), // Ensure this is a Date object
+            likes: formattedTwineet.likes,
+            retwineets: formattedTwineet.retwineets,
+            replies: formattedTwineet.replies,
+            isLiked: formattedTwineet.isLiked,
+            isRetwineeted: formattedTwineet.isRetwineeted,
         },
     }));
 
@@ -372,18 +379,21 @@ export async function insertTwineet(agentId: string, twineet: TwineetType): Prom
 
 export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
     const formattedTransaction = formatTransaction(transaction);
-    const transactionsQuery = edgeql.update(edgeql.Agent, (agent) => ({
-        filter: edgeql.op(agent.agentId, '=', agentId), 
+    const transactionsQuery = edgeql.update(edgeql.Transaction, (transaction) => ({
+        filter: edgeql.op(transaction.agentId, '=', agentId), 
         set: {
-            transactions: {
-                '+=': edgeql.insert(edgeql.Transaction, formattedTransaction),
-            },
+            kind: formattedTransaction.kind,
+            shares: formattedTransaction.shares,
+            pricePerShare: formattedTransaction.pricePerShare,
+            totalAmount: formattedTransaction.totalAmount,
+            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTransaction.timestamp)), // Ensure this is a Date object
         },
     }));
 
-    const transactionsQueryResult = await transactionsQuery.run(edgeDBCloudClient);
-}
+    const transactionsQueryResult = transactionsQuery;
+    await transactionsQueryResult.run(edgeDBCloudClient);
 
+}
 export async function fetchTwineets(): Promise<TwineetType[]> {
     const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
         id: true,

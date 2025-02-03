@@ -53,5 +53,5 @@ export const defaultAgent: AgentType = {
             volume24h: 0,
             marketCap: 0
         },
-        transaction: []
+        transactions: []
 }

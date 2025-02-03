@@ -128,7 +128,7 @@ export default function ClonePage() {
         volume24h: 0,
         marketCap: 0
       },
-      transaction: []
+      transactions: []
     };
 
     setCloneResult(newTwin);
@@ -203,7 +203,7 @@ export default function ClonePage() {
           volume24h: 0,
           marketCap: 0
         },
-        transaction: []
+        transactions: []
       });
       
       // Reset state

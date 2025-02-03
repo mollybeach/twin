@@ -7,7 +7,7 @@ import axios from 'axios';
 import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
 //import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
-import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '@/dbschema/edgeql-js/modules/default';
+import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
 import dotenv from 'dotenv';
 
 dotenv.config();

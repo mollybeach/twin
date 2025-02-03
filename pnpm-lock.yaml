@@ -100,7 +100,7 @@ importers:
         specifier: ^9.9.1
         version: 9.19.0(jiti@1.21.7)
       eslint-plugin-next:
-        specifier: ^0.0.0
+        specifier: 0.0.0
         version: 0.0.0
       eslint-plugin-react:
         specifier: ^7.32.0

@@ -1,23 +1,24 @@
    // path: pages/api/agents.ts
-    import { NextApiRequest, NextApiResponse } from 'next';
+    import { NextRequest, NextResponse } from 'next/server';
     import { insertAgent, getAllAgents } from '../../../server/index'; // Adjust the import based on your structure
-    export async function POST(req: NextApiRequest, res: NextApiResponse) {
-        if (req.method === 'POST') {
-            const newAgentData = req.body; // Get the new agent data from the request body
-            try {
-                await insertAgent(newAgentData);
-                res.status(201).send('Agent created successfully');
-            } catch (error) {
-                console.error('Error creating agent:', error);
-                res.status(500).send('Error creating agent');
-            }
-        } else {
-            res.setHeader('Allow', ['POST']);
-            res.status(405).end(`Method ${req.method} Not Allowed`);
+    export async function POST(req: NextRequest) {
+        const newAgentData = await req.json(); // Get the new agent data from the request body
+        console.log('POST Request received with data:', newAgentData);
+        try {
+            await insertAgent(newAgentData);
+            return NextResponse.json({ message: 'Agent created successfully' }, { status: 201 });
+        } catch (error) {
+            console.error('Error creating agent:', error);
+            return NextResponse.json({ message: 'Error creating agent' }, { status: 500 });
         }
     }
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
-    const agents = await getAllAgents();
-    res.status(200).json(agents);
+export async function GET(req: NextRequest) {
+    try {
+        const agents = await getAllAgents();
+        return NextResponse.json(agents, { status: 200 });
+    } catch (error) {
+        console.error('Error fetching agents:', error);
+        return NextResponse.json({ message: 'Error fetching agents' }, { status: 500 });
+    }
 }

@@ -54,7 +54,7 @@ app.use(cors({
 
 
 // Function to format Agent
-function formatAgent(agent: any): AgentType {
+function formatAgent(agent: AgentType): AgentType {
     return {
         agentId: agent.agentId,
         twinHandle: agent.twinHandle,
@@ -64,9 +64,9 @@ function formatAgent(agent: any): AgentType {
         description: agent.description,
         autoReply: agent.autoReply,
         isListed: agent.isListed,
-        price: parseFloat(agent.price), // Ensure price is a number
+        price: parseFloat(agent.price.toString()), // Ensure price is a number
         createdAt: new Date(agent.createdAt),
-        analytics: formatAnalytics(agent.analytics, agent.agentId),
+        analytics: formatAnalytics(agent.analytics),
         fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
         twineets: agent.twineets?.map(formatTwineet) || [],
         verification: formatVerification(agent.verification),
@@ -108,10 +108,10 @@ function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
 }
 
 // Function to format Analytics
-function formatAnalytics(analytics: AnalyticsType, agentId: string) {
-    console.log('analytics', analytics);
+function formatAnalytics(analytics: AnalyticsType) {
+    console.log('analytics in the format function', analytics);
     return {
-        agentId: agentId,
+        agentId: analytics.agentId,
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
         engagementRate: parseFloat(analytics.engagementRate.toString()), // Ensure this is a number
         impressions: analytics.impressions,
@@ -196,7 +196,7 @@ function formatFetchedTweet(tweet: FetchedTweetType) {
         agentId: tweet.agentId,
         text: tweet.text,
         edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-        timestamp: new Date(tweet.timestamp), // Ensure this is a Date object
+        timestamp: new Date(tweet.timestamp).toString(), // Ensure this is a Date object
     };
 }
 // Function to format Twineet
@@ -227,16 +227,16 @@ function formatTransaction(transaction: TransactionType) {
         agentId: transaction.agentId,
         kind: transaction.kind,
         shares: transaction.shares,
-        pricePerShare: edgeql.cast(edgeql.decimal, transaction.pricePerShare),
-        totalAmount: edgeql.cast(edgeql.decimal, transaction.totalAmount),
-        timestamp: new Date(transaction.timestamp), // Ensure this is a Date object
+        pricePerShare: parseFloat(transaction.pricePerShare.toString()),
+        totalAmount: parseFloat(transaction.totalAmount.toString()),
+        timestamp: new Date(transaction.timestamp).toISOString(), // Ensure this is a Date object
     };
 }
 
 // Function to insert an agent
 export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedAgent = formatAgent(agentData);
-    const formattedAnalytics = formatAnalytics(agentData.analytics, agentData.agentId);
+    const formattedAnalytics = formatAnalytics(agentData.analytics);
     const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings[agentData.analytics.cryptoHoldings.length - 1]); // how do i make it the last index of the array
     const formattedDemographics = formatDemographics(agentData.analytics.demographics[agentData.analytics.demographics.length - 1]);
     const formattedDailyImpressions = formatDailyImpressions(agentData.analytics.dailyImpressions[agentData.analytics.dailyImpressions.length - 1]);
@@ -591,9 +591,11 @@ export async function fetchAgentByAgentId(agentId: string): Promise<FetchAgentBy
         limit: 1,
         result: edgeql.Agent
     }));
-
     const result = await edgeDBCloudClient.query(JSON.stringify(query));
-    return result.length > 0 ? { status: 'success', result: formatAgent(result[0]) } : null;
+    if (Array.isArray(result) && result.length > 0) {
+        return { status: 'success', result: formatAgent(result[0] as AgentType) };
+    }
+    return null;
 }
 
 // Function to fetch all agents
@@ -601,10 +603,13 @@ export async function getAllAgents(): Promise<GetAllAgentsResult | null> {
     const query = edgeql.select(edgeql.Agent, () => ({
         result: edgeql.Agent
     }));
-
     const result = await edgeDBCloudClient.query(JSON.stringify(query));
-    return result.length > 0 ? { status: 'success', result: result.map(agent => formatAgent(agent)) } : null;
+    if (Array.isArray(result) && result.length > 0) {
+        return { status: 'success', result: result.map(agent => formatAgent(agent as AgentType)) };
+    }
+    return null;
 }
+
 
 // Start the server
 app.listen(port, () => {

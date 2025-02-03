@@ -29,6 +29,12 @@
       ],
       "@/dbschema/*": [
         "dbschema/*"
+      ],
+      "@/server/*": [
+        "server/*"
+      ],
+      "@/types/*": [
+        "types/*"
       ]
     },
   },
@@ -37,17 +43,12 @@
     "**/*.tsx",
     "app/**/*",
     "next-env.d.ts",
+    "edgeql-js.d.ts",
     ".next/types/**/*.ts",
     "components/**/*",
-    "lib/**/*",
     "types/**/*",
     "styles/**/*",
-    "src/**/*",
     "dbschema/**/*",
-    "src/training/**/*",
-    "src/scripts/**/*",
-    "src/index.ts",
-    "src",
     "server/**/*",
   ],
   "exclude": [

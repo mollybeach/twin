@@ -1,5 +1,5 @@
-// path: /edgeql-js.d.ts
-
+// path: dbschema/edgeql-js/edgeql-js.d.ts
+/*
 import {
     AgentType,
     TwineetType,
@@ -9,14 +9,7 @@ import {
     UserTokenShareType,
     TokenStatsType,
     TokenShareType,
-    AnalyticsType,
-    CryptoHoldingType,
-    DailyImpressionsType,
-    DemographicsType,
-    PeakHoursType,
-    ReachByPlatformType,
-    TopInteractionsType,
-} from '@/dbschema/interfaces'; // Import the generated interfaces
+} from '@/types/types';
 
 export declare module '@/dbschema/edgeql-js' {
     interface EdgeQL {
@@ -48,24 +41,24 @@ export declare module '@/dbschema/edgeql-js' {
         datetime: (date: Date) => Promise<void>;
 
         // Add more methods and properties as needed
-        Analytics: (data: AnalyticsType) => Promise<void>;
-        CryptoHolding: (data: CryptoHoldingType) => Promise<void>;
-        Demographics: (data: DemographicsType) => Promise<void>;
-        DailyImpressions: (data: DailyImpressionsType) => Promise<void>;
-        PeakHours: (data: PeakHoursType) => Promise<void>;
-        ReachByPlatform: (data: ReachByPlatformType) => Promise<void>;
-        TopInteractions: (data: TopInteractionsType) => Promise<void>;
-        FetchedTweet: (data: FetchedTweetType) => Promise<void>;
-        Twineet: (agentId: string, data: TwineetType) => Promise<void>;
-        Transaction: (data: TransactionType) => Promise<void>;
-        Agent: (data: AgentType) => Promise<void>;
-        AgentStats: (data: AgentStatsType) => Promise<void>;
-        Verification: (data: VerificationResponseType) => Promise<void>;
-        UserTokenShare: (data: UserTokenShareType) => Promise<void>;
-        TokenStats: (data: TokenStatsType) => Promise<void>;
-        TokenShare: (data: TokenShareType) => Promise<void>;
+        Analytics: (data: object) => Promise<void>;
+        CryptoHolding: (data: object) => Promise<void>;
+        Demographics: (data: object) => Promise<void>;
+        DailyImpressions: (data: object) => Promise<void>;
+        PeakHours: (data: object) => Promise<void>;
+        ReachByPlatform: (data: object) => Promise<void>;
+        TopInteractions: (data: object) => Promise<void>;
+        FetchedTweet: (data: object) => Promise<void>;
+        Twineet: (agentId: string, data: object) => Promise<void>;
+        Transaction: (data: object) => Promise<void>;
+        Agent: (data: object) => Promise<void>;
+        AgentStats: (data: object) => Promise<void>;
+        Verification: (data: object) => Promise<void>;
+        UserTokenShare: (data: object) => Promise<void>;
+        TokenStats: (data: object) => Promise<void>;
+        TokenShare: (data: object) => Promise<void>;
     }
 
     const edgeql: EdgeQL;
     export default edgeql;
-}
+}*/

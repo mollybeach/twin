@@ -299,7 +299,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const userTokenSharesQuery = edgeql.insert(edgeql.UserTokenShare, {
         agentId: formattedUserTokenShares.agentId,
         userId: formattedUserTokenShares.userId,
-        shares: edgeql.cast(edgeql.decimal, formattedUserTokenShares.shares.toString()),
+        shares: edgeql.cast(edgeql.decimal, formattedUserTokenShares.shares),
         purchasePrice: edgeql.decimal(formattedUserTokenShares.purchasePrice.toString()),
         purchaseDate: edgeql.cast(edgeql.datetime, new Date(formattedUserTokenShares.purchaseDate)), // Ensure this is a Date object
     });

@@ -36,6 +36,21 @@ import {
     TransactionType,
 } from '../app/types/types';
 // Function to format UserTokenShare
+
+const port = 3002;
+const isProduction = process.env.NODE_ENV === 'production';
+const url = isProduction 
+    ? 'https://twin-three.vercel.app/' 
+    : 'http://localhost:' + port + '/';
+
+const app = express();
+
+app.use(express.json());
+app.use(cors({
+    origin: url
+}));
+
+
 function formatUserTokenShare(share: UserTokenShareType) {
     return {
         agentId: share.agentId,
@@ -378,13 +393,6 @@ export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetTy
     return result as TwineetType[];
 }
 
-
-const app = express();
-const port = 3002;
-
-app.use(express.json());
-app.use(cors());
-
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
     max: 5,
@@ -598,5 +606,5 @@ export async function getAllAgents(): Promise<GetAllAgentsResult | null> {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at ${url}`);
 });

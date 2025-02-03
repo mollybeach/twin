@@ -30,6 +30,12 @@
       "@/dbschema/*": [
         "dbschema/*"
       ],
+      "@/dbschema/edgeql-js/*": [
+        "dbschema/edgeql-js/*"
+      ],
+      "@/dbschema/edgeql-js/modules/*": [
+        "dbschema/edgeql-js/modules/*"
+      ],
       "@/server/*": [
         "server/*"
       ],

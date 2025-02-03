@@ -33,7 +33,7 @@ export interface AgentType {
     tokenStats: TokenStatsType;
     twineets: TwineetType[];
     verification: VerificationResponseType;
-    transaction: TransactionType[];
+    transactions: TransactionType[];
 }
 
 export interface AgentStatsType {

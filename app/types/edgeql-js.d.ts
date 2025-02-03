@@ -1,33 +1,63 @@
 // app/types/edgeql-js.d.ts
+
+ // Adjust the import based on your actual client
+import {
+    AgentType,
+    TwineetType,
+    FetchedTweetType,
+    TransactionType,
+    VerificationResponseType,
+    UserTokenShareType,
+    TokenStatsType,
+    TokenShareType,
+} from '@/types/types';
+
 declare module '@/dbschema/edgeql-js' {
     interface EdgeQL {
         query: (queryString: string) => Promise<unknown>;
         cast: (type: decimal.Decimal, value: number | Date) => number | Date;
         decimal: (value: decimal.Decimal) => decimal.Decimal;
-        insert: (type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, data: any) => Promise<{ run: (client: any) => Promise<void> }>; 
-        update: (type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, data: any) => Promise<{ run: (client: any) => Promise<void> }>; 
-        select: (type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, data: any) => Promise<unknown>;
-        op: (agentId: string, data: any, agentId: string) => Promise<void>; 
-        run: (data: any) => Promise<void>;
-        filter: (data: any) => Promise<void>;
+
+        // Adjusted insert method to use specific types
+        insert: (
+            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+        ) => Promise<{ run: (client: EdgeDBClient) => Promise<void> }>;
+
+        // Adjusted update method to use specific types
+        update: (
+            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+        ) => Promise<{ run: (client: EdgeDBClient) => Promise<void> }>;
+
+        // Adjusted select method to return specific types
+        select: (
+            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+        ) => Promise<AgentType[] | TwineetType[] | FetchedTweetType[] | TransactionType[] | VerificationResponseType[] | UserTokenShareType[] | TokenStatsType[] | TokenShareType[]>;
+
+        op: (agentId: string, comparison: '=', otherAgentId: string) => Promise<void>;
+        run: (data: object) => Promise<void>;
+        filter: (data: object) => Promise<void>;
         datetime: (date: Date) => Promise<void>;
+
         // Add more methods and properties as needed
-        Analytics: (data: any) => Promise<void>;
-        CryptoHolding: (data: any) => Promise<void>;
-        Demographics: (data: any) => Promise<void>;
-        DailyImpressions: (data: any) => Promise<void>;
-        PeakHours: (data: any) => Promise<void>;
-        ReachByPlatform: (data: any) => Promise<void>;
-        TopInteractions: (data: any) => Promise<void>;
-        FetchedTweet: (data: any) => Promise<void>;
-        Twineet: (agentId: string, data: any) => Promise<void>;
-        Transaction: (data: any) => Promise<void>;
-        Agent: (data: any) => Promise<void>;
-        AgentStats: (data: any) => Promise<void>;    
-        Verification: (data: any) => Promise<void>;
-        UserTokenShare: (data: any) => Promise<void>;
-        TokenStats: (data: any) => Promise<void>;
-        TokenShare: (data: any) => Promise<void>;
+        Analytics: (data: object) => Promise<void>;
+        CryptoHolding: (data: object) => Promise<void>;
+        Demographics: (data: object) => Promise<void>;
+        DailyImpressions: (data: object) => Promise<void>;
+        PeakHours: (data: object) => Promise<void>;
+        ReachByPlatform: (data: object) => Promise<void>;
+        TopInteractions: (data: object) => Promise<void>;
+        FetchedTweet: (data: object) => Promise<void>;
+        Twineet: (agentId: string, data: object) => Promise<void>;
+        Transaction: (data: object) => Promise<void>;
+        Agent: (data: object) => Promise<void>;
+        AgentStats: (data: object) => Promise<void>;
+        Verification: (data: object) => Promise<void>;
+        UserTokenShare: (data: object) => Promise<void>;
+        TokenStats: (data: object) => Promise<void>;
+        TokenShare: (data: object) => Promise<void>;
     }
 
     const edgeql: EdgeQL;

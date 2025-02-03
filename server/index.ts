@@ -74,7 +74,7 @@ function formatAgent(agent: AgentType) {
         stats: formatAgentStats(agent.stats),
         tokenShares: formatTokenShare(agent.tokenShares),
         tokenStats: formatTokenStats(agent.tokenStats),
-        transactions: agent.transaction?.map(formatTransaction) || [],
+        transactions: agent.transactions?.map(formatTransaction) || [],
     };
 }
 
@@ -225,7 +225,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedTopInteractions = formatTopInteractions(agentData.analytics.topInteractions[agentData.analytics.topInteractions.length - 1]);
     const formattedFetchedTweets = formatFetchedTweet(agentData.fetchedTweets[agentData.fetchedTweets.length - 1]);
     const formattedTwineets = formatTwineet(agentData.twineets[agentData.twineets.length - 1] || agentData.twineets[0]);
-    const formattedTransactions = formatTransaction(agentData.transaction[agentData.transaction.length - 1]);
+    const formattedTransactions = formatTransaction(agentData.transactions[agentData.transactions.length - 1]);
     const formattedTokenShares = formatTokenShare(agentData.tokenShares);
     const formattedTokenStats = formatTokenStats(agentData.tokenStats); 
     const formattedUserTokenShares = formatUserTokenShare(agentData.tokenShares.shareholders[agentData.tokenShares.shareholders.length - 1]);
@@ -275,11 +275,13 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweets.timestamp)), // Ensure this is a Date object
     });
 
+
     const twineetsQuery = edgeql.insert(edgeql.Twineet, {
         agentId: formattedTwineets.agentId,
         content: formattedTwineets.content,
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineets.timestamp)), // Ensure this is a Date object
     });
+
 
     const transactionsQuery = edgeql.insert(edgeql.Transaction, {
         agentId: formattedTransactions.agentId,
@@ -340,7 +342,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
 
 export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
     const formattedFetchedTweet = formatFetchedTweet(fetchedTweet);
-    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
+    const fetchedTweetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
         filter: edgeql.op(agent.agentId, '=', agentId),
         set: {
             fetchedTweets: {
@@ -349,13 +351,13 @@ export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedT
         },
     }));
 
-    const fetchedTweetsQueryResult = await fetchedTweetsQuery;
+    const fetchedTweetsQueryResult = fetchedTweetsQuery
     await fetchedTweetsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
     const formattedTwineet = formatTwineet(twineet);
-    const twineetsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
+    const twineetsQuery = edgeql.update(edgeql.Agent, (agent) => ({
         filter: edgeql.op(agent.agentId, '=', agentId),
         set: {
             twineets: {
@@ -364,13 +366,13 @@ export async function insertTwineet(agentId: string, twineet: TwineetType): Prom
         },
     }));
 
-    const twineetsQueryResult = await twineetsQuery;
+    const twineetsQueryResult = twineetsQuery;
     await twineetsQueryResult.run(edgeDBCloudClient);
 }
 
 export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
     const formattedTransaction = formatTransaction(transaction);
-    const transactionsQuery = edgeql.update(edgeql.Agent, (agent: AgentType) => ({
+    const transactionsQuery = edgeql.update(edgeql.Agent, (agent) => ({
         filter: edgeql.op(agent.agentId, '=', agentId), 
         set: {
             transactions: {
@@ -379,8 +381,7 @@ export async function insertTransaction(agentId: string, transaction: Transactio
         },
     }));
 
-    const transactionsQueryResult = await transactionsQuery;
-    await transactionsQueryResult.run(edgeDBCloudClient);
+    const transactionsQueryResult = await transactionsQuery.run(edgeDBCloudClient);
 }
 
 export async function fetchTwineets(): Promise<TwineetType[]> {
@@ -395,17 +396,17 @@ export async function fetchTwineets(): Promise<TwineetType[]> {
         isLiked: true,
         isRetwineeted: true,
     }));
-    const result = await twineetsQuery;
+    const result = await twineetsQuery.run(edgeDBCloudClient);
     return result as TwineetType[];
 }
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
-    const twineetsQuery = edgeql.select(edgeql.Twineet, (twineet: TwineetType) => ({
-        filter: edgeql.op(twineet.agentId, '=', agentId),
+    const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
+        filter: edgeql.op(edgeql.Twineet.agentId, '=', agentId),
     }));
-    const result = await twineetsQuery;
+    const result = await twineetsQuery.run(edgeDBCloudClient);
     return result as TwineetType[];
-}   
+}
 
 const app = express();
 const port = 3002;

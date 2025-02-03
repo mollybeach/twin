@@ -13,14 +13,10 @@ pnpm install
 pnpm run dev
 ```
 
+Open a separate terminal and run the server:
 ```bash
-cd server
-pnpm install 
-npm run start
+pnpm run server
 ```
-
-
-
 
 ## Features
 

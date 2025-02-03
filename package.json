@@ -9,10 +9,7 @@
         "lint": "next lint",
         "preview": "next preview",
         "mg-cloud-gen": "edgedb migration create && edgedb migrate && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js",
-        "server-build": "tsc --noEmit --outDir dist",
-        "server-start": "ts-node -r tsconfig-paths/register server/index.ts",
-        "server-dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register server/index.ts",
-        "server-watch": "tsc --watch"
+        "server": "ts-node -r tsconfig-paths/register server/index.ts"
     },
     "dependencies": {
         "@edgedb/generate": "^0.5.6",

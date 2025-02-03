@@ -9,13 +9,13 @@ TwinAI is an innovative platform that allows users to create AI-powered digital 
 ## Set Up
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ```bash
 cd server
-npm install 
+pnpm install 
 npm run start
 ```
 

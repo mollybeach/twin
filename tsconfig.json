@@ -49,6 +49,8 @@
     "types/**/*",
     "styles/**/*",
     "dbschema/**/*",
+    "dbschema/edgeql-js/**/*",  
+    "dbschema/edgeql-js/modules/**/*",
     "server/**/*",
   ],
   "exclude": [

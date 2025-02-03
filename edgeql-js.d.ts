@@ -1,5 +1,5 @@
 // path: ./edgeql-js.d.ts
-
+/*
 import {
     AgentType,
     TwineetType,
@@ -61,4 +61,4 @@ export declare module '@/dbschema/edgeql-js' {
 
     const edgeql: EdgeQL;
     export default edgeql;
-}
+}*/

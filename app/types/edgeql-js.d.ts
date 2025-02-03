@@ -1,6 +1,7 @@
 // app/types/edgeql-js.d.ts
 
  // Adjust the import based on your actual client
+ /*
 import {
     AgentType,
     TwineetType,
@@ -62,4 +63,4 @@ export declare module '@/dbschema/edgeql-js' {
 
     const edgeql: EdgeQL;
     export default edgeql;
-}
+}*/

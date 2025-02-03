@@ -7,7 +7,7 @@ import axios from 'axios';
 import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
 //import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
-
+import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '@/dbschema/edgeql-js/modules/default';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -233,7 +233,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const formattedTokenStats = formatTokenStats(agentData.tokenStats); 
     const formattedUserTokenShares = formatUserTokenShare(agentData.tokenShares.shareholders[agentData.tokenShares.shareholders.length - 1]);
 
-    const analyticsQuery =  edgeql.insert(edgeql.Analytics, {
+    const analyticsQuery =  edgeql.insert(Analytics, {
         agentId: formattedAnalytics.agentId,
         clickThroughRate: edgeql.decimal(formattedAnalytics.clickThroughRate.toString()),
         engagementRate: edgeql.decimal(formattedAnalytics.engagementRate.toString()),
@@ -245,12 +245,12 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
             change24h: edgeql.decimal(formattedCryptoHoldings.change24h.toString()),
             value: edgeql.decimal(formattedCryptoHoldings.value.toString()),
         }),
-        demographics: edgeql.insert(edgeql.Demographics, {
+        demographics: edgeql.insert( Demographics, {
             agentId: formattedAnalytics.agentId,
             age: formattedDemographics.age,
             percentage: edgeql.decimal(formattedDemographics.percentage.toString()),
         }),
-        dailyImpressions: edgeql.insert(edgeql.DailyImpressions, {
+        dailyImpressions: edgeql.insert(DailyImpressions, {
             agentId: formattedAnalytics.agentId,
             date: formattedDailyImpressions.date,
             count: formattedDailyImpressions.count,
@@ -260,19 +260,19 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
             hour: formattedPeakHours.hour,
             engagement: edgeql.decimal(formattedPeakHours.engagement.toString()),
         }),
-        reachByPlatform: edgeql.insert(edgeql.ReachByPlatform, {
+        reachByPlatform: edgeql.insert(ReachByPlatform, {
             agentId: formattedAnalytics.agentId,
             platform: formattedReachByPlatform.platform,
             count: formattedReachByPlatform.count,
         }),
-        topInteractions: edgeql.insert(edgeql.TopInteractions, {
+        topInteractions: edgeql.insert(TopInteractions, {
             agentId: formattedAnalytics.agentId,
             kind: formattedTopInteractions.kind,
             count: formattedTopInteractions.count,
         })
     });
     
-    const fetchedTweetsQuery = edgeql.insert(edgeql.FetchedTweet, {
+    const fetchedTweetsQuery = await edgeql.insert(FetchedTweet, {
         agentId: formattedFetchedTweets.agentId,
         text: formattedFetchedTweets.text,
         edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
@@ -280,14 +280,14 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
 
 
-    const twineetsQuery = edgeql.insert(edgeql.Twineet, {
+    const twineetsQuery = await edgeql.insert(Twineet, {
         agentId: formattedTwineets.agentId,
         content: formattedTwineets.content,
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineets.timestamp)), // Ensure this is a Date object
     });
 
 
-    const transactionsQuery = edgeql.insert(edgeql.Transaction, {
+    const transactionsQuery = await edgeql.insert(Transaction, {
         agentId: formattedTransactions.agentId,
         kind: formattedTransactions.kind,
         shares: formattedTransactions.shares,
@@ -296,7 +296,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTransactions.timestamp)), // Ensure this is a Date object
     });
 
-    const userTokenSharesQuery = edgeql.insert(edgeql.UserTokenShare, {
+    const userTokenSharesQuery = await edgeql.insert(UserTokenShare, {
         agentId: formattedUserTokenShares.agentId,
         userId: formattedUserTokenShares.userId,
         shares: edgeql.cast(edgeql.decimal, formattedUserTokenShares.shares),
@@ -304,7 +304,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         purchaseDate: edgeql.cast(edgeql.datetime, new Date(formattedUserTokenShares.purchaseDate)), // Ensure this is a Date object
     });
 
-    const tokenSharesQuery = edgeql.insert(edgeql.TokenShare, {
+    const tokenSharesQuery = await edgeql.insert(TokenShare, {
         agentId: formattedTokenShares.agentId,
         totalShares: formattedTokenShares.totalShares,
         availableShares: formattedTokenShares.availableShares,
@@ -312,7 +312,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         shareholders: userTokenSharesQuery,
     });
 
-    const tokenStatsQuery = edgeql.insert(edgeql.TokenStats, {
+    const tokenStatsQuery = await edgeql.insert(TokenStats, {
         agentId: formattedTokenStats.agentId,
         price: edgeql.decimal(formattedTokenStats.price.toString()),
         change24h: edgeql.decimal(formattedTokenStats.change24h.toString()),
@@ -320,7 +320,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         marketCap: edgeql.decimal(formattedTokenStats.marketCap.toString()),
     });
     
-    const insertAgentQuery = edgeql.insert(edgeql.Agent, {
+    const insertAgentQuery = await edgeql.insert(Agent, {
         agentId: formattedAgent.agentId,
         twinHandle: formattedAgent.twinHandle,
         twitterHandle: formattedAgent.twitterHandle,
@@ -342,30 +342,42 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
     await insertAgentQuery.run(edgeDBCloudClient);
 }
-
+// Function to fetch twineets
 export async function fetchTwineets(): Promise<TwineetType[]> {
-    const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
+    const query = edgeql.select(Twineet, () => ({
         id: true,
         agentId: true,
         content: true,
         timestamp: true,
+        isRetwineeted: true,
         likes: true,
         retwineets: true,
         replies: true,
-        isLiked: true,
-        isRetwineeted: true,
+        isLiked: true
     }));
-    const result = await twineetsQuery.run(edgeDBCloudClient);
-    return result as TwineetType[];
+
+    const result = await edgeDBCloudClient.query(JSON.stringify(query)); // Execute the query
+    return result as TwineetType[]; // Cast the result to the expected type
 }
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
-    const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
-        filter: edgeql.op(edgeql.Twineet.agentId, '=', agentId),
-    }));
-    const result = await twineetsQuery.run(edgeDBCloudClient);
+    const twineetsQuery = edgeql.select(Twineet, (twineet : TwineetType) => ({
+        id: true,
+        agentId: true,
+        content: true,
+        timestamp: true,
+        isRetwineeted: true,
+        likes: true,
+        retwineets: true,
+        replies: true,
+        isLiked: true,  
+        filter: edgeql.op(twineet.agentId, '=', agentId),
+    }))
+
+    const result = await edgeDBCloudClient.query(JSON.stringify(twineetsQuery));
     return result as TwineetType[];
 }
+
 
 const app = express();
 const port = 3002;
@@ -456,9 +468,9 @@ app.post('/api/fetched-tweets', async (req: Request, res: Response) => {
         }
 
         const updatedAgent = {
-            ...currentAgent,
-            fetchedTweets: [...currentAgent.fetchedTweets, fetchedTweet], // Add the new fetched tweet to the existing array
-            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+            ...currentAgent.result,
+            fetchedTweets: [...(currentAgent.result.fetchedTweets || []), fetchedTweet], // Add the new fetched tweet to the existing array
+            agentId: currentAgent.result.agentId || agentId, // Ensure agentId is not undefined
         };
 
         // Step 3: Insert the updated agent data
@@ -485,9 +497,9 @@ app.post('/api/twineets', async (req: Request, res: Response) => {
         }
 
         const updatedAgent = {
-            ...currentAgent,
-            twineets: [...currentAgent.twineets, twineet], // Add the new twineet to the existing array
-            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+            ...currentAgent.result,
+            twineets: [...currentAgent.result.twineets, twineet], // Add the new twineet to the existing array
+            agentId: currentAgent.result.agentId || agentId, // Ensure agentId is not undefined
         };
 
         // Step 3: Insert the updated agent data
@@ -514,9 +526,9 @@ app.post('/api/transactions', async (req: Request, res: Response) => {
         }
 
         const updatedAgent = {
-            ...currentAgent,
-            transactions: [...currentAgent.transactions, transaction], // Add the new transaction to the existing array
-            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+            ...currentAgent.result,
+            transactions: [...currentAgent.result.transactions, transaction], // Add the new transaction to the existing array
+            agentId: currentAgent.result.agentId || agentId, // Ensure agentId is not undefined
         };
 
         // Step 3: Insert the updated agent data
@@ -552,62 +564,36 @@ app.get('/api/twineets/:agentId', async (req: Request, res: Response) => {
     }
 });
 
+interface FetchAgentByAgentIdResult {
+    status: string;
+    result : AgentType
+}
+
+interface GetAllAgentsResult {
+    status: string;
+    result : AgentType[]
+}
+
 // Function to fetch an agent by ID
-export async function fetchAgentByAgentId(agentId: string): Promise<AgentType | null> {
-    const query = edgeql.select(edgeql.Agent, agent => ({
+export async function fetchAgentByAgentId(agentId: string): Promise<FetchAgentByAgentIdResult | null> {
+    const query = edgeql.select(edgeql.Agent, (agent : AgentType) => ({
         filter: edgeql.op(agent.agentId, '=', agentId),
         limit: 1,
-        ...edgeql.Agent['*']
+        result: edgeql.Agent
     }));
 
-    const result = await query.run(edgeDBCloudClient);
-    return result.length > 0 ? formatAgent(result[0]) : null;
+    const result = await edgeDBCloudClient.query(JSON.stringify(query));
+    return result.length > 0 ? { status: 'success', result: formatAgent(result[0]) } : null;
 }
 
 // Function to fetch all agents
-export async function getAllAgents(): Promise<AgentType[]> {
+export async function getAllAgents(): Promise<GetAllAgentsResult | null> {
     const query = edgeql.select(edgeql.Agent, () => ({
-        ...edgeql.Agent['*']
+        result: edgeql.Agent
     }));
 
-    const result = await query.run(edgeDBCloudClient);
-    return result.map(agent => formatAgent(agent));
-}
-
-// Function to fetch agent metrics history
-export async function getAgentMetricsHistory(agentId: string, limit: number): Promise<AnalyticsType[]> {
-    const query = edgeql.select(edgeql.Analytics, analytics => ({
-        filter: edgeql.op(analytics.agentId, '=', agentId),
-        limit,
-        ...edgeql.Analytics['*']
-    }));
-
-    const result = await query.run(edgeDBCloudClient);
-    return result.map((item: any) => ({
-        ...item,
-        cryptoHoldings: item.cryptoHoldings.map((holding: any) => ({
-            ...holding,
-            amount: parseFloat(holding.amount) // Ensure amount is a number
-        }))
-    }));
-}
-
-// Function to fetch token stats history
-export async function getTokenStatsHistory(agentId: string, limit: number): Promise<TokenStatsType[]> {
-    const query = edgeql.select(edgeql.TokenStats, stats => ({
-        filter: edgeql.op(stats.agentId, '=', agentId),
-        limit,
-        ...edgeql.TokenStats['*']
-    }));
-
-    const result = await query.run(edgeDBCloudClient);
-    return result.map((item: any) => ({
-        ...item,
-        price: parseFloat(item.price), // Ensure price is a number
-        change24h: parseFloat(item.change24h), // Ensure change24h is a number
-        volume24h: parseFloat(item.volume24h), // Ensure volume24h is a number
-        marketCap: parseFloat(item.marketCap) // Ensure marketCap is a number
-    }));
+    const result = await edgeDBCloudClient.query(JSON.stringify(query));
+    return result.length > 0 ? { status: 'success', result: result.map(agent => formatAgent(agent)) } : null;
 }
 
 // Start the server

@@ -12,7 +12,7 @@ import {
     TokenShareType,
 } from '@/types/types';
 
-declare module '@/dbschema/edgeql-js' {
+export declare module '@/dbschema/edgeql-js' {
     interface EdgeQL {
         query: (queryString: string) => Promise<unknown>;
         cast: (type: decimal.Decimal, value: number | Date) => number | Date;

@@ -36,13 +36,8 @@ import {
     TransactionType,
 } from '../app/types/types';
 // Function to format UserTokenShare
-
-const port = 3002;
-const isProduction = true;
-//const isProduction = process.env.NODE_ENV === 'production';
-const url = isProduction 
-    ? 'https://twin-three.vercel.app/' 
-    : 'http://localhost:' + port + '/';
+const port = process.env.PORT;
+const url = process.env.NEXT_PUBLIC_URL;
 
 const app = express();
 

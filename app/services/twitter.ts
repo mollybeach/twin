@@ -29,7 +29,7 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
 export const fetchTweets = async (username: string): Promise<FetchedTweetType[]> => {
   try {
     console.log(`Fetching tweets for username: ${username}`); // Log the username
-    const response = await axios.get(`http://localhost:3002/api/tweets`, {
+    const response = await axios.get(process.env.NEXT_PUBLIC_URL + '/api/tweets', {
       params: {
         username: username,
       },

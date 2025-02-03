@@ -1,9 +1,12 @@
 // path: src/services/openaiService.ts
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const generateResponse = async (prompt: string): Promise<string> => {
     try {
-        const response = await axios.post('http://localhost:3002/generate', { prompt });
+        const response = await axios.post(process.env.NEXT_PUBLIC_URL + '/generate', { prompt });
         
         // Log the entire response for debugging
         console.log('OpenAI Response:', response.data);

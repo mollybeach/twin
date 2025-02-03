@@ -15,6 +15,7 @@ export interface AnalyticsType {
 }
 
 export interface AgentType {
+    id?: string;
     agentId: AgentIdType;
     autoReply: boolean;
     createdAt: Date;

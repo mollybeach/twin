@@ -40,9 +40,9 @@ function formatUserTokenShare(share: UserTokenShareType) {
     return {
         agentId: share.agentId,
         userId: share.userId,
-        shares: edgeql.cast(edgeql.decimal, share.shares),
-        purchasePrice: edgeql.cast(edgeql.decimal, share.purchasePrice),
-        purchaseDate: new Date(share.purchaseDate), // Ensure this is a Date object
+        shares: parseFloat(share.shares.toString()),
+        purchasePrice: parseFloat(share.purchasePrice.toString()),
+        purchaseDate: share.purchaseDate,
     };
 }
 
@@ -52,12 +52,12 @@ function formatTokenShare(tokenShare: TokenShareType) {
         agentId: tokenShare.agentId,
         totalShares: tokenShare.totalShares,
         availableShares: tokenShare.availableShares,
-        pricePerShare: edgeql.cast(edgeql.decimal, tokenShare.pricePerShare),
-        shareholders: tokenShare.shareholders.map(formatUserTokenShare), // Ensure this is an array
+        pricePerShare: parseFloat(tokenShare.pricePerShare.toString()),
+        shareholders: tokenShare?.shareholders?.map(formatUserTokenShare) || [],
     };
 }
 // Function to format Agent
-function formatAgent(agent: AgentType) {
+function formatAgent(agent: any): AgentType {
     return {
         agentId: agent.agentId,
         twinHandle: agent.twinHandle,
@@ -67,7 +67,7 @@ function formatAgent(agent: AgentType) {
         description: agent.description,
         autoReply: agent.autoReply,
         isListed: agent.isListed,
-        price: edgeql.cast(edgeql.decimal, agent.price),
+        price: parseFloat(agent.price), // Ensure price is a number
         createdAt: new Date(agent.createdAt),
         analytics: formatAnalytics(agent.analytics),
         fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
@@ -77,16 +77,17 @@ function formatAgent(agent: AgentType) {
         tokenShares: formatTokenShare(agent.tokenShares),
         tokenStats: formatTokenStats(agent.tokenStats),
         transactions: agent.transactions?.map(formatTransaction) || [],
+        modelData: agent.modelData, // Ensure this is included
     };
 }
 
 function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
     return {
         agentId: cryptoHolding.agentId,
-        amount: edgeql.cast(edgeql.decimal, cryptoHolding.amount),
+        amount: parseFloat(cryptoHolding.amount.toString()), // Ensure this is a number
         symbol: cryptoHolding.symbol,
-        change24h: edgeql.cast(edgeql.decimal, cryptoHolding.change24h), // Ensure this is included
-        value: edgeql.cast(edgeql.decimal, cryptoHolding.value), // Ensure this is included
+        change24h: parseFloat(cryptoHolding.change24h.toString()), // Ensure this is a number
+        value: parseFloat(cryptoHolding.value.toString()), // Ensure this is a number
     };
 }
 
@@ -94,8 +95,8 @@ function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
 function formatAnalytics(analytics: AnalyticsType) {
     return {
         agentId: analytics.agentId,
-        clickThroughRate: analytics.clickThroughRate, // Ensure this is a number
-        engagementRate: analytics.engagementRate, // Ensure this is a number
+        clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
+        engagementRate: parseFloat(analytics.engagementRate.toString()), // Ensure this is a number
         impressions: analytics.impressions,
         cryptoHoldings: analytics.cryptoHoldings.map(formatCryptoHolding),
         demographics: analytics.demographics.map(formatDemographics),
@@ -120,10 +121,10 @@ function formatAgentStats(stats: AgentStatsType) {
 function formatTokenStats(tokenStats: TokenStatsType) {
     return {
         agentId: tokenStats.agentId,
-        price: edgeql.cast(edgeql.decimal, tokenStats.price),
-        change24h: edgeql.cast(edgeql.decimal, tokenStats.change24h),
-        volume24h: edgeql.cast(edgeql.decimal, tokenStats.volume24h),
-        marketCap: edgeql.cast(edgeql.decimal, tokenStats.marketCap),
+        price: parseFloat(tokenStats.price.toString()), // Ensure this is a number
+        change24h: parseFloat(tokenStats.change24h.toString()), // Ensure this is a number
+        volume24h: parseFloat(tokenStats.volume24h.toString()), // Ensure this is a number
+        marketCap: parseFloat(tokenStats.marketCap.toString()), // Ensure this is a number
     };
 }
 
@@ -132,7 +133,7 @@ function formatDemographics(demographics: DemographicsType) {
     return {
         agentId: demographics.agentId,
         age: demographics.age,
-        percentage: edgeql.cast(edgeql.decimal, demographics.percentage),
+        percentage: parseFloat(demographics.percentage.toString()), // Ensure this is a number
     };
 }
 
@@ -141,7 +142,7 @@ function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
     return {
         agentId: dailyImpressions.agentId,
         date: dailyImpressions.date,
-        count: dailyImpressions.count,
+        count: parseInt(dailyImpressions.count.toString()), // Ensure this is a number
     };
 }
 
@@ -149,8 +150,8 @@ function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
 function formatPeakHours(peakHours: PeakHoursType) {
     return {
         agentId: peakHours.agentId,
-        hour: peakHours.hour,
-        engagement: edgeql.cast(edgeql.decimal, peakHours.engagement),
+        hour: parseInt(peakHours.hour.toString()), // Ensure this is a number
+        engagement: parseFloat(peakHours.engagement.toString()), // Ensure this is a number
     };
 }
 
@@ -159,7 +160,7 @@ function formatReachByPlatform(reach: ReachByPlatformType) {
     return {
         agentId: reach.agentId,
         platform: reach.platform,
-        count: reach.count,
+        count: parseInt(reach.count.toString()), // Ensure this is a number
     };
 }
 
@@ -168,7 +169,7 @@ function formatTopInteractions(interactions: TopInteractionsType) {
     return {
         agentId: interactions.agentId,
         kind: interactions.kind,
-        count: interactions.count,
+        count: parseInt(interactions.count.toString()), // Ensure this is a number
     };
 }
 
@@ -270,6 +271,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
             count: formattedTopInteractions.count,
         })
     });
+    
     const fetchedTweetsQuery = edgeql.insert(edgeql.FetchedTweet, {
         agentId: formattedFetchedTweets.agentId,
         text: formattedFetchedTweets.text,
@@ -297,7 +299,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const userTokenSharesQuery = edgeql.insert(edgeql.UserTokenShare, {
         agentId: formattedUserTokenShares.agentId,
         userId: formattedUserTokenShares.userId,
-        shares: formattedUserTokenShares.shares,
+        shares: edgeql.cast(edgeql.decimal, formattedUserTokenShares.shares.toString()),
         purchasePrice: edgeql.decimal(formattedUserTokenShares.purchasePrice.toString()),
         purchaseDate: edgeql.cast(edgeql.datetime, new Date(formattedUserTokenShares.purchaseDate)), // Ensure this is a Date object
     });
@@ -314,8 +316,8 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         agentId: formattedTokenStats.agentId,
         price: edgeql.decimal(formattedTokenStats.price.toString()),
         change24h: edgeql.decimal(formattedTokenStats.change24h.toString()),
-        volume24h: formattedTokenStats.volume24h,
-        marketCap: formattedTokenStats.marketCap,
+        volume24h: edgeql.decimal(formattedTokenStats.volume24h.toString()),
+        marketCap: edgeql.decimal(formattedTokenStats.marketCap.toString()),
     });
     
     const insertAgentQuery = edgeql.insert(edgeql.Agent, {
@@ -327,8 +329,8 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         description: formattedAgent.description,
         autoReply: formattedAgent.autoReply,
         isListed: formattedAgent.isListed,
-        price: formattedAgent.price,
-        createdAt: edgeql.cast(edgeql.datetime, formattedAgent.createdAt),
+        price: edgeql.decimal(formattedAgent.price.toString()),
+        createdAt: edgeql.cast(edgeql.datetime, new Date(formattedAgent.createdAt)), // Ensure this is a Date object
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedAgent.verification)),
         stats: edgeql.insert(edgeql.AgentStats, formatAgentStats(formattedAgent.stats)),
@@ -338,62 +340,10 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         tokenStats: tokenStatsQuery,
         transactions: transactionsQuery,
     });
-
-    await (await insertAgentQuery).run(edgeDBCloudClient);
+    const insertAgentQueryResult = insertAgentQuery;
+    await insertAgentQueryResult.run(edgeDBCloudClient);
 }
 
-
-export async function insertFetchedTweet(agentId: string, fetchedTweet: FetchedTweetType): Promise<void> {
-    const formattedFetchedTweet = formatFetchedTweet(fetchedTweet);
-    const fetchedTweetsQuery = edgeql.update(edgeql.FetchedTweet, (fetchedTweet) => ({
-        filter: edgeql.op(fetchedTweet.agentId, '=', agentId),
-        set: {
-            text: formattedFetchedTweet.text,
-            edit_history_tweet_ids: formattedFetchedTweet.edit_history_tweet_ids,
-            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweet.timestamp)), // Ensure this is a Date object
-        },
-    }));
-
-    const fetchedTweetsQueryResult = fetchedTweetsQuery;
-    await fetchedTweetsQueryResult.run(edgeDBCloudClient);
-}
-
-export async function insertTwineet(agentId: string, twineet: TwineetType): Promise<void> {
-    const formattedTwineet = formatTwineet(twineet);
-    const twineetsQuery = edgeql.update(edgeql.FetchedTweet, (fetchedTweet) => ({
-        filter: edgeql.op(fetchedTweet.agentId, '=', agentId),
-        set: {
-            content: formattedTwineet.content,
-            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTwineet.timestamp)), // Ensure this is a Date object
-            likes: formattedTwineet.likes,
-            retwineets: formattedTwineet.retwineets,
-            replies: formattedTwineet.replies,
-            isLiked: formattedTwineet.isLiked,
-            isRetwineeted: formattedTwineet.isRetwineeted,
-        },
-    }));
-
-    const twineetsQueryResult = twineetsQuery;
-    await twineetsQueryResult.run(edgeDBCloudClient);
-}
-
-export async function insertTransaction(agentId: string, transaction: TransactionType): Promise<void> {
-    const formattedTransaction = formatTransaction(transaction);
-    const transactionsQuery = edgeql.update(edgeql.Transaction, (transaction) => ({
-        filter: edgeql.op(transaction.agentId, '=', agentId), 
-        set: {
-            kind: formattedTransaction.kind,
-            shares: formattedTransaction.shares,
-            pricePerShare: formattedTransaction.pricePerShare,
-            totalAmount: formattedTransaction.totalAmount,
-            timestamp: edgeql.cast(edgeql.datetime, new Date(formattedTransaction.timestamp)), // Ensure this is a Date object
-        },
-    }));
-
-    const transactionsQueryResult = transactionsQuery;
-    await transactionsQueryResult.run(edgeDBCloudClient);
-
-}
 export async function fetchTwineets(): Promise<TwineetType[]> {
     const twineetsQuery = edgeql.select(edgeql.Twineet, () => ({
         id: true,
@@ -498,7 +448,23 @@ app.post('/api/fetched-tweets', async (req: Request, res: Response) => {
     const { agentId, fetchedTweet } = req.body; // Get agentId and fetchedTweet from the request body
 
     try {
-        await insertFetchedTweet(agentId, fetchedTweet);
+        // Step 1: Fetch the current agent data
+        const currentAgent = await fetchAgentByAgentId(agentId); // Fetch the agent by ID
+
+        // Step 2: Create a copy of the current agent data and update the fetchedTweets array
+        if (!currentAgent) {
+            throw new Error('Agent not found');
+        }
+
+        const updatedAgent = {
+            ...currentAgent,
+            fetchedTweets: [...currentAgent.fetchedTweets, fetchedTweet], // Add the new fetched tweet to the existing array
+            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+        };
+
+        // Step 3: Insert the updated agent data
+        await insertAgent(updatedAgent as AgentType); // Insert the agent with updated fetched tweets
+
         res.status(201).send('Fetched tweet inserted successfully');
     } catch (error) {
         console.error('Error inserting fetched tweet:', error);
@@ -511,7 +477,23 @@ app.post('/api/twineets', async (req: Request, res: Response) => {
     const { agentId, twineet } = req.body; // Get agentId and twineet from the request body
 
     try {
-        await insertTwineet(agentId, twineet);
+        // Step 1: Fetch the current agent data
+        const currentAgent = await fetchAgentByAgentId(agentId); // Fetch the agent by ID
+
+        // Step 2: Create a copy of the current agent data and update the twineets array
+        if (!currentAgent) {
+            throw new Error('Agent not found');
+        }
+
+        const updatedAgent = {
+            ...currentAgent,
+            twineets: [...currentAgent.twineets, twineet], // Add the new twineet to the existing array
+            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+        };
+
+        // Step 3: Insert the updated agent data
+        await insertAgent(updatedAgent as AgentType); // Insert the agent with updated twineets
+
         res.status(201).send('Twineet inserted successfully');
     } catch (error) {
         console.error('Error inserting twineet:', error);
@@ -524,7 +506,23 @@ app.post('/api/transactions', async (req: Request, res: Response) => {
     const { agentId, transaction } = req.body; // Get agentId and transaction from the request body
 
     try {
-        await insertTransaction(agentId, transaction);
+        // Step 1: Fetch the current agent data
+        const currentAgent = await fetchAgentByAgentId(agentId); // Fetch the agent by ID
+
+        // Step 2: Create a copy of the current agent data and update the transactions array
+        if (!currentAgent) {
+            throw new Error('Agent not found');
+        }
+
+        const updatedAgent = {
+            ...currentAgent,
+            transactions: [...currentAgent.transactions, transaction], // Add the new transaction to the existing array
+            agentId: currentAgent.agentId || agentId, // Ensure agentId is not undefined
+        };
+
+        // Step 3: Insert the updated agent data
+        await insertAgent(updatedAgent as AgentType); // Insert the agent with updated transactions
+
         res.status(201).send('Transaction inserted successfully');
     } catch (error) {
         console.error('Error inserting transaction:', error);
@@ -554,6 +552,64 @@ app.get('/api/twineets/:agentId', async (req: Request, res: Response) => {
         res.status(500).send('Error fetching twineets by agent ID');
     }
 });
+
+// Function to fetch an agent by ID
+export async function fetchAgentByAgentId(agentId: string): Promise<AgentType | null> {
+    const query = edgeql.select(edgeql.Agent, agent => ({
+        filter: edgeql.op(agent.agentId, '=', agentId),
+        limit: 1,
+        ...edgeql.Agent['*']
+    }));
+
+    const result = await query.run(edgeDBCloudClient);
+    return result.length > 0 ? formatAgent(result[0]) : null;
+}
+
+// Function to fetch all agents
+export async function getAllAgents(): Promise<AgentType[]> {
+    const query = edgeql.select(edgeql.Agent, () => ({
+        ...edgeql.Agent['*']
+    }));
+
+    const result = await query.run(edgeDBCloudClient);
+    return result.map(agent => formatAgent(agent));
+}
+
+// Function to fetch agent metrics history
+export async function getAgentMetricsHistory(agentId: string, limit: number): Promise<AnalyticsType[]> {
+    const query = edgeql.select(edgeql.Analytics, analytics => ({
+        filter: edgeql.op(analytics.agentId, '=', agentId),
+        limit,
+        ...edgeql.Analytics['*']
+    }));
+
+    const result = await query.run(edgeDBCloudClient);
+    return result.map((item: any) => ({
+        ...item,
+        cryptoHoldings: item.cryptoHoldings.map((holding: any) => ({
+            ...holding,
+            amount: parseFloat(holding.amount) // Ensure amount is a number
+        }))
+    }));
+}
+
+// Function to fetch token stats history
+export async function getTokenStatsHistory(agentId: string, limit: number): Promise<TokenStatsType[]> {
+    const query = edgeql.select(edgeql.TokenStats, stats => ({
+        filter: edgeql.op(stats.agentId, '=', agentId),
+        limit,
+        ...edgeql.TokenStats['*']
+    }));
+
+    const result = await query.run(edgeDBCloudClient);
+    return result.map((item: any) => ({
+        ...item,
+        price: parseFloat(item.price), // Ensure price is a number
+        change24h: parseFloat(item.change24h), // Ensure change24h is a number
+        volume24h: parseFloat(item.volume24h), // Ensure volume24h is a number
+        marketCap: parseFloat(item.marketCap) // Ensure marketCap is a number
+    }));
+}
 
 // Start the server
 app.listen(port, () => {

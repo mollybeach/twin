@@ -78,13 +78,23 @@ function formatAgent(agent: AgentType): AgentType {
     };
 }
 function formatUserTokenShare(share: UserTokenShareType) {
-    return {
-        agentId: share.agentId,
-        userId: share.userId,
-        shares: parseFloat(share.shares.toString()),
-        purchasePrice: parseFloat(share.purchasePrice.toString()),
-        purchaseDate: share.purchaseDate,
-    };
+    try {
+        const purchaseDate = new Date(share.purchaseDate);
+        if (isNaN(purchaseDate.getTime())) {
+            console.error('Invalid purchase date for user token share:', share.purchaseDate);
+            throw new Error('Invalid purchase date for user token share');
+        }
+        return {
+            agentId: share.agentId,
+            userId: share.userId,
+            shares: parseFloat(share.shares.toString()),
+            purchasePrice: parseFloat(share.purchasePrice.toString()),
+            purchaseDate: purchaseDate, // Use the validated purchase date
+        };
+    } catch (error) {
+        console.error('Error formatting user token share:', error);
+        throw error; // Rethrow the error after logging
+    }
 }
 
 // Function to format TokenShare
@@ -109,7 +119,6 @@ function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
 
 // Function to format Analytics
 function formatAnalytics(analytics: AnalyticsType) {
-    console.log('analytics in the format function', analytics);
     return {
         agentId: analytics.agentId,
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
@@ -155,12 +164,22 @@ function formatDemographics(demographics: DemographicsType) {
 }
 
 // Function to format DailyImpressions
-function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
-    return {
-        agentId: dailyImpressions.agentId,
-        date: dailyImpressions.date,
-        count: parseInt(dailyImpressions.count.toString()), // Ensure this is a number
-    };
+function formatDailyImpressions(dailyImpression: DailyImpressionsType) {
+    try {
+        const date = new Date(dailyImpression.date);
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date for daily impressions:', dailyImpression.date);
+            throw new Error('Invalid date for daily impressions');
+        }
+        return {
+            agentId: dailyImpression.agentId,
+            count: dailyImpression.count,
+            date: date, // Use the validated date
+        };
+    } catch (error) {
+        console.error('Error formatting daily impressions:', error);
+        throw error; // Rethrow the error after logging
+    }
 }
 
 // Function to format PeakHours
@@ -192,49 +211,80 @@ function formatTopInteractions(interactions: TopInteractionsType) {
 
 // Function to format FetchedTweet
 function formatFetchedTweet(tweet: FetchedTweetType) {
-    return {
-        agentId: tweet.agentId,
-        text: tweet.text,
-        edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-        timestamp: new Date(tweet.timestamp).toString(), // Ensure this is a Date object
-    };
+    try {
+        const timestamp = new Date(tweet.timestamp);
+        if (isNaN(timestamp.getTime())) {
+            console.error('Invalid timestamp for tweet:', tweet.timestamp);
+            throw new Error('Invalid timestamp for tweet');
+        }
+        return {
+            agentId: tweet.agentId,
+            text: tweet.text,
+            edit_history_tweet_ids: tweet.edit_history_tweet_ids,
+            timestamp: timestamp, // Use the validated timestamp
+        };
+    } catch (error) {
+        console.error('Error formatting fetched tweet:', error);
+        throw error; // Rethrow the error after logging
+    }
 }
 // Function to format Twineet
 function formatTwineet(twineet: TwineetType) {
-    return {
-        agentId: twineet.agentId,
-        content: twineet.content,
-        timestamp: new Date(twineet.timestamp), // Ensure this is a Date object
-        likes: twineet.likes,
-        retwineets: twineet.retwineets,
-        replies: twineet.replies,
-        isLiked: twineet.isLiked,
-        isRetwineeted: twineet.isRetwineeted,
-    };
+    try {
+        const timestamp = new Date(twineet.timestamp);
+        if (isNaN(timestamp.getTime())) {
+            console.error('Invalid timestamp for twineet:', twineet.timestamp);
+            throw new Error('Invalid timestamp for twineet');
+        }
+        return {
+            agentId: twineet.agentId,
+            content: twineet.content,
+            timestamp: timestamp, // Use the validated timestamp
+            likes: twineet.likes,
+            retwineets: twineet.retwineets,
+            replies: twineet.replies,
+            isLiked: twineet.isLiked,
+            isRetwineeted: twineet.isRetwineeted,
+        };
+    } catch (error) {
+        console.error('Error formatting twineet:', error);
+        throw error; // Rethrow the error after logging
+    }
 }
 // Function to format Verification
 function formatVerification(verification: VerificationResponseType) {
     return {
         agentId: verification.agentId,
         isVerified: verification.isVerified,
-        verificationDate: new Date(verification.verificationDate),
+        verificationDate: verification.verificationDate
     };
 }
 
 // Function to format Transaction
 function formatTransaction(transaction: TransactionType) {
-    return {
-        agentId: transaction.agentId,
-        kind: transaction.kind,
-        shares: transaction.shares,
-        pricePerShare: parseFloat(transaction.pricePerShare.toString()),
-        totalAmount: parseFloat(transaction.totalAmount.toString()),
-        timestamp: new Date(transaction.timestamp).toISOString(), // Ensure this is a Date object
-    };
+    try {
+        const timestamp = new Date(transaction.timestamp);
+        if (isNaN(timestamp.getTime())) {
+            console.error('Invalid timestamp for transaction:', transaction.timestamp);
+            throw new Error('Invalid timestamp for transaction');
+        }
+        return {
+            agentId: transaction.agentId,
+            kind: transaction.kind,
+            shares: transaction.shares,
+            pricePerShare: parseFloat(transaction.pricePerShare.toString()),
+            totalAmount: parseFloat(transaction.totalAmount.toString()),
+            timestamp: timestamp, // Use the validated timestamp
+        };
+    } catch (error) {
+        console.error('Error formatting transaction:', error);
+        throw error; // Rethrow the error after logging
+    }
 }
 
 // Function to insert an agent
 export async function insertAgent(agentData: AgentType): Promise<void> {
+    console.log('agentData in the insert function', agentData);
     const formattedAgent = formatAgent(agentData);
     const formattedAnalytics = formatAnalytics(agentData.analytics);
     const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings);
@@ -346,16 +396,17 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         description: formattedAgent.description,
         autoReply: formattedAgent.autoReply,
         isListed: formattedAgent.isListed,
+        modelData: formattedAgent.modelData,
         price: edgeql.decimal(formattedAgent.price.toString()),
         createdAt: edgeql.cast(edgeql.datetime, new Date(formattedAgent.createdAt)), // Ensure this is a Date object
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedAgent.verification)),
         stats: edgeql.insert(edgeql.AgentStats, formatAgentStats(formattedAgent.stats)),
         tokenShares: tokenSharesQuery,
-        fetchedTweets: fetchedTweetsQuery,
-        twineets: twineetsQuery,
+        fetchedTweets: agentData.fetchedTweets.length > 0 ? fetchedTweetsQuery : [],
+        twineets: agentData.twineets.length > 0 ? twineetsQuery : [],
         tokenStats: tokenStatsQuery,
-        transactions: transactionsQuery,
+        transactions: agentData.transactions.length > 0 ? transactionsQuery : []
     });
     await insertAgentQuery.run(edgeDBCloudClient);
 }

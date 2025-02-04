@@ -55,7 +55,7 @@ export interface CryptoHoldingType {
 export interface DailyImpressionsType {
     agentId: AgentIdType;
     count: number;
-    date: string;
+    date: Date;
 }
 
 export interface DemographicsType {
@@ -85,7 +85,7 @@ export interface NotificationType {
     message: string;
     twitterHandle: string;
     twinHandle: string;
-    timestamp: number;
+    timestamp: Date;
 }
 
 export interface PeakHoursType {
@@ -121,7 +121,7 @@ export interface UserTokenShareType {
     userId: string;
     shares: number;
     purchasePrice: number;
-    purchaseDate: string;
+    purchaseDate: Date;
 }
 export interface TransactionType {
     agentId: AgentIdType;
@@ -129,14 +129,14 @@ export interface TransactionType {
     shares: number;
     pricePerShare: number;
     totalAmount: number;
-    timestamp: string;
+    timestamp: Date;
 }
 
 export interface FetchedTweetType {
     agentId: AgentIdType;
     text: string;
     edit_history_tweet_ids: string[];
-    timestamp: string;
+    timestamp: Date;
 }
 
 export interface ReachByPlatformType {

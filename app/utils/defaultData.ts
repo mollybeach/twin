@@ -27,7 +27,15 @@ export const defaultAgent: AgentType = {
             totalShares: 0,
             availableShares: 0,
             pricePerShare: 0,
-            shareholders: []
+            shareholders: [
+                {
+                    agentId: '',
+                    userId: '',
+                    shares: 0,
+                    purchasePrice: 0,
+                    purchaseDate: new Date()
+                }
+            ]
         },
         verification: {
             agentId: '',
@@ -54,7 +62,7 @@ export const defaultAgent: AgentType = {
             dailyImpressions: {
                 agentId: '',
                 count: 0,
-                date: ''
+                date: new Date()
             },
             peakHours: {
                 agentId: '',
@@ -79,5 +87,14 @@ export const defaultAgent: AgentType = {
             volume24h: 0,
             marketCap: 0
         },
-        transactions: []
+        transactions: [
+            {
+                agentId: '',
+                kind: 'buy',
+                shares: 0,
+                pricePerShare: 0,
+                totalAmount: 0,
+                timestamp: new Date()
+            }
+        ]
 }

@@ -19,8 +19,10 @@ export default function CreatePage() {
   const [deployError, setDeployError] = useState<string | null>(null);
   const [generatedTwineet, setGeneratedTwineet] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isFetchingTweets, setIsFetchingTweets] = useState(false);
 
   const handleFetchTweets = async () => {
+    setIsFetchingTweets(true);
     try {
       const tweets = await fetchTweets(config.twitterHandle);
       setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
@@ -32,7 +34,7 @@ export default function CreatePage() {
       await handleGenerateResponse(tweets, modelData); // Pass model data to the response handler
 
       // Set success message after fetching tweets
-      setSuccessMessage('Tweets fetched successfully!');
+      setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
     } catch (error) {
       if (error instanceof Error) {
         console.error('Failed to fetch tweets:', error);
@@ -41,6 +43,8 @@ export default function CreatePage() {
         console.error('Failed to fetch tweets:', error);
         setDeployError('An unknown error occurred'); // Display a generic error message to the user
       }
+    } finally {
+      setIsFetchingTweets(false);
     }
   };
 
@@ -51,8 +55,6 @@ export default function CreatePage() {
       // Log the response for debugging
       console.log('Response from OpenAI:', response);
       
-      // Since the response is plain text, you can return it directly or process it as needed
-      // If you need to return an object, you can create a structure based on the response
       return { generatedText: response }; // Example structure
     } catch (error) {
       console.error('Failed to train model:', error);
@@ -72,6 +74,7 @@ export default function CreatePage() {
     config.agentId = crypto.randomUUID();
     config.fetchedTweets.forEach(tweet => {
       tweet.agentId = config.agentId;
+      tweet.timestamp = new Date();
     }); 
     config.twineets.forEach(twineet => {
       twineet.agentId = config.agentId;
@@ -108,16 +111,21 @@ export default function CreatePage() {
     config.verification.agentId = config.agentId;
     config.analytics.agentId = config.agentId;
     config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
+    config.analytics.cryptoHoldings.agentId = config.agentId;
 
     config.analytics.demographics = config.analytics.demographics;
+    config.analytics.demographics.agentId = config.agentId;
 
     config.analytics.dailyImpressions = config.analytics.dailyImpressions;
-
+    config.analytics.dailyImpressions.agentId = config.agentId;
+    
     config.analytics.peakHours = config.analytics.peakHours;
+    config.analytics.peakHours.agentId = config.agentId;
 
     config.analytics.reachByPlatform = config.analytics.reachByPlatform;
-
+    config.analytics.reachByPlatform.agentId = config.agentId;
     config.analytics.topInteractions = config.analytics.topInteractions;
+    config.analytics.topInteractions.agentId = config.agentId;
 
     config.tokenStats.agentId = config.agentId;
     config.tokenStats.price = config.price;
@@ -126,6 +134,10 @@ export default function CreatePage() {
 
     config.tokenShares.shareholders.forEach(shareholder => {
       shareholder.agentId = config.agentId;
+    });
+
+    config.transactions.forEach(transaction => {
+      transaction.agentId = config.agentId;
     });
 
     config.verification.agentId = config.agentId;
@@ -276,15 +288,20 @@ export default function CreatePage() {
               <label className="block text-sm font-medium text-purple-300">
                 Twin Handle
               </label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-purple-400 sm:text-sm">@</span>
+                </div>
               <input
                 type="text"
                 value={config.twinHandle}
                 onChange={(e) => {
                   setConfig({ ...config, twinHandle: e.target.value });
                 }}
-                className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-3 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
+                className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
                 placeholder="Enter your Twin's name"
               />
+            </div>
             </div>
 
             <div className="space-y-2">
@@ -302,7 +319,7 @@ export default function CreatePage() {
                     setConfig({ ...config, twitterHandle: e.target.value });
                   }}
                   className={`bg-white/5 focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-12 sm:text-sm border-white/10 rounded-md text-white`}
-                  placeholder="twitter username to train your twin on"
+                  placeholder="Enter a Twitter Username to Train Your Twin"
                 />
               </div>
             </div>
@@ -312,7 +329,15 @@ export default function CreatePage() {
               disabled={!config.twitterHandle}
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Fetch Tweets <Rocket className="ml-2 w-4 h-4" />
+              {isFetchingTweets ? (
+                <>
+                  <span className="animate-spin">🔄</span> Fetching Tweets...
+                </>
+              ) : (
+                <>
+                  Fetch Tweets <Rocket className="ml-2 w-4 h-4" />
+                </>
+              )}
             </button>
 
             {successMessage && (

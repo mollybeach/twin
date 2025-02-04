@@ -16,7 +16,7 @@ module default {
 
     type DailyImpressions {
         required property agentId -> AgentIdType;
-        required property date -> str;
+        required property date -> datetime;
         required property count -> int16;
     }
 

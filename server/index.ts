@@ -6,7 +6,6 @@ import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
-//import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
 import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
 import dotenv from 'dotenv';
 
@@ -35,7 +34,7 @@ import {
     TopInteractionsType,
     TransactionType,
 } from '../app/types/types';
-// Function to format UserTokenShare
+
 const port = process.env.PORT;
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -51,9 +50,6 @@ app.use(cors({
     origin: allowedOrigins
 }));
 
-
-
-// Function to format Agent
 function formatAgent(agent: AgentType): AgentType {
     return {
         agentId: agent.agentId,
@@ -283,8 +279,9 @@ function formatTransaction(transaction: TransactionType) {
 }
 
 // Function to insert an agent
-export async function insertAgent(agentData: AgentType): Promise<void> {
+export async function insertAgent(agentData: AgentType): Promise<AgentType> {
     console.log('agentData in the insert function', agentData);
+    
     const formattedAgent = formatAgent(agentData);
     const formattedAnalytics = formatAnalytics(agentData.analytics);
     const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings);
@@ -398,7 +395,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         isListed: formattedAgent.isListed,
         modelData: formattedAgent.modelData,
         price: edgeql.decimal(formattedAgent.price.toString()),
-        createdAt: edgeql.cast(edgeql.datetime, new Date(formattedAgent.createdAt)), // Ensure this is a Date object
+        createdAt: edgeql.cast(edgeql.datetime, new Date(formattedAgent.createdAt)), 
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedAgent.verification)),
         stats: edgeql.insert(edgeql.AgentStats, formatAgentStats(formattedAgent.stats)),
@@ -408,9 +405,15 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         tokenStats: tokenStatsQuery,
         transactions: agentData.transactions.length > 0 ? transactionsQuery : []
     });
-    await insertAgentQuery.run(edgeDBCloudClient);
+    try{
+        await insertAgentQuery.run(edgeDBCloudClient);
+        return Promise.resolve(agentData);
+    }catch(error){
+        console.error('Error inserting agent:', error);
+        throw new Error('Failed to insert agent');
+    }
 }
-// Function to fetch twineets
+
 export async function fetchTwineets(): Promise<TwineetType[]> {
     const query = edgeql.select(Twineet, () => ({
         id: true,

@@ -5,11 +5,7 @@
         const newAgentData = await req.json(); // Get the new agent data from the request body
         console.log('POST Request received with data:', newAgentData);
         try {
-            const response = await insertAgent(newAgentData);
-            if (response === undefined) {
-                console.error('Error creating agent: No response received'); // Log the error message
-                throw new Error('Failed to create agent: No response received');
-            }
+            await insertAgent(newAgentData); // Call insertAgent without expecting a response
             return NextResponse.json({ message: 'Agent created successfully' }, { status: 201 });
         } catch (error) {
             console.error('Error creating agent:', error);
@@ -17,7 +13,7 @@
         }
     }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const agents = await getAllAgents();
         return NextResponse.json(agents, { status: 200 });

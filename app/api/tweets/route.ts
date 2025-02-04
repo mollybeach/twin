@@ -1,10 +1,15 @@
    // path: pages/api/tweets.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { URL } from 'url'; // Import URL to parse the request URL
+
 dotenv.config();
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { username } = req.query;
+
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url); // Use URL to get search parameters
+    const username = searchParams.get('username'); // Extract username from query parameters
+
     try {
         const userResponse = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
             headers: {
@@ -18,9 +23,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
             },
         });
-        res.json(response.data);
+        return NextResponse.json(response.data);
     } catch (error) {
         console.error('Error fetching tweets:', error);
-        res.status(500).send('Error fetching tweets');
+        return NextResponse.json({ message: 'Error fetching tweets' }, { status: 500 });
     }
 }

@@ -79,12 +79,10 @@ export default function CreatePage() {
     config.twineets.forEach(twineet => {
       twineet.agentId = config.agentId;
     });
-
     config.tokenShares.agentId = config.agentId;
     config.tokenShares.shareholders.forEach(shareholder => {
       shareholder.agentId = config.agentId;
     });
-
     config.tokenStats.agentId = config.agentId; 
     config.stats.agentId = config.agentId;
     config.verification.agentId = config.agentId;
@@ -94,52 +92,39 @@ export default function CreatePage() {
     config.analytics.peakHours = config.analytics.peakHours;
     config.analytics.reachByPlatform = config.analytics.reachByPlatform;
     config.analytics.topInteractions = config.analytics.topInteractions;
-
     config.transactions.forEach(transaction => {
       transaction.agentId = config.agentId;
     });
-
     config.modelData.agentId = config.agentId;
-
     config.tokenShares.agentId = config.agentId;
     config.tokenShares.shareholders.forEach(shareholder => {
       shareholder.agentId = config.agentId;
     });
-
     config.tokenStats.agentId = config.agentId;
     config.stats.agentId = config.agentId;
     config.verification.agentId = config.agentId;
     config.analytics.agentId = config.agentId;
     config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
     config.analytics.cryptoHoldings.agentId = config.agentId;
-
     config.analytics.demographics = config.analytics.demographics;
     config.analytics.demographics.agentId = config.agentId;
-
     config.analytics.dailyImpressions = config.analytics.dailyImpressions;
     config.analytics.dailyImpressions.agentId = config.agentId;
-    
     config.analytics.peakHours = config.analytics.peakHours;
     config.analytics.peakHours.agentId = config.agentId;
-
     config.analytics.reachByPlatform = config.analytics.reachByPlatform;
     config.analytics.reachByPlatform.agentId = config.agentId;
     config.analytics.topInteractions = config.analytics.topInteractions;
     config.analytics.topInteractions.agentId = config.agentId;
-
     config.tokenStats.agentId = config.agentId;
     config.tokenStats.price = config.price;
-
     config.tokenShares.agentId = config.agentId;
-
     config.tokenShares.shareholders.forEach(shareholder => {
       shareholder.agentId = config.agentId;
     });
-
     config.transactions.forEach(transaction => {
       transaction.agentId = config.agentId;
     });
-
     config.verification.agentId = config.agentId;
 
     console.log(config);
@@ -161,7 +146,21 @@ export default function CreatePage() {
 
       addAgent(config);
 
+      setIsDeployed(true);
+      setTimeout(() => {
+        router.push(`/portfolio`);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to deploy Twin:', error);
+      setDeployError('Failed to deploy Twin. Please try again later.');
+    } finally {
+      setIsDeploying(false);
+    }
+  };
+
+
       // Insert fetched tweets
+      /*
       for (const tweet of (config.fetchedTweets || [])) {
         const tweetResponse = await fetch('/api/fetched-tweets', {
           method: 'POST',
@@ -191,19 +190,8 @@ export default function CreatePage() {
           throw new Error('Failed to insert twineet');
         }
       }
-
-      setIsDeployed(true);
-      setTimeout(() => {
-        router.push(`/analytics/${config.agentId}`);
-      }, 2000);
-    } catch (error) {
-      console.error('Failed to deploy Twin:', error);
-      setDeployError('Failed to deploy Twin. Please try again later.');
-    } finally {
-      setIsDeploying(false);
-    }
-  };
-
+*/
+/*
   const generateMultipleTwineets = async (agentId: string): Promise<TwineetType[]> => {
     const twineets: TwineetType[] = [];
     for (let i = 0; i < 5; i++) {
@@ -224,7 +212,7 @@ export default function CreatePage() {
       twineets.push(newTwineet);
     }
     return twineets;
-  };
+  };*/
   const handleGenerateResponse = async (tweets: FetchedTweetType[], modelData: Record<string, unknown>) => {
     const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
     try {

@@ -41,6 +41,9 @@
       ],
       "@/types/*": [
         "types/*"
+      ],
+      "@/server/formatData/*": [
+        "server/formatData/*"
       ]
     },
   },
@@ -58,6 +61,7 @@
     "dbschema/edgeql-js/**/*",  
     "dbschema/edgeql-js/modules/**/*",
     "server/**/*",
+    "server/formatData/**/*"
   ],
   "exclude": [
     "node_modules"

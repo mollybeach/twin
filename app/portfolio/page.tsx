@@ -196,7 +196,7 @@ export default function PortfolioPage() {
                         <td className="py-4">{transaction.shares}</td>
                         <td className="py-4">${transaction.pricePerShare.toFixed(4)}</td>
                         <td className="py-4">${transaction.totalAmount.toFixed(2)}</td>
-                        <td className="py-4">{formatDate(transaction.timestamp)}</td>
+                        <td className="py-4">{formatDate(transaction.timestamp.toISOString())}</td>
                       </tr>
                     );
                   })}

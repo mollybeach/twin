@@ -21,6 +21,14 @@ export interface AnalyticsType {
     topInteractions: TopInteractionsType[];
 }
 
+export interface AllAgentsType {
+    allAgents: AgentType[];
+}
+
+export interface AllTwineetsType {
+    allTwineets: TwineetType[];
+}
+
 export interface AgentType {
     id?: string;
     agentId: AgentIdType;

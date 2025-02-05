@@ -4,7 +4,6 @@ import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 
 import { useMarketplaceStore } from '../store/marketplace';
 import { useRouter } from 'next/navigation';
 import { generateResponse } from '../services/openaiService';
-import { fetchTweets } from '../services/twitter';
 import {  AgentType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
 import { defaultAgent } from '../utils/defaultData';
 
@@ -25,7 +24,17 @@ export default function CreatePage() {
   const handleFetchTweets = async () => {
     setIsFetchingTweets(true);
     try {
-      const tweets = await fetchTweets(config.twitterHandle);
+      const response = await fetch(`/api/tweets?username=${encodeURIComponent(config.twitterHandle)}`, {
+          method: 'GET', // Specify the method
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error('Failed to fetch tweets');
+      }
+      const tweets = await response.json();
       setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
       
       // Send tweets to OpenAI for training the model
@@ -124,7 +133,7 @@ export default function CreatePage() {
 
       setIsDeployed(true);
       setTimeout(() => {
-        router.push(`/portfolio`);
+        router.push(`/timeline`);
       }, 2000);
     } catch (error) {
       console.error('Failed to deploy Twin:', error);

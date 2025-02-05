@@ -2,14 +2,15 @@
 import { useEffect, useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
-import { TwineetType } from '../types/types';
+import { AgentType, TwineetType } from '../types/types';
 
 export default function TimelinePage() {
   const agents = useMarketplaceStore((state) => state.agents);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
   const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
-
+  const [allAgents, setAllAgents] = useState<AgentType[]>([]);
+/*
   useEffect(() => {
     const fetchAndDisplayTwineets = async () => {
       try {
@@ -25,8 +26,64 @@ export default function TimelinePage() {
     };
 
     fetchAndDisplayTwineets();
-  }, [agents]);
+  }, [agents]);*/
 
+  /*    try {
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create agent', { cause: response.statusText });
+      }
+
+      const result = await response.json();
+      console.log('Agent created successfully:', result);*/
+
+      // get all agents 
+    const fetchAgents = async () => {
+      const agents = await fetch('/api/agents', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const agentsResult = await agents.json();
+      setAllAgents(agentsResult);
+    };
+    fetchAgents();
+
+
+
+
+
+      const fetchAndDisplayTwineets = async () => {
+      try{  
+        const response = await fetch('/api/twineets', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to fetch twineets');
+        }
+        const result = await response.json();
+        setTwineets(result);
+        console.log('Twineets fetched successfully:', result);
+      } catch (error) {
+        console.error('Error fetching twineets:', error);
+      }
+    };
+
+    fetchAndDisplayTwineets();
+
+      
   const handleLike = (twineetId: string) => {
     setTwineets(prev => prev.map(twineet => {
       if (twineet.id === twineetId) {

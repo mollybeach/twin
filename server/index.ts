@@ -34,6 +34,8 @@ import {
     ReachByPlatformType,
     TopInteractionsType,
     TransactionType,
+    AllAgentsType,
+    AllTwineetsType,    
 } from '../app/types/types';
 // Function to format UserTokenShare
 
@@ -375,23 +377,61 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
     await insertAgentQuery.run(edgeDBCloudClient);
 }
-// Function to fetch twineets
-export async function fetchTwineets(): Promise<TwineetType[]> {
-    const query = edgeql.select(Twineet, () => ({
-        id: true,
+
+const safeStringify = (obj: any) => {
+    const seen = new WeakSet();
+    return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return; // Circular reference found, discard key
+            }
+            seen.add(value);
+        }
+        return value;
+    });
+};
+// Function to fetch twineets for all agents
+export async function fetchTwineets(agents: AgentType[]): Promise<TwineetType[]> {
+    // Step 1: Fetch all agents along with their twineets
+   /* const agentsQuery = edgeql.select(edgeql.Agent, () => ({
         agentId: true,
-        content: true,
-        timestamp: true,
-        isRetwineeted: true,
-        likes: true,
-        retwineets: true,
-        replies: true,
-        isLiked: true
+        twineets: {
+            id: true,
+            agentId: true,
+            content: true,
+            timestamp: true,
+            isRetwineeted: true,
+            likes: true,
+            retwineets: true,
+            replies: true,
+            isLiked: true,
+        },
     }));
 
-    const result = await edgeDBCloudClient.query(JSON.stringify(query)); // Execute the query
-    return result as TwineetType[]; // Cast the result to the expected type
+    const agentsResult = await edgeDBCloudClient.query(JSON.stringify(agentsQuery));
+    const agents = agentsResult as AgentType[];*/
+
+    // Step 2: Initialize an array to hold all twineets
+    const allTwineets: TwineetType[] = [];
+
+    // Step 3: Collect twineets from each agent
+    for (const agent of agents) {
+        if (agent.twineets) {
+            allTwineets.push(...agent.twineets); // Spread the twineets into the allTwineets array
+        }
+    }
+
+    // Step 4: Sort the twineets by timestamp
+    allTwineets.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    // Step 5: Return the combined and sorted twineets
+    return allTwineets;
 }
+
+
+
+// Use safeStringify when logging or storing
+//console.log('Fetched twineets:', safeStringify(result));
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
     const twineetsQuery = edgeql.select(Twineet, (twineet : TwineetType) => ({
@@ -407,7 +447,7 @@ export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetTy
         filter: edgeql.op(twineet.agentId, '=', agentId),
     }))
 
-    const result = await edgeDBCloudClient.query(JSON.stringify(twineetsQuery));
+    const result = await edgeDBCloudClient.query(safeStringify(twineetsQuery));
     return result as TwineetType[];
 }
 
@@ -441,31 +481,6 @@ app.post('/generate', async (req: Request, res: Response) => {
     }
 });
 
-// Route to fetch tweets
-app.get('/api/tweets', async (req: Request, res: Response) => {
-    const { username } = req.query;
-    try {
-        const userResponse = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
-            headers: {
-                Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-            },
-        });
-
-        const userId = userResponse.data.data.id; // Get the user ID
-
-        const response = await axios.get(`https://api.twitter.com/2/users/${userId}/tweets`, {
-            params: { max_results: 5 },
-            headers: {
-                Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-            },
-        });
-
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error fetching tweets:', error);
-        res.status(500).send('Error fetching tweets');
-    }
-});
 
 // Route to handle agent creation
 app.post('/api/agents', async (req: Request, res: Response) => {
@@ -510,6 +525,7 @@ app.post('/api/fetched-tweets', async (req: Request, res: Response) => {
 });
 
 // Route to insert twineet
+/*
 app.post('/api/twineets', async (req: Request, res: Response) => {
     const { agentId, twineet } = req.body; // Get agentId and twineet from the request body
 
@@ -536,7 +552,7 @@ app.post('/api/twineets', async (req: Request, res: Response) => {
         console.error('Error inserting twineet:', error);
         res.status(500).send('Error inserting twineet');
     }
-});
+});*/
 
 // Route to insert transaction
 app.post('/api/transactions', async (req: Request, res: Response) => {
@@ -568,16 +584,18 @@ app.post('/api/transactions', async (req: Request, res: Response) => {
 });
 
 // Route to fetch twineets
+/*
 app.get('/api/twineets', async (req: Request, res: Response) => {
+    const { agents } = req.body;
     try {
-        const twineets = await fetchTwineets();
+        const twineets = await fetchTwineets(agents);
         res.json(twineets);
     } catch (error) {
         console.error('Error fetching twineets:', error);
         res.status(500).send('Error fetching twineets');
     }
 });
-
+*/
 // Route to fetch twineets by agent ID
 app.get('/api/twineets/:agentId', async (req: Request, res: Response) => {
     const { agentId } = req.params; // Get agentId from the request parameters

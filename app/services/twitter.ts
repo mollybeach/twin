@@ -1,6 +1,5 @@
 // path: app/services/twitter.ts
-import axios from 'axios';
-import { FetchedTweetType } from '../types/types';
+
 import { VerificationResponseType } from '../types/types';
 import dotenv from 'dotenv';
 
@@ -29,7 +28,7 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
     }, 1000);
   });
 }
-
+/*
 export const fetchTweets = async (username: string): Promise<FetchedTweetType[]> => {
   try {
     console.log(`Fetching tweets for username: ${username}`); // Log the username
@@ -49,4 +48,4 @@ export const fetchTweets = async (username: string): Promise<FetchedTweetType[]>
     console.error('Error fetching tweets:', error);
     throw new Error('Failed to fetch tweets. Please try again :' + error);
   }
-};
+};*/

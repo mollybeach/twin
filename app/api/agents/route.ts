@@ -1,11 +1,11 @@
    // path: pages/api/agents.ts
     import { NextRequest, NextResponse } from 'next/server';
-    import { insertAgent, getAllAgents } from '../../../server/index'; // Adjust the import based on your structure
+    import { insertAgent, getAllAgents } from '../../../server/index';
     export async function POST(req: NextRequest) {
-        const newAgentData = await req.json(); // Get the new agent data from the request body
+        const newAgentData = await req.json();
         console.log('POST Request received with data:', newAgentData);
         try {
-            await insertAgent(newAgentData); // Call insertAgent without expecting a response
+            await insertAgent(newAgentData); 
             return NextResponse.json({ message: 'Agent created successfully' }, { status: 201 });
         } catch (error) {
             console.error('Error creating agent:', error);

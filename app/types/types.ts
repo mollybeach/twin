@@ -1,17 +1,24 @@
 // path: src/types/types.tsx
 
 export type AgentIdType = string;
+export type AgeGroup = '18-24' | '25-34' | '35-44' | '45-54' | '55+';
+export type InteractionGroup = 'likes' | 'retwineets' | 'replies' | 'quotes';
+export type NotificationGroup = 'create' | 'buy' | 'sell';
+export type PlatformType = 'mobile' | 'desktop' | 'tablet';
+export type TransactionGroup = 'buy' | 'sell';
+
+
 export interface AnalyticsType {
     agentId: AgentIdType;
     clickThroughRate: number;
     engagementRate: number;
     impressions: number;
-    cryptoHoldings: CryptoHoldingType;
-    demographics: DemographicsType;
-    dailyImpressions: DailyImpressionsType;
-    peakHours: PeakHoursType;
-    reachByPlatform: ReachByPlatformType;
-    topInteractions: TopInteractionsType;
+    cryptoHoldings: CryptoHoldingType[];
+    demographics: DemographicsType[];
+    dailyImpressions: DailyImpressionsType[];
+    peakHours: PeakHoursType[];
+    reachByPlatform: ReachByPlatformType[];
+    topInteractions: TopInteractionsType[];
 }
 
 export interface AgentType {
@@ -81,7 +88,7 @@ export interface MarketplaceStoreType {
 
 export interface NotificationType {
     agentId: AgentIdType;
-    kind: 'create' | 'buy' | 'sell';
+    kind: NotificationGroup;
     message: string;
     twitterHandle: string;
     twinHandle: string;
@@ -112,7 +119,7 @@ export interface TokenShareType {
 
 export interface TopInteractionsType {
     agentId: AgentIdType;
-    kind: string;
+    kind: InteractionGroup;
     count: number;
 }
 
@@ -125,7 +132,7 @@ export interface UserTokenShareType {
 }
 export interface TransactionType {
     agentId: AgentIdType;
-    kind: 'buy' | 'sell';
+    kind: TransactionGroup;
     shares: number;
     pricePerShare: number;
     totalAmount: number;
@@ -141,7 +148,7 @@ export interface FetchedTweetType {
 
 export interface ReachByPlatformType {
     agentId: AgentIdType;
-    platform: string;
+    platform: PlatformType;
     count: number;
 }
 
@@ -174,7 +181,7 @@ export interface AnalyticsPropsType {
 
 export interface NotificationBarPropsType {
     agentId: AgentIdType;
-    notification: NotificationType | null;
+    notification: NotificationGroup | null;
     onClose: () => void;
 }
 

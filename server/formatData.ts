@@ -1,5 +1,5 @@
 // path: server/formatData.ts
-/*
+
 import {
     UserTokenShareType,
     TokenShareType,
@@ -29,6 +29,7 @@ export function formatAgent(agent: AgentType): AgentType {
         description: agent.description,
         autoReply: agent.autoReply,
         isListed: agent.isListed,
+        modelData: agent.modelData,
         price: parseFloat(agent.price.toString()), // Ensure price is a number
         createdAt: new Date(agent.createdAt),
         analytics: formatAnalytics(agent.analytics),
@@ -39,7 +40,6 @@ export function formatAgent(agent: AgentType): AgentType {
         tokenShares: formatTokenShare(agent.tokenShares),
         tokenStats: formatTokenStats(agent.tokenStats),
         transactions: agent.transactions?.map(formatTransaction) || [],
-        modelData: agent.modelData, // Ensure this is included
     };
 }
 export function formatUserTokenShare(share: UserTokenShareType) {
@@ -89,12 +89,12 @@ export function formatAnalytics(analytics: AnalyticsType) {
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()), // Ensure this is a number
         engagementRate: parseFloat(analytics.engagementRate.toString()), // Ensure this is a number
         impressions: analytics.impressions,
-        cryptoHoldings: formatCryptoHolding(analytics.cryptoHoldings),
-        demographics: formatDemographics(analytics.demographics),
-        dailyImpressions: formatDailyImpressions(analytics.dailyImpressions),
-        peakHours: formatPeakHours(analytics.peakHours),
-        reachByPlatform: formatReachByPlatform(analytics.reachByPlatform),
-        topInteractions: formatTopInteractions(analytics.topInteractions),
+        cryptoHoldings: analytics.cryptoHoldings.map(formatCryptoHolding),
+        demographics: analytics.demographics.map(formatDemographics),
+        dailyImpressions: analytics.dailyImpressions.map(formatDailyImpressions),
+        peakHours: analytics.peakHours.map(formatPeakHours),
+        reachByPlatform: analytics.reachByPlatform.map(formatReachByPlatform),
+        topInteractions: analytics.topInteractions.map(formatTopInteractions),
     };
 }
 
@@ -251,17 +251,20 @@ export function formatAgentData(agentData: AgentType) {
     return {
         agent : formatAgent(agentData),
         analytics : formatAnalytics(agentData.analytics),
-        cryptoHoldings : formatCryptoHolding(agentData.analytics.cryptoHoldings),
-        demographics : formatDemographics(agentData.analytics.demographics),
-        dailyImpressions : formatDailyImpressions(agentData.analytics.dailyImpressions),
-        peakHours : formatPeakHours(agentData.analytics.peakHours),
-        reachByPlatform : formatReachByPlatform(agentData.analytics.reachByPlatform),
-        topInteractions : formatTopInteractions(agentData.analytics.topInteractions),
-        fetchedTweets : formatFetchedTweet(agentData.fetchedTweets[agentData.fetchedTweets.length - 1]),
-        twineets : formatTwineet(agentData.twineets[agentData.twineets.length - 1] || agentData.twineets[0]),
-        transactions : formatTransaction(agentData.transactions[agentData.transactions.length - 1]),
+        cryptoHoldings : agentData.analytics.cryptoHoldings.map(formatCryptoHolding),
+        demographics : agentData.analytics.demographics.map(formatDemographics),
+        dailyImpressions : agentData.analytics.dailyImpressions.map(formatDailyImpressions),
+        peakHours : agentData.analytics.peakHours.map(formatPeakHours),
+        reachByPlatform : agentData.analytics.reachByPlatform.map(formatReachByPlatform),
+        topInteractions : agentData.analytics.topInteractions.map(formatTopInteractions),
+        fetchedTweets : agentData.fetchedTweets.map(formatFetchedTweet),
+        stats : formatAgentStats(agentData.stats),
+        twineets : agentData.twineets.map(formatTwineet),
+        transactions : agentData.transactions.map(formatTransaction),
         tokenShares : formatTokenShare(agentData.tokenShares),
         tokenStats : formatTokenStats(agentData.tokenStats),
-        userTokenShares : formatUserTokenShare(agentData.tokenShares.shareholders[agentData.tokenShares.shareholders.length - 1]),
+        userTokenShares : agentData.tokenShares.shareholders.map(formatUserTokenShare),
+        verification : formatVerification(agentData.verification),
+
     };
-}*/
+}

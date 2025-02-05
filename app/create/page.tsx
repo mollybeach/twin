@@ -62,6 +62,32 @@ export default function CreatePage() {
     }
   };
 
+  // Recursively set the agentId and timestamp in the config
+  const setAgentIdInConfig = (obj: any, myAgentId: string) => {
+    if (Array.isArray(obj)) {
+        obj.forEach(item => setAgentIdInConfig(item, myAgentId));
+    } else if (typeof obj === 'object' && obj !== null) {
+
+        for (const key in obj) {
+            if (key === 'agentId') {
+                obj[key] = myAgentId; 
+            } else if (key === 'timestamp' && obj[key] === null) {
+                obj[key] = new Date();
+            } else if (key === 'fetchedTweets' && Array.isArray(obj[key])) {
+                obj[key].forEach(tweet => {
+                    if (!tweet.timestamp) {
+                        tweet.timestamp = new Date();
+                    }
+                });
+            } else {
+                if (!obj.hasOwnProperty('agentId')) {
+                    obj.agentId = myAgentId;
+                }
+                setAgentIdInConfig(obj[key], myAgentId);
+            }
+        }
+    }
+};
   const handleDeploy = async () => {
     if (config.isListed && (config.price === undefined || config.price <= 0)) {
       setDeployError('Please set a valid price for your Twin');
@@ -71,63 +97,11 @@ export default function CreatePage() {
     setIsDeploying(true);
     setDeployError(null);
 
-    config.agentId = crypto.randomUUID();
-    config.fetchedTweets.forEach(tweet => {
-      tweet.agentId = config.agentId;
-      tweet.timestamp = new Date();
-    }); 
-    config.twineets.forEach(twineet => {
-      twineet.agentId = config.agentId;
-    });
-    config.tokenShares.agentId = config.agentId;
-    config.tokenShares.shareholders.forEach(shareholder => {
-      shareholder.agentId = config.agentId;
-    });
-    config.tokenStats.agentId = config.agentId; 
-    config.stats.agentId = config.agentId;
-    config.verification.agentId = config.agentId;
-    config.analytics.agentId = config.agentId;
-    config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
-    config.analytics.dailyImpressions = config.analytics.dailyImpressions;
-    config.analytics.peakHours = config.analytics.peakHours;
-    config.analytics.reachByPlatform = config.analytics.reachByPlatform;
-    config.analytics.topInteractions = config.analytics.topInteractions;
-    config.transactions.forEach(transaction => {
-      transaction.agentId = config.agentId;
-    });
-    config.modelData.agentId = config.agentId;
-    config.tokenShares.agentId = config.agentId;
-    config.tokenShares.shareholders.forEach(shareholder => {
-      shareholder.agentId = config.agentId;
-    });
-    config.tokenStats.agentId = config.agentId;
-    config.stats.agentId = config.agentId;
-    config.verification.agentId = config.agentId;
-    config.analytics.agentId = config.agentId;
-    config.analytics.cryptoHoldings = config.analytics.cryptoHoldings;
-    config.analytics.cryptoHoldings.agentId = config.agentId;
-    config.analytics.demographics = config.analytics.demographics;
-    config.analytics.demographics.agentId = config.agentId;
-    config.analytics.dailyImpressions = config.analytics.dailyImpressions;
-    config.analytics.dailyImpressions.agentId = config.agentId;
-    config.analytics.peakHours = config.analytics.peakHours;
-    config.analytics.peakHours.agentId = config.agentId;
-    config.analytics.reachByPlatform = config.analytics.reachByPlatform;
-    config.analytics.reachByPlatform.agentId = config.agentId;
-    config.analytics.topInteractions = config.analytics.topInteractions;
-    config.analytics.topInteractions.agentId = config.agentId;
-    config.tokenStats.agentId = config.agentId;
-    config.tokenStats.price = config.price;
-    config.tokenShares.agentId = config.agentId;
-    config.tokenShares.shareholders.forEach(shareholder => {
-      shareholder.agentId = config.agentId;
-    });
-    config.transactions.forEach(transaction => {
-      transaction.agentId = config.agentId;
-    });
-    config.verification.agentId = config.agentId;
+    const myAgentId = crypto.randomUUID();
 
-    console.log(config);
+    setAgentIdInConfig(config, myAgentId);
+
+    
     try {
       const response = await fetch('/api/agents', {
         method: 'POST',

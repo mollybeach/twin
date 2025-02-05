@@ -3,27 +3,54 @@
 import * as $ from "../reflection";
 import * as _ from "../imports";
 import type * as _std from "./std";
+export type $AgeGroup = {
+  "18-24": $.$expr_Literal<$AgeGroup>;
+  "25-34": $.$expr_Literal<$AgeGroup>;
+  "35-44": $.$expr_Literal<$AgeGroup>;
+  "45-54": $.$expr_Literal<$AgeGroup>;
+  "55+": $.$expr_Literal<$AgeGroup>;
+} & $.EnumType<"default::AgeGroup", ["18-24", "25-34", "35-44", "45-54", "55+"]>;
+const AgeGroup: $AgeGroup = $.makeType<$AgeGroup>(_.spec, "19dfa6b6-e2ad-11ef-9607-f3f851d61852", _.syntax.literal);
+
 export type $AgentIdType = $.ScalarType<"std::str", string>;
-const AgentIdType: $.scalarTypeWithConstructor<_std.$str, never> = $.makeType<$.scalarTypeWithConstructor<_std.$str, never>>(_.spec, "ad1336da-e04d-11ef-9f92-a1d75f4e9466", _.syntax.literal);
+const AgentIdType: $.scalarTypeWithConstructor<_std.$str, never> = $.makeType<$.scalarTypeWithConstructor<_std.$str, never>>(_.spec, "19d44e1a-e2ad-11ef-bd75-177d35acec5b", _.syntax.literal);
 
-export type $NotificationType = {
-  "create": $.$expr_Literal<$NotificationType>;
-  "buy": $.$expr_Literal<$NotificationType>;
-  "sell": $.$expr_Literal<$NotificationType>;
-} & $.EnumType<"default::NotificationType", ["create", "buy", "sell"]>;
-const NotificationType: $NotificationType = $.makeType<$NotificationType>(_.spec, "ad2f8362-e04d-11ef-9a75-fb6c7c8449ca", _.syntax.literal);
+export type $InteractionGroup = {
+  "likes": $.$expr_Literal<$InteractionGroup>;
+  "retwineets": $.$expr_Literal<$InteractionGroup>;
+  "replies": $.$expr_Literal<$InteractionGroup>;
+  "quotes": $.$expr_Literal<$InteractionGroup>;
+} & $.EnumType<"default::InteractionGroup", ["likes", "retwineets", "replies", "quotes"]>;
+const InteractionGroup: $InteractionGroup = $.makeType<$InteractionGroup>(_.spec, "19e2d49e-e2ad-11ef-bb4b-47975ecbaa8d", _.syntax.literal);
 
-export type $TransactionType = {
-  "buy": $.$expr_Literal<$TransactionType>;
-  "sell": $.$expr_Literal<$TransactionType>;
-} & $.EnumType<"default::TransactionType", ["buy", "sell"]>;
-const TransactionType: $TransactionType = $.makeType<$TransactionType>(_.spec, "ad2090c8-e04d-11ef-9e1b-5d8f6ceb1b98", _.syntax.literal);
+export type $NotificationGroup = {
+  "create": $.$expr_Literal<$NotificationGroup>;
+  "buy": $.$expr_Literal<$NotificationGroup>;
+  "sell": $.$expr_Literal<$NotificationGroup>;
+} & $.EnumType<"default::NotificationGroup", ["create", "buy", "sell"]>;
+const NotificationGroup: $NotificationGroup = $.makeType<$NotificationGroup>(_.spec, "19f36a98-e2ad-11ef-9ddc-230f0546bb02", _.syntax.literal);
+
+export type $PlatformType = {
+  "mobile": $.$expr_Literal<$PlatformType>;
+  "desktop": $.$expr_Literal<$PlatformType>;
+  "tablet": $.$expr_Literal<$PlatformType>;
+} & $.EnumType<"default::PlatformType", ["mobile", "desktop", "tablet"]>;
+const PlatformType: $PlatformType = $.makeType<$PlatformType>(_.spec, "19e1d300-e2ad-11ef-85e3-594618e51194", _.syntax.literal);
+
+export type $TransactionGroup = {
+  "buy": $.$expr_Literal<$TransactionGroup>;
+  "sell": $.$expr_Literal<$TransactionGroup>;
+} & $.EnumType<"default::TransactionGroup", ["buy", "sell"]>;
+const TransactionGroup: $TransactionGroup = $.makeType<$TransactionGroup>(_.spec, "19eadfcc-e2ad-11ef-ab5a-c1a3dcf7edb5", _.syntax.literal);
 
 export type $AgentλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "analytics": $.LinkDesc<$Analytics, $.Cardinality.One, {}, false, false,  false, false>;
+  "fetchedTweets": $.LinkDesc<$FetchedTweet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "stats": $.LinkDesc<$AgentStats, $.Cardinality.One, {}, false, false,  false, false>;
   "tokenShares": $.LinkDesc<$TokenShare, $.Cardinality.One, {}, false, false,  false, false>;
   "tokenStats": $.LinkDesc<$TokenStats, $.Cardinality.One, {}, false, false,  false, false>;
+  "transactions": $.LinkDesc<$Transaction, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "twineets": $.LinkDesc<$Twineet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "verification": $.LinkDesc<$Verification, $.Cardinality.One, {}, false, false,  false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, true, false, false, false>;
   "autoReply": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, false, false, false>;
@@ -36,15 +63,12 @@ export type $AgentλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c
   "profileImage": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "twinHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "twitterHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
-  "fetchedTweets": $.LinkDesc<$FetchedTweet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
-  "transactions": $.LinkDesc<$Transaction, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
-  "twineets": $.LinkDesc<$Twineet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
 }>;
 type $Agent = $.ObjectType<"default::Agent", $AgentλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
   {agentId: {__element__: $AgentIdType, __cardinality__: $.Cardinality.One | $.Cardinality.AtMostOne },},
 ]>;
-const $Agent = $.makeType<$Agent>(_.spec, "ad2c302c-e04d-11ef-8614-9dcabf323444", _.syntax.literal);
+const $Agent = $.makeType<$Agent>(_.spec, "19f00d44-e2ad-11ef-9308-bf1a053b92c0", _.syntax.literal);
 
 const Agent: $.$expr_PathNode<$.TypeSet<$Agent, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Agent, $.Cardinality.Many), null);
 
@@ -59,17 +83,17 @@ export type $AgentStatsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7
 type $AgentStats = $.ObjectType<"default::AgentStats", $AgentStatsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $AgentStats = $.makeType<$AgentStats>(_.spec, "ad134224-e04d-11ef-a4fa-99fdcb144d8a", _.syntax.literal);
+const $AgentStats = $.makeType<$AgentStats>(_.spec, "19d45d06-e2ad-11ef-9e14-6f31ed42a831", _.syntax.literal);
 
 const AgentStats: $.$expr_PathNode<$.TypeSet<$AgentStats, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($AgentStats, $.Cardinality.Many), null);
 
 export type $AnalyticsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "cryptoHoldings": $.LinkDesc<$CryptoHolding, $.Cardinality.One, {}, false, false,  false, false>;
-  "dailyImpressions": $.LinkDesc<$DailyImpressions, $.Cardinality.One, {}, false, false,  false, false>;
-  "demographics": $.LinkDesc<$Demographics, $.Cardinality.One, {}, false, false,  false, false>;
-  "peakHours": $.LinkDesc<$PeakHours, $.Cardinality.One, {}, false, false,  false, false>;
-  "reachByPlatform": $.LinkDesc<$ReachByPlatform, $.Cardinality.One, {}, false, false,  false, false>;
-  "topInteractions": $.LinkDesc<$TopInteractions, $.Cardinality.One, {}, false, false,  false, false>;
+  "cryptoHoldings": $.LinkDesc<$CryptoHolding, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "dailyImpressions": $.LinkDesc<$DailyImpressions, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "demographics": $.LinkDesc<$Demographics, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "peakHours": $.LinkDesc<$PeakHours, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "reachByPlatform": $.LinkDesc<$ReachByPlatform, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
+  "topInteractions": $.LinkDesc<$TopInteractions, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "clickThroughRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "engagementRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
@@ -80,7 +104,7 @@ export type $AnalyticsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73
 type $Analytics = $.ObjectType<"default::Analytics", $AnalyticsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Analytics = $.makeType<$Analytics>(_.spec, "ad1a1734-e04d-11ef-b137-3fe2fdf8ca5a", _.syntax.literal);
+const $Analytics = $.makeType<$Analytics>(_.spec, "19e40b02-e2ad-11ef-af68-75c34ec36332", _.syntax.literal);
 
 const Analytics: $.$expr_PathNode<$.TypeSet<$Analytics, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Analytics, $.Cardinality.Many), null);
 
@@ -96,26 +120,26 @@ export type $CryptoHoldingλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa
 type $CryptoHolding = $.ObjectType<"default::CryptoHolding", $CryptoHoldingλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $CryptoHolding = $.makeType<$CryptoHolding>(_.spec, "ad144e08-e04d-11ef-b8fb-bf1dc5cb336f", _.syntax.literal);
+const $CryptoHolding = $.makeType<$CryptoHolding>(_.spec, "19dd825a-e2ad-11ef-a2fa-d5ed45f02919", _.syntax.literal);
 
 const CryptoHolding: $.$expr_PathNode<$.TypeSet<$CryptoHolding, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($CryptoHolding, $.Cardinality.Many), null);
 
 export type $DailyImpressionsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "date": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "count": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
+  "date": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, false>;
   "<dailyImpressions[is Analytics]": $.LinkDesc<$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<dailyImpressions": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $DailyImpressions = $.ObjectType<"default::DailyImpressions", $DailyImpressionsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $DailyImpressions = $.makeType<$DailyImpressions>(_.spec, "ad155140-e04d-11ef-a3e9-c77b680eece4", _.syntax.literal);
+const $DailyImpressions = $.makeType<$DailyImpressions>(_.spec, "19de951e-e2ad-11ef-89a4-5baf5356b616", _.syntax.literal);
 
 const DailyImpressions: $.$expr_PathNode<$.TypeSet<$DailyImpressions, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($DailyImpressions, $.Cardinality.Many), null);
 
 export type $DemographicsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "age": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "age": $.PropertyDesc<$AgeGroup, $.Cardinality.One, false, false, false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "percentage": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "<demographics[is Analytics]": $.LinkDesc<$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -124,7 +148,7 @@ export type $DemographicsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5
 type $Demographics = $.ObjectType<"default::Demographics", $DemographicsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Demographics = $.makeType<$Demographics>(_.spec, "ad163f10-e04d-11ef-8332-c5c60508377a", _.syntax.literal);
+const $Demographics = $.makeType<$Demographics>(_.spec, "19dfafe4-e2ad-11ef-a91d-05b40055ecb5", _.syntax.literal);
 
 const Demographics: $.$expr_PathNode<$.TypeSet<$Demographics, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Demographics, $.Cardinality.Many), null);
 
@@ -139,13 +163,13 @@ export type $FetchedTweetλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5
 type $FetchedTweet = $.ObjectType<"default::FetchedTweet", $FetchedTweetλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $FetchedTweet = $.makeType<$FetchedTweet>(_.spec, "ad1c18ea-e04d-11ef-bfed-df2246fc49df", _.syntax.literal);
+const $FetchedTweet = $.makeType<$FetchedTweet>(_.spec, "19e634ea-e2ad-11ef-99d7-3f4b18046340", _.syntax.literal);
 
 const FetchedTweet: $.$expr_PathNode<$.TypeSet<$FetchedTweet, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($FetchedTweet, $.Cardinality.Many), null);
 
 export type $NotificationλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
-  "kind": $.PropertyDesc<$NotificationType, $.Cardinality.One, false, false, false, false>;
+  "kind": $.PropertyDesc<$NotificationGroup, $.Cardinality.One, false, false, false, false>;
   "message": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "twinHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
@@ -154,7 +178,7 @@ export type $NotificationλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5
 type $Notification = $.ObjectType<"default::Notification", $NotificationλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Notification = $.makeType<$Notification>(_.spec, "ad2f8c7c-e04d-11ef-8a34-83cb833de147", _.syntax.literal);
+const $Notification = $.makeType<$Notification>(_.spec, "19f375ec-e2ad-11ef-b323-31c87d9d2d92", _.syntax.literal);
 
 const Notification: $.$expr_PathNode<$.TypeSet<$Notification, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Notification, $.Cardinality.Many), null);
 
@@ -168,37 +192,37 @@ export type $PeakHoursλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73
 type $PeakHours = $.ObjectType<"default::PeakHours", $PeakHoursλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $PeakHours = $.makeType<$PeakHours>(_.spec, "ad173cda-e04d-11ef-b4e9-3177c2ead015", _.syntax.literal);
+const $PeakHours = $.makeType<$PeakHours>(_.spec, "19e0b8e4-e2ad-11ef-976b-d5861349e14d", _.syntax.literal);
 
 const PeakHours: $.$expr_PathNode<$.TypeSet<$PeakHours, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($PeakHours, $.Cardinality.Many), null);
 
 export type $ReachByPlatformλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "count": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
-  "platform": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "platform": $.PropertyDesc<$PlatformType, $.Cardinality.One, false, false, false, false>;
   "<reachByPlatform[is Analytics]": $.LinkDesc<$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<reachByPlatform": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $ReachByPlatform = $.ObjectType<"default::ReachByPlatform", $ReachByPlatformλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $ReachByPlatform = $.makeType<$ReachByPlatform>(_.spec, "ad183432-e04d-11ef-ba48-d3f6640b75de", _.syntax.literal);
+const $ReachByPlatform = $.makeType<$ReachByPlatform>(_.spec, "19e1dcba-e2ad-11ef-be25-2f0c9a2ba038", _.syntax.literal);
 
 const ReachByPlatform: $.$expr_PathNode<$.TypeSet<$ReachByPlatform, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($ReachByPlatform, $.Cardinality.Many), null);
 
 export type $TokenShareλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
+  "shareholders": $.LinkDesc<$UserTokenShare, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "availableShares": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
   "pricePerShare": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "totalShares": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
-  "shareholders": $.LinkDesc<$UserTokenShare, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "<tokenShares[is Agent]": $.LinkDesc<$Agent, $.Cardinality.Many, {}, false, false,  false, false>;
   "<tokenShares": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $TokenShare = $.ObjectType<"default::TokenShare", $TokenShareλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $TokenShare = $.makeType<$TokenShare>(_.spec, "ad1e565a-e04d-11ef-8e99-ab4028b28f43", _.syntax.literal);
+const $TokenShare = $.makeType<$TokenShare>(_.spec, "19e88ce0-e2ad-11ef-bc2c-db2cbca96184", _.syntax.literal);
 
 const TokenShare: $.$expr_PathNode<$.TypeSet<$TokenShare, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($TokenShare, $.Cardinality.Many), null);
 
@@ -214,27 +238,27 @@ export type $TokenStatsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7
 type $TokenStats = $.ObjectType<"default::TokenStats", $TokenStatsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $TokenStats = $.makeType<$TokenStats>(_.spec, "ad1f78e6-e04d-11ef-98db-3790471bc9f1", _.syntax.literal);
+const $TokenStats = $.makeType<$TokenStats>(_.spec, "19e9bea8-e2ad-11ef-a17b-377c6f968b23", _.syntax.literal);
 
 const TokenStats: $.$expr_PathNode<$.TypeSet<$TokenStats, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($TokenStats, $.Cardinality.Many), null);
 
 export type $TopInteractionsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "count": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
-  "kind": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "kind": $.PropertyDesc<$InteractionGroup, $.Cardinality.One, false, false, false, false>;
   "<topInteractions[is Analytics]": $.LinkDesc<$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<topInteractions": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $TopInteractions = $.ObjectType<"default::TopInteractions", $TopInteractionsλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $TopInteractions = $.makeType<$TopInteractions>(_.spec, "ad191f28-e04d-11ef-a509-070dd848f139", _.syntax.literal);
+const $TopInteractions = $.makeType<$TopInteractions>(_.spec, "19e2ddae-e2ad-11ef-b45e-e176b157f57a", _.syntax.literal);
 
 const TopInteractions: $.$expr_PathNode<$.TypeSet<$TopInteractions, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($TopInteractions, $.Cardinality.Many), null);
 
 export type $TransactionλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
-  "kind": $.PropertyDesc<$TransactionType, $.Cardinality.One, false, false, false, false>;
+  "kind": $.PropertyDesc<$TransactionGroup, $.Cardinality.One, false, false, false, false>;
   "pricePerShare": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "shares": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
   "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
@@ -245,7 +269,7 @@ export type $TransactionλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f
 type $Transaction = $.ObjectType<"default::Transaction", $TransactionλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Transaction = $.makeType<$Transaction>(_.spec, "ad2099f6-e04d-11ef-bd45-730cac08fbfd", _.syntax.literal);
+const $Transaction = $.makeType<$Transaction>(_.spec, "19eae940-e2ad-11ef-a743-efca300da87e", _.syntax.literal);
 
 const Transaction: $.$expr_PathNode<$.TypeSet<$Transaction, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Transaction, $.Cardinality.Many), null);
 
@@ -264,7 +288,7 @@ export type $TwineetλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7384
 type $Twineet = $.ObjectType<"default::Twineet", $TwineetλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Twineet = $.makeType<$Twineet>(_.spec, "ad21e16c-e04d-11ef-8b53-bb6763742972", _.syntax.literal);
+const $Twineet = $.makeType<$Twineet>(_.spec, "19ec3cc8-e2ad-11ef-be3d-271ad1d16129", _.syntax.literal);
 
 const Twineet: $.$expr_PathNode<$.TypeSet<$Twineet, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Twineet, $.Cardinality.Many), null);
 
@@ -272,15 +296,15 @@ export type $UserTokenShareλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4f
   "agentId": $.PropertyDesc<$AgentIdType, $.Cardinality.One, false, false, false, false>;
   "purchaseDate": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, false>;
   "purchasePrice": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
-  "userId": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "shares": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
+  "userId": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "<shareholders[is TokenShare]": $.LinkDesc<$TokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
   "<shareholders": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $UserTokenShare = $.ObjectType<"default::UserTokenShare", $UserTokenShareλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $UserTokenShare = $.makeType<$UserTokenShare>(_.spec, "ad1d4fc6-e04d-11ef-b6e8-bfe9513c2ccf", _.syntax.literal);
+const $UserTokenShare = $.makeType<$UserTokenShare>(_.spec, "19e77cd8-e2ad-11ef-bf39-97543d1c8e53", _.syntax.literal);
 
 const UserTokenShare: $.$expr_PathNode<$.TypeSet<$UserTokenShare, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($UserTokenShare, $.Cardinality.Many), null);
 
@@ -294,18 +318,21 @@ export type $VerificationλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5
 type $Verification = $.ObjectType<"default::Verification", $VerificationλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
 ]>;
-const $Verification = $.makeType<$Verification>(_.spec, "ad2b338e-e04d-11ef-95f7-75d9a8d5172f", _.syntax.literal);
+const $Verification = $.makeType<$Verification>(_.spec, "19ef0dae-e2ad-11ef-85e0-6d0fc44c9294", _.syntax.literal);
 
 const Verification: $.$expr_PathNode<$.TypeSet<$Verification, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Verification, $.Cardinality.Many), null);
 
 
 
-export { AgentIdType, NotificationType, TransactionType, $Agent, Agent, $AgentStats, AgentStats, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twineet, Twineet, $UserTokenShare, UserTokenShare, $Verification, Verification };
+export { AgeGroup, AgentIdType, InteractionGroup, NotificationGroup, PlatformType, TransactionGroup, $Agent, Agent, $AgentStats, AgentStats, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twineet, Twineet, $UserTokenShare, UserTokenShare, $Verification, Verification };
 
 type __defaultExports = {
+  "AgeGroup": typeof AgeGroup;
   "AgentIdType": typeof AgentIdType;
-  "NotificationType": typeof NotificationType;
-  "TransactionType": typeof TransactionType;
+  "InteractionGroup": typeof InteractionGroup;
+  "NotificationGroup": typeof NotificationGroup;
+  "PlatformType": typeof PlatformType;
+  "TransactionGroup": typeof TransactionGroup;
   "Agent": typeof Agent;
   "AgentStats": typeof AgentStats;
   "Analytics": typeof Analytics;
@@ -325,9 +352,12 @@ type __defaultExports = {
   "Verification": typeof Verification
 };
 const __defaultExports: __defaultExports = {
+  "AgeGroup": AgeGroup,
   "AgentIdType": AgentIdType,
-  "NotificationType": NotificationType,
-  "TransactionType": TransactionType,
+  "InteractionGroup": InteractionGroup,
+  "NotificationGroup": NotificationGroup,
+  "PlatformType": PlatformType,
+  "TransactionGroup": TransactionGroup,
   "Agent": Agent,
   "AgentStats": AgentStats,
   "Analytics": Analytics,

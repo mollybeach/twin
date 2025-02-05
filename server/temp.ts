@@ -396,3 +396,56 @@ export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetTy
 }   
 
 */
+
+// Utility functions for type casting
+/*
+const eQlDate = (date: Date) => edgeql.cast(edgeql.datetime, date);
+const eQlDecimal = (value: number) => edgeql.cast(edgeql.decimal, value);
+const eQlString = (value: string) =>  value;
+*/
+/*// Recursive Formatting Data Insert Function
+const eQlInsert = (data: any) => {
+    const castedData: any = {}; 
+
+    for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+            if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+                // If it's a linked object, insert it using the EdgeDB insert format
+                if (linkTypeMapping[key]) {
+                    console.log('Link Type Object Mapping', linkTypeMapping[key]);
+                    castedData[key] = edgeql.insert(linkTypeMapping[key], eQlInsert(data[key]));
+                } else {
+                    console.log('Not a Link Type Object Mapping', key);
+                    castedData[key] = eQlInsert(data[key]);
+                }
+            } else if (Array.isArray(data[key])) {
+                // If it's an array, check if it's a linked type and insert each item as a subquery
+                if (linkTypeMapping[key]) {
+                    console.log('Link Type Array Mapping', linkTypeMapping[key]);
+                    castedData[key] = data[key].map(item => edgeql.insert(linkTypeMapping[key], eQlInsert(item)));
+                } else {
+                    console.log('Not a Link Type Array Mapping', key);
+                    castedData[key] = data[key].map(item => eQlInsert(item));
+                }
+            } else {
+                // Handle primitive types
+                if (typeof data[key] === 'string') {
+                    console.log('Primitive Type String', key);
+                    castedData[key] = qQlString(data[key]); 
+                } else if (typeof data[key] === 'number') {
+                    console.log('Primitive Type Number ', key);
+                    castedData[key] = eQlDecimal(data[key]); 
+                } else if (data[key] instanceof Date) {
+                    console.log('Primitive Type Date', key);
+                    castedData[key] = eQlDate(data[key]);
+                } else {
+                    console.log('Primitive Type Other', key);
+                    castedData[key] = data[key];
+                }
+            }
+        }
+    }
+    console.log('Casted Data', castedData);
+    return castedData;
+}
+*/

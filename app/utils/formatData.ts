@@ -61,7 +61,7 @@ function formatAgent(agent: AgentType) {
         stats: formatAgentStats(agent.stats),
         tokenShares: formatTokenShare(agent.tokenShares),
         tokenStats: formatTokenStats(agent.tokenStats),
-        transactions: agent.transaction?.map(formatTransaction) || [],
+        transactions: agent.transactions.map(formatTransaction) || [],
     };
 }
 

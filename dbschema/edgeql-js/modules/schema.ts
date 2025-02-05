@@ -691,14 +691,14 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
   "<__type__[is schema::Trigger]": $.LinkDesc<$Trigger, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::Extension]": $.LinkDesc<$Extension, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is AgentStats]": $.LinkDesc<_default.$AgentStats, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is CryptoHolding]": $.LinkDesc<_default.$CryptoHolding, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is DailyImpressions]": $.LinkDesc<_default.$DailyImpressions, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Demographics]": $.LinkDesc<_default.$Demographics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is PeakHours]": $.LinkDesc<_default.$PeakHours, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is AgentStats]": $.LinkDesc<_default.$AgentStats, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is ReachByPlatform]": $.LinkDesc<_default.$ReachByPlatform, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is TopInteractions]": $.LinkDesc<_default.$TopInteractions, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Analytics]": $.LinkDesc<_default.$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is CryptoHolding]": $.LinkDesc<_default.$CryptoHolding, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is DailyImpressions]": $.LinkDesc<_default.$DailyImpressions, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Demographics]": $.LinkDesc<_default.$Demographics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is FetchedTweet]": $.LinkDesc<_default.$FetchedTweet, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is UserTokenShare]": $.LinkDesc<_default.$UserTokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is TokenShare]": $.LinkDesc<_default.$TokenShare, $.Cardinality.Many, {}, false, false,  false, false>;

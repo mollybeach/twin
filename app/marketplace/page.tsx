@@ -91,7 +91,7 @@ export default function MarketplacePage() {
                         <div className="relative">
                           <img
                             src={agent.profileImage}
-                            alt={`@${agent.twitterHandle}`}
+                            alt={`@${agent.twinHandle}`}
                             className={`w-16 h-16 rounded-full object-cover border-2 ${
                               agent.verification.isVerified ? 'border-blue-500' : 'border-white/20'
                             }`}

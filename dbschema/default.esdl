@@ -1,5 +1,11 @@
 module default {
     scalar type AgentIdType extending str;
+    scalar type AgeGroup extending enum<'18-24', '25-34', '35-44', '45-54', '55+'>;
+    scalar type InteractionGroup extending enum<'likes', 'retwineets', 'replies', 'quotes'>;
+    scalar type NotificationGroup extending enum<'create', 'buy', 'sell'>;
+    scalar type PlatformType extending enum<'mobile', 'desktop', 'tablet'>;
+    scalar type TransactionGroup extending enum<'buy', 'sell'>;
+
     type CryptoHolding {
         required property agentId -> AgentIdType;
         required property amount -> decimal;
@@ -10,7 +16,7 @@ module default {
 
     type Demographics {
         required property agentId -> AgentIdType;
-        required property age -> str;
+        required property age -> AgeGroup;
         required property percentage -> decimal;
     }
 
@@ -28,13 +34,13 @@ module default {
 
     type ReachByPlatform {
         required property agentId -> AgentIdType;
-        required property platform -> str;
+        required property platform -> PlatformType;
         required property count -> int16;
     }
 
     type TopInteractions {
         required property agentId -> AgentIdType;
-        required property kind -> str;
+        required property kind -> InteractionGroup;
         required property count -> int16;
     }
 
@@ -43,12 +49,12 @@ module default {
         required property clickThroughRate -> decimal;
         required property engagementRate -> decimal;
         required property impressions -> int16;
-        required link cryptoHoldings -> CryptoHolding;
-        required link demographics -> Demographics;
-        required link dailyImpressions -> DailyImpressions;
-        required link peakHours -> PeakHours;
-        required link reachByPlatform -> ReachByPlatform;
-        required link topInteractions -> TopInteractions;
+        required multi link cryptoHoldings -> CryptoHolding;
+        required multi link demographics -> Demographics;
+        required multi link dailyImpressions -> DailyImpressions;
+        required multi link peakHours -> PeakHours;
+        required multi link reachByPlatform -> ReachByPlatform;
+        required multi link topInteractions -> TopInteractions;
     }
 
     type UserTokenShare {
@@ -76,13 +82,10 @@ module default {
         required property marketCap -> decimal;
     }
 
-    # Define the TransactionType enum
-    scalar type TransactionType extending enum<'buy', 'sell'>;
-
     # Define the Transaction type
     type Transaction {
         required property agentId -> AgentIdType;
-        required property kind -> TransactionType;
+        required property kind -> TransactionGroup;
         required property shares -> int16;
         required property pricePerShare -> decimal;
         required property totalAmount -> decimal;
@@ -167,12 +170,10 @@ module default {
         required multi link transactions -> Transaction;
     }
 
-    scalar type NotificationType extending enum<'create', 'buy', 'sell'>;
-
     # Define the Notification type
     type Notification {
         required property agentId -> AgentIdType;
-        required property kind -> NotificationType;
+        required property kind -> NotificationGroup;
         required property message -> str;
         required property twinHandle -> str;
         required property twitterHandle -> str;

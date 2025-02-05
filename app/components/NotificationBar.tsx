@@ -1,10 +1,16 @@
 "use client";
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { Bot, Check, AlertCircle } from 'lucide-react';
-import { NotificationType, NotificationBarPropsType } from '../types/types';
+import { NotificationType} from '../types/types';
 
+interface NotificationBarProps {
+  agentId: string;
+  notification: NotificationType | null;
+  onClose: () => void;
+}
 
-export function NotificationBar({ notification }: NotificationBarPropsType) {
+export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, onClose }) => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [flashIndex, setFlashIndex] = useState(0);
 
@@ -14,7 +20,7 @@ export function NotificationBar({ notification }: NotificationBarPropsType) {
       setNotifications(prev => {
         const exists = prev.some(n => n.agentId === notification.agentId);
         if (exists) return prev;
-        return [notification, ...prev].slice(0, 5);
+        return [notification, ...prev].slice(0, 5) as NotificationType[];
       });
     }
   }, [notification]);
@@ -69,18 +75,20 @@ export function NotificationBar({ notification }: NotificationBarPropsType) {
     }
   };
 
-  if (notifications.length === 0) return null;
+  if (!notification) return null;
+
+  const { agentId, kind, message, twitterHandle, twinHandle, timestamp } = notification;
 
   return (
     <div className="sticky top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm">
       {/* Top flashing rectangle */}
       <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden">
-        <div className={`h-full w-full ${getColors(notifications[0].kind)[0]} transition-colors duration-150`} />
+        <div className={`h-full w-full ${getColors(kind)[0]} transition-colors duration-150`} />
       </div>
 
       {/* Bottom flashing rectangle */}
       <div className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden">
-        <div className={`h-full w-full ${getColors(notifications[0].kind)[1]} transition-colors duration-150`} />
+        <div className={`h-full w-full ${getColors(kind)[1]} transition-colors duration-150`} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,8 +109,18 @@ export function NotificationBar({ notification }: NotificationBarPropsType) {
               );
             })}
           </div>
+          <div className="flex items-center space-x-4">
+            <p className="text-sm text-gray-400">Kind: {kind}</p>
+            <p className="text-sm text-gray-400">Agent ID: {agentId}</p>
+            <p className="text-sm text-gray-400">Twitter Handle: {twitterHandle}</p>
+            <p className="text-sm text-gray-400">Twin Handle: {twinHandle}</p>
+            <p className="text-sm text-gray-400">Timestamp: {timestamp.toString()}</p>
+            <button onClick={onClose} className="text-sm text-gray-400">Close</button>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default NotificationBar;

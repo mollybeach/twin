@@ -90,17 +90,21 @@ const generateDummyAnalytics = (agentId: string): AnalyticsType => {
     impressions: Math.floor(Math.random() * 10000) + 1000,
     engagementRate: Math.random() * 5 + 1,
     clickThroughRate: Math.random() * 2 + 0.5,
-    dailyImpressions,
+    dailyImpressions: [
+      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
+      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
+      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
+    ],
     topInteractions: [
-      { agentId, kind: 'Likes', count: Math.floor(Math.random() * 500) + 100 },
-      { agentId, kind: 'Retwineets', count: Math.floor(Math.random() * 300) + 50 },
-      { agentId, kind: 'Replies', count: Math.floor(Math.random() * 200) + 30 },
-      { agentId, kind: 'Quotes', count: Math.floor(Math.random() * 100) + 20 },
+      { agentId, kind: 'likes', count: Math.floor(Math.random() * 500) + 100 },
+      { agentId, kind: 'retwineets', count: Math.floor(Math.random() * 300) + 50 },
+      { agentId, kind: 'replies', count: Math.floor(Math.random() * 200) + 30 },
+      { agentId, kind: 'quotes', count: Math.floor(Math.random() * 100) + 20 },
     ],
     reachByPlatform: [
-      { agentId, platform: 'Mobile', count: Math.floor(Math.random() * 6000) + 2000 },
-      { agentId, platform: 'Desktop', count: Math.floor(Math.random() * 3000) + 1000 },
-      { agentId, platform: 'Tablet', count: Math.floor(Math.random() * 1000) + 500 },
+      { agentId, platform: 'mobile', count: Math.floor(Math.random() * 6000) + 2000 },
+      { agentId, platform: 'desktop', count: Math.floor(Math.random() * 3000) + 1000 },
+      { agentId, platform: 'tablet', count: Math.floor(Math.random() * 1000) + 500 },
     ],
     demographics: [
       { agentId, age: '18-24', percentage: Math.random() * 20 + 10 },
@@ -152,7 +156,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           userId: 'demo-user',
           shares,
           purchasePrice: agent.tokenShares.pricePerShare,
-          purchaseDate: new Date().toISOString(),
+          purchaseDate: new Date(),
         };
 
         set((state) => ({
@@ -180,7 +184,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           shares,
           pricePerShare: agent.tokenShares.pricePerShare,
           totalAmount: agent.tokenShares.pricePerShare * shares,
-          timestamp: new Date().toISOString(),
+          timestamp: new Date()
         };
 
         set((state) => ({

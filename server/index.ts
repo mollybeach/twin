@@ -2,18 +2,14 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
+import { edgeDBCloudClient } from '../lib/client';
 //import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
 import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const edgeDBCloudClient = createClient({
-    instanceName: 'mollybeach/twindb',
-    secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
-});
 
 import {
     UserTokenShareType,

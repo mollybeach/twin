@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from 'edgedb';
 import { AgentType } from '../../types/types';
 import { insertAgent } from '../../../server/index';
-
-export const edgeDBCloudClient = createClient({
-    instanceName: 'mollybeach/twindb',
-    secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
-});
+import { edgeDBCloudClient } from '../../../lib/client';
 
 export async function GET() {
-    
-    const edgeDBCloudClient = createClient({
-        instanceName: 'mollybeach/twindb',
-        secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
-    });
-
     try {
         const query = `
             SELECT Agent {

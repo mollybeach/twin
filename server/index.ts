@@ -1,9 +1,7 @@
 // path: api/index.ts
 import express, { Request, Response } from 'express';
-import OpenAI from 'openai';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import axios from 'axios';
 import { createClient } from 'edgedb';
 import edgeql from '../dbschema/edgeql-js'
 //import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
@@ -391,47 +389,41 @@ const safeStringify = (obj: any) => {
     });
 };
 // Function to fetch twineets for all agents
-export async function fetchTwineets(agents: AgentType[]): Promise<TwineetType[]> {
-    // Step 1: Fetch all agents along with their twineets
-   /* const agentsQuery = edgeql.select(edgeql.Agent, () => ({
+/*
+export async function fetchTwineets(): Promise<TwineetType[]> {
+    // Step 1: Fetch all twineets from the database
+    const twineetsQuery = edgeql.select(Twineet, () => ({
+        id: true,
         agentId: true,
-        twineets: {
-            id: true,
-            agentId: true,
-            content: true,
-            timestamp: true,
-            isRetwineeted: true,
-            likes: true,
-            retwineets: true,
-            replies: true,
-            isLiked: true,
-        },
+        content: true,
+        timestamp: true,
+        isRetwineeted: true,
+        likes: true,
+        retwineets: true,
+        replies: true,
+        isLiked: true,
     }));
 
-    const agentsResult = await edgeDBCloudClient.query(JSON.stringify(agentsQuery));
-    const agents = agentsResult as AgentType[];*/
-
-    // Step 2: Initialize an array to hold all twineets
-    const allTwineets: TwineetType[] = [];
-
-    // Step 3: Collect twineets from each agent
-    for (const agent of agents) {
-        if (agent.twineets) {
-            allTwineets.push(...agent.twineets); // Spread the twineets into the allTwineets array
-        }
-    }
-
-    // Step 4: Sort the twineets by timestamp
+    const result = await edgeDBCloudClient.query(safeStringify(twineetsQuery));
+    
+    // Step 2: Sort the twineets by timestamp
+    const allTwineets = result as TwineetType[];
     allTwineets.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Step 5: Return the combined and sorted twineets
-    return allTwineets;
+    // Step 3: Return the sorted twineets
+    return allTwineets.map(twineet => ({
+        id: twineet.id,
+        agentId: twineet.agentId,
+        content: twineet.content,
+        timestamp: twineet.timestamp,
+        isRetwineeted: twineet.isRetwineeted,
+        likes: twineet.likes,
+        retwineets: twineet.retwineets,
+        replies: twineet.replies,
+        isLiked: twineet.isLiked,
+    }));
 }
-
-
-
-// Use safeStringify when logging or storing
-//console.log('Fetched twineets:', safeStringify(result));
+*/
 
 export async function fetchTwineetsByAgentId(agentId: string): Promise<TwineetType[]> {
     const twineetsQuery = edgeql.select(Twineet, (twineet : TwineetType) => ({
@@ -459,19 +451,6 @@ const limiter = rateLimit({
 
 // Apply rate limiting to all requests
 app.use(limiter);
-
-// Route to handle agent creation
-app.post('/api/agents', async (req: Request, res: Response) => {
-    const newAgentData = req.body; // Get the new agent data from the request body
-
-    try {
-        await insertAgent(newAgentData);
-        res.status(201).send('Agent created successfully');
-    } catch (error) {
-        console.error('Error creating agent:', error);
-        res.status(500).send('Error creating agent');
-    }
-});
 
 // Route to insert fetched tweet
 app.post('/api/fetched-tweets', async (req: Request, res: Response) => {
@@ -562,11 +541,6 @@ interface FetchAgentByAgentIdResult {
     result : AgentType
 }
 
-interface GetAllAgentsResult {
-    status: string;
-    result : AgentType[]
-}
-
 // Function to fetch an agent by ID
 export async function fetchAgentByAgentId(agentId: string): Promise<FetchAgentByAgentIdResult | null> {
     const query = edgeql.select(edgeql.Agent, (agent : AgentType) => ({
@@ -580,14 +554,15 @@ export async function fetchAgentByAgentId(agentId: string): Promise<FetchAgentBy
 }
 
 // Function to fetch all agents
-export async function getAllAgents(): Promise<GetAllAgentsResult | null> {
+/*
+export async function fetchAgents(): Promise<AgentType[]> {
     const query = edgeql.select(edgeql.Agent, () => ({
         result: edgeql.Agent
     }));
 
     const result = await edgeDBCloudClient.query(JSON.stringify(query));
-    return result.length > 0 ? { status: 'success', result: result.map(agent => formatAgent(agent)) } : null;
-}
+    return result.map(agent => formatAgent(agent));
+}*/
 
 // Start the server
 app.listen(port, () => {

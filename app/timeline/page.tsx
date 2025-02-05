@@ -10,41 +10,7 @@ export default function TimelinePage() {
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
   const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
   const [allAgents, setAllAgents] = useState<AgentType[]>([]);
-/*
-  useEffect(() => {
-    const fetchAndDisplayTwineets = async () => {
-      try {
-        const response = await fetch('/api/twineets'); // Fetch from the API
-        if (!response.ok) {
-          throw new Error('Failed to fetch twineets');
-        }
-        const fetchedTwineets = await response.json();
-        setTwineets(fetchedTwineets);
-      } catch (error) {
-        console.error('Error fetching twineets:', error);
-      }
-    };
 
-    fetchAndDisplayTwineets();
-  }, [agents]);*/
-
-  /*    try {
-      const response = await fetch('/api/agents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create agent', { cause: response.statusText });
-      }
-
-      const result = await response.json();
-      console.log('Agent created successfully:', result);*/
-
-      // get all agents 
     const fetchAgents = async () => {
       const agents = await fetch('/api/agents', {
         method: 'GET',
@@ -53,13 +19,11 @@ export default function TimelinePage() {
         },
       });
       const agentsResult = await agents.json();
+      console.log('Agents fetched successfully:', agentsResult);
       setAllAgents(agentsResult);
     };
     fetchAgents();
-
-
-
-
+    console.log('Agents fetched successfully:', allAgents);
 
       const fetchAndDisplayTwineets = async () => {
       try{  
@@ -81,9 +45,10 @@ export default function TimelinePage() {
       }
     };
 
-    fetchAndDisplayTwineets();
+   // fetchAndDisplayTwineets();
 
-      
+    
+
   const handleLike = (twineetId: string) => {
     setTwineets(prev => prev.map(twineet => {
       if (twineet.id === twineetId) {

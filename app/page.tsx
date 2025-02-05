@@ -1,8 +1,8 @@
-// app/page.tsx
-"use client"; // Ensure this file is treated as a client component
+// path: app/page.tsx
+"use client"; 
 import React from 'react';
-import Link from 'next/link'; // Import Link from next/link
-import { PlusCircle, Eye, Twitter } from 'lucide-react'; // Importing icons for buttons
+import Link from 'next/link';
+import { PlusCircle, Eye, Twitter } from 'lucide-react'; 
 
 const Home = () => {
     return (

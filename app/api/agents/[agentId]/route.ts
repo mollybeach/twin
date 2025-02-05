@@ -1,4 +1,5 @@
 // path: app/api/agents/[agentId]/route.ts
+/*
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchAgentByAgentId } from '../../../../server/index'; // Adjust the import path as necessary
 
@@ -17,4 +18,4 @@ export async function GET(req: NextRequest) {
         console.error('Error fetching agent:', error);
         return NextResponse.json({ message: 'Error fetching agent' }, { status: 500 });
     }
-}
+}*/

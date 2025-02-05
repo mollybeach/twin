@@ -1,31 +1,31 @@
+// path: app/timeline/page.tsx
 "use client";
 import { useEffect, useState } from 'react';
-import { useMarketplaceStore } from '../store/marketplace';
+//import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
 import { AgentType, TwineetType } from '../types/types';
 
 export default function TimelinePage() {
-  const agents = useMarketplaceStore((state) => state.agents);
+ // const agents = useMarketplaceStore((state) => state.agents);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
   const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
-  const [allAgents, setAllAgents] = useState<AgentType[]>([]);
 
-    const fetchAgents = async () => {
-      const agents = await fetch('/api/agents', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const agentsResult = await agents.json();
-      console.log('Agents fetched successfully:', agentsResult);
-      setAllAgents(agentsResult);
-    };
-    fetchAgents();
-    console.log('Agents fetched successfully:', allAgents);
+  const [agents, setAgents] = useState<AgentType[]>([]);
 
-      const fetchAndDisplayTwineets = async () => {
+  const fetchAgents = async () => {
+    const response = await fetch('/api/agents', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const agentsResult = await response.json();
+    setAgents(agentsResult);
+    console.log("agents", agents)
+  };
+  fetchAgents();
+  const fetchAndDisplayTwineets = async () => {
       try{  
         const response = await fetch('/api/twineets', {
           method: 'GET',
@@ -39,13 +39,12 @@ export default function TimelinePage() {
         }
         const result = await response.json();
         setTwineets(result);
-        console.log('Twineets fetched successfully:', result);
       } catch (error) {
         console.error('Error fetching twineets:', error);
       }
     };
 
-   // fetchAndDisplayTwineets();
+    fetchAndDisplayTwineets();
 
     
 
@@ -101,10 +100,7 @@ export default function TimelinePage() {
     return date.toLocaleDateString();
   };
 
-  const filteredTwineets = activeTab === 'following'
-    ? twineets.filter(twineet => followedAgents.has(twineet.agentId))
-    : twineets;
-
+  console.log("twineets", twineets)
   return (
     <div className="min-h-screen bg-black">
       <div className="max-w-2xl mx-auto">
@@ -162,7 +158,7 @@ export default function TimelinePage() {
           </div>
         ) : (
           <div className="divide-y divide-white/10">
-            {filteredTwineets.map((twineet) => {
+            {twineets.map((twineet) => {
               const agent = agents.find(a => a.agentId === twineet.agentId);
               if (!agent) return null;
 
@@ -181,7 +177,7 @@ export default function TimelinePage() {
                         </span>
                         <Bot className="w-4 h-4 text-purple-400" />
                         <span className="text-purple-300">·</span>
-                        <span className="text-purple-300">{formatTimestamp(twineet.timestamp.toISOString())}</span>
+                        <span className="text-purple-300">{formatTimestamp(twineet.timestamp.toString())}</span>
                         <button
                           onClick={() => toggleFollow(agent.agentId)}
                           className={`ml-2 px-3 py-1 rounded-full text-sm font-medium transition-colors ${

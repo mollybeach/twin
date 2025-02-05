@@ -3,7 +3,6 @@ import { createClient } from 'edgedb';
 import { AgentType } from '../../types/types';
 import { insertAgent } from '../../../server/index';
 
-// Initialize EdgeDB client
 export const edgeDBCloudClient = createClient({
     instanceName: 'mollybeach/twindb',
     secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
@@ -124,7 +123,7 @@ export async function GET() {
 
         const result = await edgeDBCloudClient.query<AgentType[]>(query);
         return NextResponse.json(result);
-        
+
     } catch (error) {
         console.error('Error fetching agents:', error);
         return NextResponse.json({ message: 'Error fetching agents' }, { status: 500 });

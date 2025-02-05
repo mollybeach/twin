@@ -1,7 +1,7 @@
-// path: src/pages/api/twineets.ts
+// path: app/api/twineets/route.ts
 import { NextResponse } from 'next/server';
-import edgeql from '../../../dbschema/edgeql-js'
 import { createClient } from 'edgedb';
+import { TwineetType } from '../../types/types';
 
 export const edgeDBCloudClient = createClient({
     instanceName: 'mollybeach/twindb',
@@ -10,13 +10,25 @@ export const edgeDBCloudClient = createClient({
 
 export async function GET() {
     try {
-        const query = edgeql.select(edgeql.Twineet, () => ({
-            result: edgeql.Twineet
-        }));
-        const result = await edgeDBCloudClient.query(JSON.stringify(query));
+        const query = `
+            SELECT Twineet {
+                id,
+                agentId,
+                content,
+                timestamp,
+                likes,
+                retwineets,
+                replies,
+                isLiked,
+                isRetwineeted
+            };
+        `;
+
+        const result = await edgeDBCloudClient.query<TwineetType[]>(query);
         return NextResponse.json(result);
+
     } catch (error) {
         console.error('Error fetching twineets:', error);
-        return NextResponse.json({ message: 'Error fetching twineets' }, { status: 500 }); // Handle errors
+        return NextResponse.json({ message: 'Error fetching twineets' }, { status: 500 });
     }
 }

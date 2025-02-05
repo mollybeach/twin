@@ -73,7 +73,6 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
       const data = await response.json();
       const generatedText = data.choices[0].message?.content || data.choices[0].text; // Adjust based on your OpenAI API response structure
 
-      // Save the generated twineet to twineets
       setConfig(prev => ({
           ...prev,
           twineets: [...(prev.twineets || []), {
@@ -89,14 +88,13 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
           }]
       }));
 
-      return { generatedText }; // Return the generated text
+      return { generatedText };
   } catch (error) {
       console.error('Failed to generate response:', error);
       throw new Error('Failed to generate response from OpenAI.');
   }
 };
 
-  // Recursively set the agentId and timestamp in the config
   const setAgentIdInConfig = (obj: any, myAgentId: string) => {
     if (Array.isArray(obj)) {
         obj.forEach(item => setAgentIdInConfig(item, myAgentId));
@@ -167,39 +165,6 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
     }
   };
 
-
-      // Insert fetched tweets
-      /*
-      for (const tweet of (config.fetchedTweets || [])) {
-        const tweetResponse = await fetch('/api/fetched-tweets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ agentId: config.agentId, fetchedTweet: tweet }),
-        });
-
-        if (!tweetResponse.ok) {
-          throw new Error('Failed to insert fetched tweet');
-        }
-      }
-
-      // Generate and insert twineets
-      const generatedTwineets = await generateMultipleTwineets(config.agentId);
-      for (const twineet of generatedTwineets) {
-        const twineetResponse = await fetch('/api/twineets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ agentId: config.agentId, twineet }),
-        });
-
-        if (!twineetResponse.ok) {
-          throw new Error('Failed to insert twineet');
-        }
-      }
-*/
 /*
   const generateMultipleTwineets = async (agentId: string): Promise<TwineetType[]> => {
     const twineets: TwineetType[] = [];

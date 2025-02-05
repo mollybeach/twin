@@ -12,8 +12,10 @@ export default function TimelinePage() {
   const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
 
   const [agents, setAgents] = useState<AgentType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); 
 
   const fetchAgents = async () => {
+    setLoading(true); // Start loading
     const response = await fetch('/api/agents', {
       method: 'GET',
       headers: {
@@ -22,31 +24,43 @@ export default function TimelinePage() {
     });
     const agentsResult = await response.json();
     setAgents(agentsResult);
-    console.log("agents", agents)
   };
-  fetchAgents();
+
   const fetchAndDisplayTwineets = async () => {
-      try{  
-        const response = await fetch('/api/twineets', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-    
-        if (!response.ok) {
-          throw new Error('Failed to fetch twineets');
-        }
-        const result = await response.json();
-        setTwineets(result);
-      } catch (error) {
-        console.error('Error fetching twineets:', error);
+    try {
+      const response = await fetch('/api/twineets', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch twineets');
       }
-    };
+      const result = await response.json();
+      setTwineets(result);
+    } catch (error) {
+      console.error('Error fetching twineets:', error);
+    } finally {
+      setLoading(false); 
+    }
+  };
 
+  useEffect(() => {
+    fetchAgents();
     fetchAndDisplayTwineets();
+  }, []);
 
-    
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+    </div>
+  );
+
+  if (loading) {
+    return <LoadingSpinner />; // Show loading spinner while data is being fetched
+  }
 
   const handleLike = (twineetId: string) => {
     setTwineets(prev => prev.map(twineet => {
@@ -100,7 +114,6 @@ export default function TimelinePage() {
     return date.toLocaleDateString();
   };
 
-  console.log("twineets", twineets)
   return (
     <div className="min-h-screen bg-black">
       <div className="max-w-2xl mx-auto">

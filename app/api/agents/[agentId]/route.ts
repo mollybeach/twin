@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from 'edgedb';
 import { AgentType } from '../../../types/types';
 
-export async function GET(_req: NextRequest, { params }: { params: { agentId: string } }) {
-    const { agentId } = params;
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const agentId = searchParams.get('agentId');
 
     if (!agentId) {
         return NextResponse.json({ message: 'Agent ID is required' }, { status: 400 });

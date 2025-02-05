@@ -3,14 +3,12 @@ import { NextResponse } from 'next/server';
 import { createClient } from 'edgedb';
 import { TwineetType } from '../../types/types';
 
+const edgeDBCloudClient = createClient({
+    instanceName: 'mollybeach/twindb',
+    secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
+});
 
 export async function GET() {
-
-    const edgeDBCloudClient = createClient({
-        instanceName: 'mollybeach/twindb',
-        secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
-    });
-
     try {
         const query = `
             SELECT Twineet {

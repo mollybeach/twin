@@ -12,7 +12,7 @@ export const defaultAgent: AgentType = {
         profileImage: 'https://i.imgur.com/HDQ3OTC.png', 
         personality: '',
         description: 'This is a default description for the agent.',
-        autoReply: Math.random() < 0.5,
+        autoReply: true,
         price: getRandomInt(100, 1000),
         isListed: Math.random() < 0.5,
         modelData: {},

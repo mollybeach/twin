@@ -5,7 +5,7 @@ import { useMarketplaceStore } from '../store/marketplace';
 import { useRouter } from 'next/navigation';
 import { generateResponse } from '../services/openaiService';
 import { fetchTweets } from '../services/twitter';
-import {  AgentType, FetchedTweetType, TwineetType, } from '../types/types';
+import {  AgentType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
 import { defaultAgent } from '../utils/defaultData';
 
 export default function CreatePage() {
@@ -20,6 +20,7 @@ export default function CreatePage() {
   const [generatedTwineet, setGeneratedTwineet] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
+
 
   const handleFetchTweets = async () => {
     setIsFetchingTweets(true);
@@ -76,6 +77,7 @@ export default function CreatePage() {
             } else if (key === 'fetchedTweets' && Array.isArray(obj[key])) {
                 obj[key].forEach(tweet => {
                     if (!tweet.timestamp) {
+                        tweet.agentId = myAgentId;
                         tweet.timestamp = new Date();
                     }
                 });
@@ -194,6 +196,11 @@ export default function CreatePage() {
       console.log('Generated response:', response);
       setGeneratedTwineet(response);
       
+     /*
+      setConfig(prev => ({
+        ...prev,
+        modelData: modelData,
+      }));*/
       // Save the generated twineet to twineets
       setConfig(prev => ({
         ...prev,
@@ -202,11 +209,11 @@ export default function CreatePage() {
           agentId: config.agentId,
           content: response,
           timestamp: new Date(),
-          likes: 0,
-          retwineets: 0,
-          replies: 0,
-          isLiked: false,
-          isRetwineeted: false,
+          likes: Math.floor(Math.random() * 100),
+          retwineets: Math.floor(Math.random() * 100),
+          replies: Math.floor(Math.random() * 100),
+          isLiked: Math.random() < 0.5,
+          isRetwineeted: Math.random() < 0.5,
         }]
       }));
     } catch (error) {

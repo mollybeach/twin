@@ -28,24 +28,4 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
     }, 1000);
   });
 }
-/*
-export const fetchTweets = async (username: string): Promise<FetchedTweetType[]> => {
-  try {
-    console.log(`Fetching tweets for username: ${username}`); // Log the username
-    const response = await axios.get(process.env.NEXT_PUBLIC_URL + '/api/tweets', {
-      params: {
-        username: username,
-      },
-    });
-    console.log('Response:', response.data); // Log the response data
-    // Map the response data to the Tweet format
-    return response.data.data.map((tweet: { id: string; text: string; edit_history_tweet_ids: string[] }) => ({
-      id: tweet.id,
-      text: tweet.text,
-      edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-    }));
-  } catch (error) {
-    console.error('Error fetching tweets:', error);
-    throw new Error('Failed to fetch tweets. Please try again :' + error);
-  }
-};*/
+

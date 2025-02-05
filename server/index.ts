@@ -460,28 +460,6 @@ const limiter = rateLimit({
 // Apply rate limiting to all requests
 app.use(limiter);
 
-// Initialize OpenAI with the API key from environment variables
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Route to handle generating responses
-app.post('/generate', async (req: Request, res: Response) => {
-    const { prompt } = req.body; // Extract prompt from request body
-    try {
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // Specify the model to use
-            messages: [{ role: 'user', content: prompt }], // User's message
-            max_tokens: 150, // Limit the number of tokens in the response
-        });
-        res.json(completion); // Send the response back to the client
-    } catch (error) {
-        console.error('Error generating response:', error);
-        res.status(500).send('Error generating response');
-    }
-});
-
-
 // Route to handle agent creation
 app.post('/api/agents', async (req: Request, res: Response) => {
     const newAgentData = req.body; // Get the new agent data from the request body
@@ -524,35 +502,6 @@ app.post('/api/fetched-tweets', async (req: Request, res: Response) => {
     }
 });
 
-// Route to insert twineet
-/*
-app.post('/api/twineets', async (req: Request, res: Response) => {
-    const { agentId, twineet } = req.body; // Get agentId and twineet from the request body
-
-    try {
-        // Step 1: Fetch the current agent data
-        const currentAgent = await fetchAgentByAgentId(agentId); // Fetch the agent by ID
-
-        // Step 2: Create a copy of the current agent data and update the twineets array
-        if (!currentAgent) {
-            throw new Error('Agent not found');
-        }
-
-        const updatedAgent = {
-            ...currentAgent.result,
-            twineets: [...currentAgent.result.twineets, twineet], // Add the new twineet to the existing array
-            agentId: currentAgent.result.agentId || agentId, // Ensure agentId is not undefined
-        };
-
-        // Step 3: Insert the updated agent data
-        await insertAgent(updatedAgent as AgentType); // Insert the agent with updated twineets
-
-        res.status(201).send('Twineet inserted successfully');
-    } catch (error) {
-        console.error('Error inserting twineet:', error);
-        res.status(500).send('Error inserting twineet');
-    }
-});*/
 
 // Route to insert transaction
 app.post('/api/transactions', async (req: Request, res: Response) => {

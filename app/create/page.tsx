@@ -3,7 +3,6 @@ import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { useRouter } from 'next/navigation';
-import { generateResponse } from '../services/openaiService';
 import {  AgentType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
 import { defaultAgent } from '../utils/defaultData';
 
@@ -24,53 +23,78 @@ export default function CreatePage() {
   const handleFetchTweets = async () => {
     setIsFetchingTweets(true);
     try {
-      const response = await fetch(`/api/tweets?username=${encodeURIComponent(config.twitterHandle)}`, {
-          method: 'GET', // Specify the method
+        const response = await fetch(`/api/tweets?username=${encodeURIComponent(config.twitterHandle)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch tweets');
+        }
+
+        const tweets = await response.json();
+        setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
+
+        // Send tweets to OpenAI for training the model
+        const modelData = await handleGenerateResponse(tweets); // Call the updated function
+        console.log('Model data:', modelData);
+        // Set success message after fetching tweets
+        setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error('Failed to fetch tweets:', error);
+            setDeployError(error.message);
+        } else {
+            console.error('Failed to fetch tweets:', error);
+            setDeployError('An unknown error occurred');
+        }
+    } finally {
+        setIsFetchingTweets(false);
+    }
+};
+
+const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Record<string, unknown>> => {
+  const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent.`;
+  try {
+      const response = await fetch('/api/generate', {
+          method: 'POST',
           headers: {
               'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ prompt }), // Send the prompt to the API
       });
 
       if (!response.ok) {
-          throw new Error('Failed to fetch tweets');
+          throw new Error('Failed to generate response from OpenAI');
       }
-      const tweets = await response.json();
-      setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
-      
-      // Send tweets to OpenAI for training the model
-      const modelData = await trainModelWithTweets(tweets);
-      
-      // Update the agent data with the model information and fetchedTweets
-      await handleGenerateResponse(tweets, modelData); // Pass model data to the response handler
 
-      // Set success message after fetching tweets
-      setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Failed to fetch tweets:', error);
-        setDeployError(error.message); // Display the error message to the user
-      } else {
-        console.error('Failed to fetch tweets:', error);
-        setDeployError('An unknown error occurred'); // Display a generic error message to the user
-      }
-    } finally {
-      setIsFetchingTweets(false);
-    }
-  };
+      const data = await response.json();
+      const generatedText = data.choices[0].message?.content || data.choices[0].text; // Adjust based on your OpenAI API response structure
 
-  const trainModelWithTweets = async (tweets: FetchedTweetType[]): Promise<Record<string, unknown>> => {
-    try {
-      const response = await generateResponse(tweets.map(tweet => tweet.text).join(' '));
-      
-      // Log the response for debugging
-      console.log('Response from OpenAI:', response);
-      
-      return { generatedText: response }; // Example structure
-    } catch (error) {
-      console.error('Failed to train model:', error);
-      throw new Error('Failed to train model with tweets.');
-    }
-  };
+      // Save the generated twineet to twineets
+      setConfig(prev => ({
+          ...prev,
+          twineets: [...(prev.twineets || []), {
+              id: crypto.randomUUID(),
+              agentId: config.agentId,
+              content: generatedText,
+              timestamp: new Date(),
+              likes: Math.floor(Math.random() * 100),
+              retwineets: Math.floor(Math.random() * 100),
+              replies: Math.floor(Math.random() * 100),
+              isLiked: Math.random() < 0.5,
+              isRetwineeted: Math.random() < 0.5,
+          }]
+      }));
+
+      return { generatedText }; // Return the generated text
+  } catch (error) {
+      console.error('Failed to generate response:', error);
+      throw new Error('Failed to generate response from OpenAI.');
+  }
+};
 
   // Recursively set the agentId and timestamp in the config
   const setAgentIdInConfig = (obj: any, myAgentId: string) => {
@@ -198,37 +222,7 @@ export default function CreatePage() {
     }
     return twineets;
   };*/
-  const handleGenerateResponse = async (tweets: FetchedTweetType[], modelData: Record<string, unknown>) => {
-    const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent. Model data: ${JSON.stringify(modelData)}`;
-    try {
-      const response = await generateResponse(prompt);
-      console.log('Generated response:', response);
-      setGeneratedTwineet(response);
-      
-     /*
-      setConfig(prev => ({
-        ...prev,
-        modelData: modelData,
-      }));*/
-      // Save the generated twineet to twineets
-      setConfig(prev => ({
-        ...prev,
-        twineets: [...(prev.twineets || []), {
-          id: crypto.randomUUID(),
-          agentId: config.agentId,
-          content: response,
-          timestamp: new Date(),
-          likes: Math.floor(Math.random() * 100),
-          retwineets: Math.floor(Math.random() * 100),
-          replies: Math.floor(Math.random() * 100),
-          isLiked: Math.random() < 0.5,
-          isRetwineeted: Math.random() < 0.5,
-        }]
-      }));
-    } catch (error) {
-      console.error('Failed to generate response:', error);
-    }
-  };
+
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

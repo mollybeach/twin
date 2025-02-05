@@ -1,5 +1,4 @@
-   // path: pages/api/generate.ts
-    import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
     import OpenAI from 'openai';
     import dotenv from 'dotenv';
     
@@ -22,4 +21,4 @@
             console.error('Error generating response:', error);
             return NextResponse.json({ message: 'Error generating response' }, { status: 500 });
         }
-    }
+}

@@ -4,17 +4,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from 'edgedb';
 import { AgentType } from '../../../types/types';
 
-export const edgeDBCloudClient = createClient({
-    instanceName: 'mollybeach/twindb',
-    secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
-});
-
 export async function GET(_req: NextRequest, { params }: { params: { agentId: string } }) {
     const { agentId } = params;
 
     if (!agentId) {
         return NextResponse.json({ message: 'Agent ID is required' }, { status: 400 });
     }
+
+    const edgeDBCloudClient = createClient({
+        instanceName: 'mollybeach/twindb',
+        secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
+    });
 
     try {
         const query = `

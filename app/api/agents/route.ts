@@ -9,6 +9,12 @@ export const edgeDBCloudClient = createClient({
 });
 
 export async function GET() {
+    
+    const edgeDBCloudClient = createClient({
+        instanceName: 'mollybeach/twindb',
+        secretKey: process.env.EDGE_DB_SECRET_KEY_TWIN,
+    });
+
     try {
         const query = `
             SELECT Agent {

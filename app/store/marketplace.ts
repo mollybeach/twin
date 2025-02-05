@@ -69,59 +69,6 @@ const createCustomStorage = () => {
   };
 };
 
-// Generate dummy analytics for an agent
-const generateDummyAnalytics = (agentId: string): AnalyticsType => {
-  const now = new Date();
-  const dailyImpressions = Array.from({ length: 30 }, (_, i) => ({
-    agentId,
-    date: new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    count: Math.floor(Math.random() * 1000) + 100,
-  }));
-
-  const cryptoHoldings = [
-    { agentId, symbol: 'BTC', amount: Math.random() * 2, value: Math.random() * 50000 + 30000, change24h: Math.random() * 10 - 5 },
-    { agentId, symbol: 'ETH', amount: Math.random() * 20, value: Math.random() * 3000 + 1500, change24h: Math.random() * 10 - 5 },
-    { agentId, symbol: 'SOL', amount: Math.random() * 200, value: Math.random() * 100 + 50, change24h: Math.random() * 10 - 5 },
-    { agentId, symbol: 'DOGE', amount: Math.random() * 10000, value: Math.random() * 0.2 + 0.1, change24h: Math.random() * 10 - 5 },
-  ];
-
-  return {
-    agentId,
-    impressions: Math.floor(Math.random() * 10000) + 1000,
-    engagementRate: Math.random() * 5 + 1,
-    clickThroughRate: Math.random() * 2 + 0.5,
-    dailyImpressions: [
-      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
-      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
-      { agentId, date: new Date(), count: Math.floor(Math.random() * 1000) + 100 },
-    ],
-    topInteractions: [
-      { agentId, kind: 'likes', count: Math.floor(Math.random() * 500) + 100 },
-      { agentId, kind: 'retwineets', count: Math.floor(Math.random() * 300) + 50 },
-      { agentId, kind: 'replies', count: Math.floor(Math.random() * 200) + 30 },
-      { agentId, kind: 'quotes', count: Math.floor(Math.random() * 100) + 20 },
-    ],
-    reachByPlatform: [
-      { agentId, platform: 'mobile', count: Math.floor(Math.random() * 6000) + 2000 },
-      { agentId, platform: 'desktop', count: Math.floor(Math.random() * 3000) + 1000 },
-      { agentId, platform: 'tablet', count: Math.floor(Math.random() * 1000) + 500 },
-    ],
-    demographics: [
-      { agentId, age: '18-24', percentage: Math.random() * 20 + 10 },
-      { agentId, age: '25-34', percentage: Math.random() * 25 + 15 },
-      { agentId, age: '35-44', percentage: Math.random() * 20 + 10 },
-      { agentId, age: '45-54', percentage: Math.random() * 15 + 5 },
-      { agentId, age: '55+', percentage: Math.random() * 10 + 5 },
-    ],
-    peakHours: Array.from({ length: 24 }, (_, i) => ({
-      agentId,
-      hour: i,
-      engagement: Math.floor(Math.random() * 100) + 20,
-    })),
-    cryptoHoldings,
-  };
-};
-
 // Create the marketplace store
 const useMarketplaceStore = create<MarketplaceStoreType>()(
   persist(
@@ -129,7 +76,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
       agents: [],
       transactions: [],
       notifications: [],
-      notification: null, // Added missing 'notification' property
+      notification: null,
       setNotification: (notification: NotificationType | null) => set({ notification }),
       addAgent: async (agent: AgentType) => {
         set((state) => ({
@@ -184,7 +131,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           shares,
           pricePerShare: agent.tokenShares.pricePerShare,
           totalAmount: agent.tokenShares.pricePerShare * shares,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
 
         set((state) => ({
@@ -247,7 +194,7 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
         set((state) => ({
           agents: state.agents.map((agent) =>
             agent.agentId === agentId
-              ? { ...agent, analytics: generateDummyAnalytics(agentId) }
+              ? { ...agent, analytics: agent.analytics }
               : agent
           ),
         }));

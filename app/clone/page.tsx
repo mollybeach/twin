@@ -1,3 +1,4 @@
+// path: app/clone/page.tsx
 "use client";
 import React, { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';

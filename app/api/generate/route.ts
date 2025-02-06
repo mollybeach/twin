@@ -1,3 +1,4 @@
+// path: app/api/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
     import OpenAI from 'openai';
     import dotenv from 'dotenv';
@@ -9,14 +10,14 @@ import { NextRequest, NextResponse } from 'next/server';
     });
 
     export async function POST(req: NextRequest) {
-        const { prompt } = await req.json(); // Extract prompt from request body
+        const { prompt } = await req.json(); 
         try {
             const completion = await openai.chat.completions.create({
                 model: 'gpt-3.5-turbo',
                 messages: [{ role: 'user', content: prompt }],
                 max_tokens: 150,
             });
-            return NextResponse.json(completion); // Return the completion as JSON
+            return NextResponse.json(completion);
         } catch (error) {
             console.error('Error generating response:', error);
             return NextResponse.json({ message: 'Error generating response' }, { status: 500 });

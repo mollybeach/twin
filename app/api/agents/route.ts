@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AgentType } from '../../types/types';
-import { insertAgent } from '../../../server/index';
+import { insertAgent } from '../../../lib/queries';
 import { edgeDBCloudClient } from '../../../lib/client';
 
 export async function GET() {

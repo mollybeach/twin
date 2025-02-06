@@ -1,49 +1,32 @@
-// path: server/index.ts
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
+// path: lib/queries.ts
 import edgeql from '../dbschema/edgeql-js'
 import { edgeDBCloudClient } from '../lib/client';
-//import { Agent, FetchedTweet } from '../dbschema/interfaces'; // Import generated types
-import { Agent, Analytics, FetchedTweet, Twineet, Verification, UserTokenShare, TokenShare, TokenStats, Transaction, CryptoHolding, DailyImpressions, PeakHours, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
+import { Agent, Analytics, CryptoHolding, PeakHours, FetchedTweet, Twineet, UserTokenShare, TokenShare, TokenStats, Transaction,  DailyImpressions, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
+import {
+    formatAgent,
+    formatAnalytics,
+    formatCryptoHolding,
+    formatDemographics,
+    formatDailyImpressions,
+    formatPeakHours,
+    formatReachByPlatform,
+    formatTopInteractions,
+    formatFetchedTweet,
+    formatTwineet,
+    formatTransaction,
+    formatTokenShare,
+    formatTokenStats,
+    formatUserTokenShare,
+    formatVerification,
+    formatAgentStats,
+} from '../app/utils/formatData';
 
 import {
-    UserTokenShareType,
-    TokenShareType,
-    AgentType,
-    AnalyticsType,
-    FetchedTweetType,
-    TwineetType,
-    VerificationResponseType,
-    AgentStatsType,
-    TokenStatsType,
-    CryptoHoldingType,
-    DailyImpressionsType,
-    DemographicsType,
-    PeakHoursType,
-    ReachByPlatformType,
-    TopInteractionsType,
-    TransactionType 
+    AgentType 
 } from '../app/types/types';
-
-const port = process.env.PORT || 3002;
-const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3002';
-
-const app = express();
-
-const allowedOrigins = [
-    'http://localhost:3000', 
-    'http://localhost:3002', 
-    'https://twin-three.vercel.app'
-];
-app.use(express.json());
-app.use(cors({
-    origin: allowedOrigins
-}));
 
 const eQlString = (value: string) => {
     console.log('String', value)
@@ -57,175 +40,6 @@ const eQlDate = (date: Date) => {
 const eQlDecimal = (value: number) => {
     console.log('Decimal', value)
     return edgeql.decimal(value.toString());
-}
-
-function formatUserTokenShare(share: UserTokenShareType) {
-    return {
-        agentId: share.agentId,
-        userId: share.userId,
-        shares: parseFloat(share.shares.toString()),
-        purchasePrice: parseFloat(share.purchasePrice.toString()),
-        purchaseDate: share.purchaseDate,
-    };
-}
-
-function formatTokenShare(tokenShare: TokenShareType) {
-    return {
-        agentId: tokenShare.agentId,
-        totalShares: tokenShare.totalShares,
-        availableShares: tokenShare.availableShares,
-        pricePerShare: parseFloat(tokenShare.pricePerShare.toString()),
-        shareholders: tokenShare?.shareholders?.map(formatUserTokenShare) || [],
-    };
-}
-
-function formatAgent(agent: any): AgentType {
-    return {
-        agentId: agent.agentId,
-        twinHandle: agent.twinHandle,
-        twitterHandle: agent.twitterHandle,
-        profileImage: agent.profileImage,
-        personality: agent.personality,
-        description: agent.description,
-        autoReply: agent.autoReply,
-        isListed: agent.isListed,
-        price: parseFloat(agent.price),
-        modelData: agent.modelData, 
-        createdAt: new Date(agent.createdAt),
-        analytics: formatAnalytics(agent.analytics),
-        fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
-        twineets: agent.twineets?.map(formatTwineet) || [],
-        verification: formatVerification(agent.verification),
-        stats: formatAgentStats(agent.stats),
-        tokenShares: formatTokenShare(agent.tokenShares),
-        tokenStats: formatTokenStats(agent.tokenStats),
-        transactions: agent.transactions?.map(formatTransaction) || [],
-    };
-}
-
-function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
-    return {
-        agentId: cryptoHolding.agentId,
-        amount: parseFloat(cryptoHolding.amount.toString()), 
-        symbol: cryptoHolding.symbol,
-        change24h: parseFloat(cryptoHolding.change24h.toString()), 
-        value: parseFloat(cryptoHolding.value.toString())
-    };
-}
-
-function formatAnalytics(analytics: AnalyticsType) {
-    return {
-        agentId: analytics.agentId,
-        clickThroughRate: parseFloat(analytics.clickThroughRate.toString()),
-        engagementRate: parseFloat(analytics.engagementRate.toString()), 
-        impressions: analytics.impressions,
-        cryptoHoldings: analytics.cryptoHoldings.map(formatCryptoHolding),
-        demographics: analytics.demographics.map(formatDemographics),
-        dailyImpressions: analytics.dailyImpressions.map(formatDailyImpressions),
-        peakHours: analytics.peakHours.map(formatPeakHours),
-        reachByPlatform: analytics.reachByPlatform.map(formatReachByPlatform),
-        topInteractions: analytics.topInteractions.map(formatTopInteractions),
-    };
-}
-
-function formatAgentStats(stats: AgentStatsType) {
-    return {
-        agentId: stats.agentId,
-        replies: stats.replies,
-        interactions: stats.interactions,
-        uptime: stats.uptime,
-    };
-}
-
-function formatTokenStats(tokenStats: TokenStatsType) {
-    return {
-        agentId: tokenStats.agentId,
-        price: parseFloat(tokenStats.price.toString()), 
-        change24h: parseFloat(tokenStats.change24h.toString()), 
-        volume24h: parseFloat(tokenStats.volume24h.toString()), 
-        marketCap: parseFloat(tokenStats.marketCap.toString()), 
-    };
-}
-
-function formatDemographics(demographics: DemographicsType) {
-    return {
-        agentId: demographics.agentId,
-        age: demographics.age,
-        percentage: parseFloat(demographics.percentage.toString()), 
-    };
-}
-
-function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
-    return {
-        agentId: dailyImpressions.agentId,
-        date: dailyImpressions.date,
-        count: parseInt(dailyImpressions.count.toString()), 
-    };
-}
-
-function formatPeakHours(peakHours: PeakHoursType) {
-    return {
-        agentId: peakHours.agentId,
-        hour: parseInt(peakHours.hour.toString()), 
-        engagement: parseFloat(peakHours.engagement.toString()), 
-    };
-}
-
-function formatReachByPlatform(reach: ReachByPlatformType) {
-    return {
-        agentId: reach.agentId,
-        platform: reach.platform,
-        count: parseInt(reach.count.toString()), 
-    };
-}
-
-function formatTopInteractions(interactions: TopInteractionsType) {
-    return {
-        agentId: interactions.agentId,
-        kind: interactions.kind,
-        count: parseInt(interactions.count.toString()), 
-    };
-}
-
-function formatFetchedTweet(tweet: FetchedTweetType) {
-    return {
-        agentId: tweet.agentId,
-        text: tweet.text,
-        edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-        timestamp: new Date(tweet.timestamp), 
-    };
-}
-
-function formatTwineet(twineet: TwineetType) {
-    return {
-        agentId: twineet.agentId,
-        content: twineet.content,
-        timestamp: twineet.timestamp, 
-        likes: twineet.likes,
-        retwineets: twineet.retwineets,
-        replies: twineet.replies,
-        isLiked: twineet.isLiked,
-        isRetwineeted: twineet.isRetwineeted,
-    };
-}
-
-function formatVerification(verification: VerificationResponseType) {
-    return {
-        agentId: verification.agentId,
-        isVerified: verification.isVerified,
-        verificationDate: verification.verificationDate,
-    };
-}
-
-function formatTransaction(transaction: TransactionType) {
-    return {
-        agentId: transaction.agentId,
-        kind: transaction.kind,
-        shares: transaction.shares,
-        pricePerShare: transaction.pricePerShare,
-        totalAmount: transaction.totalAmount,
-        timestamp: transaction.timestamp, 
-    };
 }
 
 export async function insertAgent(agentData: AgentType): Promise<void> {
@@ -249,7 +63,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         clickThroughRate: eQlDecimal(agentData.analytics.clickThroughRate),  
         engagementRate: eQlDecimal(agentData.analytics.engagementRate),
         impressions: formattedAnalytics.impressions,
-        cryptoHoldings: edgeql.insert(edgeql.CryptoHolding, {
+        cryptoHoldings: edgeql.insert(CryptoHolding, {
             agentId: formattedAnalytics.agentId,
             amount: eQlDecimal(formattedCryptoHoldings.amount),
             symbol: formattedCryptoHoldings.symbol,
@@ -266,7 +80,7 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
             date: eQlDate(formattedDailyImpressions.date),
             count: formattedDailyImpressions.count,
         }),
-        peakHours: edgeql.insert(edgeql.PeakHours, {
+        peakHours: edgeql.insert(PeakHours, {
             agentId: formattedAnalytics.agentId,
             hour: formattedPeakHours.hour,
             engagement: eQlDecimal(formattedPeakHours.engagement),
@@ -290,13 +104,11 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
         timestamp: eQlDate(formattedFetchedTweets.timestamp), 
     });
 
-
     const twineetsQuery = await edgeql.insert(Twineet, {
         agentId: formattedTwineets.agentId,
         content: formattedTwineets.content,
         timestamp: eQlDate(formattedTwineets.timestamp), 
     });
-
 
     const transactionsQuery = await edgeql.insert(Transaction, {
         agentId: formattedTransactions.agentId,
@@ -354,15 +166,3 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     });
     await insertAgentQuery.run(edgeDBCloudClient);
 }
-
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 5,
-    message: 'Too many requests, please try again later.',
-});
-
-app.use(limiter);
-
-app.listen(port, () => {
-    console.log(`Server running at ${url}`);
-});

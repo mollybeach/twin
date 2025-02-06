@@ -43,6 +43,7 @@ const eQlDecimal = (value: number) => {
 }
 
 export async function insertAgent(agentData: AgentType): Promise<void> {
+    console.log('agentData', agentData);
     const formattedAgent = formatAgent(agentData);
     const formattedAnalytics = formatAnalytics(agentData.analytics);
     const formattedCryptoHoldings = formatCryptoHolding(agentData.analytics.cryptoHoldings[agentData.analytics.cryptoHoldings.length - 1]); // how do i make it the last index of the array
@@ -107,7 +108,12 @@ export async function insertAgent(agentData: AgentType): Promise<void> {
     const twineetsQuery = await edgeql.insert(Twineet, {
         agentId: formattedTwineets.agentId,
         content: formattedTwineets.content,
-        timestamp: eQlDate(formattedTwineets.timestamp), 
+        isLiked: formattedTwineets.isLiked,
+        isRetwineeted: formattedTwineets.isRetwineeted,
+        likes: formattedTwineets.likes,
+        retwineets: formattedTwineets.retwineets,
+        replies: formattedTwineets.replies,
+        timestamp: eQlDate(formattedTwineets.timestamp)
     });
 
     const transactionsQuery = await edgeql.insert(Transaction, {

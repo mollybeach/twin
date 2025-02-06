@@ -10,7 +10,7 @@ export const defaultAgent: AgentType = {
         twinHandle: '',
         twitterHandle: '',
         profileImage: 'https://i.imgur.com/HDQ3OTC.png', 
-        personality: '',
+        personality: ['friendly', 'professional', 'casual', 'witty'][Math.floor(Math.random() * 4)],
         description: 'This is a default description for the agent.',
         autoReply: true,
         price: getRandomInt(100, 1000),

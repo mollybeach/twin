@@ -37,10 +37,8 @@ export default function CreatePage() {
         const tweets = await response.json();
         setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
 
-        // Send tweets to OpenAI for training the model
-        const modelData = await handleGenerateResponse(tweets); // Call the updated function
+        const modelData = await handleGenerateResponse(tweets);
         console.log('Model data:', modelData);
-        // Set success message after fetching tweets
         setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
     } catch (error) {
         if (error instanceof Error) {
@@ -63,7 +61,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt }), // Send the prompt to the API
+          body: JSON.stringify({ prompt }),
       });
 
       if (!response.ok) {
@@ -71,7 +69,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
       }
 
       const data = await response.json();
-      const generatedText = data.choices[0].message?.content || data.choices[0].text; // Adjust based on your OpenAI API response structure
+      const generatedText = data.choices[0].message?.content || data.choices[0].text;
 
       setConfig(prev => ({
           ...prev,
@@ -126,12 +124,10 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
       setDeployError('Please set a valid price for your Twin');
       return;
     }
-
     setIsDeploying(true);
     setDeployError(null);
 
     const myAgentId = crypto.randomUUID();
-
     setAgentIdInConfig(config, myAgentId);
 
     

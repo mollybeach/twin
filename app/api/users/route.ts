@@ -16,7 +16,35 @@ export async function GET(req: NextRequest) {
             SELECT User {
                 id,
                 username,
-                email
+                email,
+                birthday,
+                walletAddress,
+                createdAt,
+                transactions,
+                twins,
+                notifications,
+                tokenShares,
+                userTokenShares,
+                twins: {
+                    id,
+                    twinHandle,
+                    profileImage,
+                    description,
+                    price,
+                    tokenShares: {
+                        availableShares,
+                        totalShares,
+                        pricePerShare,
+                        shareholders
+                    },
+                    verification: {
+                        isVerified
+                    },
+                    stats: {
+                        replies,
+                        interactions
+                    }
+                } FILTER .owner.id != <uuid>$userId
             }
         `;
 

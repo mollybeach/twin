@@ -1,50 +1,32 @@
+// app/marketplace/page.tsx
 "use client";
 import { useState, useEffect } from 'react';
 import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
 import { PriceChart } from '../components/PriceChart';
+import { TwinType } from '../types/types';
 
 const VERIFICATION_FEE = 100;
 
-// Define the Twin type based on your schema
-type Twin = {
-  twinId: string;
-  profileImage: string;
-  twinHandle: string;
-  personality: string;
-  description: string;
-  price: number;
-  tokenShares: {
-    availableShares: number;
-    totalShares: number;
-    pricePerShare: number;
-    shareholders: Array<any>; // Adjust this type based on your actual shareholder structure
-  };
-  verification: {
-    isVerified: boolean;
-  };
-  stats: {
-    replies: number;
-    interactions: number;
-  };
-};
-
 export default function MarketplacePage() {
-  const [twins, setTwins] = useState<Twin[]>([]);
+  const [twins, setTwins] = useState<TwinType[]>([]);
   const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
 
+  const userId = 'some-user-id'; // Replace with actual user ID logic
+
   // Fetch twins and user shares from the API
   const fetchTwins = async () => {
     try {
-      const response = await fetch('/api/twins');
+      const response = await fetch('/api/twins'); // Fetch all twins
       if (!response.ok) {
         throw new Error('Failed to fetch twins');
       }
-      const twinsData: Twin[] = await response.json(); // Ensure the response is typed
-      setTwins(twinsData);
+      const allTwins: TwinType[] = await response.json(); // Ensure the response is typed
+      const filteredTwins = allTwins.filter(twin => twin.userId !== userId); // Filter out twins owned by the user
+      setTwins(filteredTwins); // Update state with filtered twins
     } catch (error) {
       console.error('Error fetching twins:', error);
     }
@@ -69,7 +51,6 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     fetchTwins();
-    const userId = 'some-user-id'; // Replace with actual user ID logic
     fetchUserShares(userId);
   }, []);
 
@@ -137,7 +118,7 @@ export default function MarketplacePage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {twins.map((twin) => {
               const userSharesCount = userShares[twin.twinId] || 0;
-              const userValue = userSharesCount * twin.tokenShares.pricePerShare;
+              const userValue = userSharesCount * (typeof twin.tokenShares.pricePerShare === 'number' ? twin.tokenShares.pricePerShare : 0);
               
               return (
                 <div
@@ -172,7 +153,7 @@ export default function MarketplacePage() {
                       </div>
                       <span className="flex items-center text-gray-900 dark:text-white font-semibold">
                         <DollarSign className="h-4 w-4" />
-                        {twin.price.toFixed(2)}
+                        {typeof twin.price === 'number' ? twin.price.toFixed(2) : 'N/A'}
                       </span>
                     </div>
 

@@ -5,8 +5,8 @@ import { edgeDBCloudClient } from '../../../../lib/client';
 import { AgentType } from '../../../types/types';
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const agentId = searchParams.get('agentId');
+    const { pathname } = req.nextUrl;
+    const agentId = pathname.split('/')[3];
 
     if (!agentId) {
         return NextResponse.json({ message: 'Agent ID is required' }, { status: 400 });

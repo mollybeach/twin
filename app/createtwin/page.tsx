@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {  TwinType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
 import { defaultTwin } from '../utils/defaultData';
 
-export default function CreatePage() {
+export default function CreateTwinPage() {
   const router = useRouter();
   const addTwin = useMarketplaceStore((state) => state.addTwin);
   const fileInputRef = useRef<HTMLInputElement>(null);

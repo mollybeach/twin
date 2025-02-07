@@ -25,9 +25,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'Invalid username or password' }, { status: 401 });
         }
 
-        // Optionally, you can create a session or token for the user here
+        // Set a cookie with the user ID
+        const res = NextResponse.json({ message: 'Login successful', userId: user.userId }, { status: 200 });
+        res.cookies.set('userId', user.userId, { httpOnly: true, path: '/' }); // Set cookie
 
-        return NextResponse.json({ message: 'Login successful', userId: user.userId }, { status: 200 });
+        return res;
     } catch (error) {
         console.error('Error logging in user:', error);
         return NextResponse.json({ message: 'Error logging in user' }, { status: 500 });

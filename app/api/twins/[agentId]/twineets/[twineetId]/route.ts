@@ -1,8 +1,8 @@
 // path: app/api/twineets/[twinId]/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { TwineetType } from '../../../../types/types';
-import { edgeDBCloudClient } from '../../../../../lib/client';
+import { TwineetType } from '../../../../../types/types';
+import { edgeDBCloudClient } from '../../../../../../lib/client';
 
 export async function GET(req: NextRequest) {
     const { pathname } = req.nextUrl;

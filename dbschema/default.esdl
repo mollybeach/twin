@@ -1,4 +1,5 @@
 module default {
+    scalar type UserIdType extending str;
     scalar type TwinIdType extending str;
     scalar type AgeGroup extending enum<'18-24', '25-34', '35-44', '45-54', '55+'>;
     scalar type InteractionGroup extending enum<'likes', 'retwineets', 'replies', 'quotes'>;
@@ -150,6 +151,9 @@ module default {
         required property createdAt -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }
+        required property userId -> UserIdType {
+            default := "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+        }
         required property twinHandle -> str;
         required property twitterHandle -> str;
         required property profileImage -> str;
@@ -172,7 +176,7 @@ module default {
 
     # Define the User type
     type User {
-        required property userId -> str {
+        required property userId -> UserIdType {
                 constraint exclusive
         }
         required property username -> str {
@@ -182,10 +186,10 @@ module default {
                 constraint exclusive
         }
         required property passwordHash -> str;
-        required property birthday -> datetime;
         required property createdAt -> datetime {
             default := datetime_current(); 
         }
+        optional property birthday -> datetime;
         required property walletAddress -> str;
         optional multi link transactions -> Transaction;
         optional multi link twins -> Twin;

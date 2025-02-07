@@ -51,6 +51,7 @@ export type scalarAssignableBy<T extends $.ScalarType> =
   T extends _fts.$LuceneLanguage ? _fts.$LuceneLanguage : 
   T extends _fts.$Language ? _fts.$Language : 
   T extends _fts.$ElasticLanguage ? _fts.$ElasticLanguage : 
+  T extends _default.$UserIdType ? _default.$UserIdType : 
   T extends _default.$TwinIdType ? _default.$TwinIdType : 
   T extends _std.$str ? _std.$str : 
   T extends _default.$TransactionGroup ? _default.$TransactionGroup : 
@@ -109,6 +110,7 @@ export type scalarCastableFrom<T extends $.ScalarType> =
   T extends _fts.$LuceneLanguage ? _fts.$LuceneLanguage : 
   T extends _fts.$Language ? _fts.$Language : 
   T extends _fts.$ElasticLanguage ? _fts.$ElasticLanguage : 
+  T extends _default.$UserIdType ? _default.$UserIdType : 
   T extends _default.$TwinIdType ? _default.$TwinIdType : 
   T extends _std.$str ? _std.$str : 
   T extends _default.$TransactionGroup ? _default.$TransactionGroup : 
@@ -364,6 +366,12 @@ type getSharedParentScalar<A, B> =
   :
   A extends _fts.$ElasticLanguage ?
     B extends _fts.$ElasticLanguage ?
+    B
+    :
+    never
+  :
+  A extends _default.$UserIdType ?
+    B extends _default.$UserIdType ?
     B
     :
     never
@@ -717,6 +725,12 @@ function getSharedParentScalar<A extends $.ScalarType, B extends $.ScalarType>(a
     }
   if (a.__name__ === "fts::ElasticLanguage") {
     if(b.__name__ === "fts::ElasticLanguage") {
+      return b;
+    }
+    throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
+    }
+  if (a.__name__ === "default::UserIdType") {
+    if(b.__name__ === "default::UserIdType") {
       return b;
     }
     throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);

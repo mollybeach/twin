@@ -99,12 +99,10 @@ export function Navbar() {
               <Twitter className="h-6 w-6 text-purple-400" />
               <span className="ml-2 text-lg font-semibold text-white">Twin.fun</span>
             </Link>
-
             <div className="ml-6">
               <TokenStats />
             </div>
-          </div>
-          
+          </div>    
           <div className="flex items-center space-x-4">
             {/* Search Bar */}
             <div ref={searchRef} className="relative">
@@ -156,9 +154,7 @@ export function Navbar() {
                 )}
               </div>
             </div>
-
             <ThemeToggle />
-
             <div className="hidden md:flex items-center space-x-2">
               <Link href="/marketplace" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <ShoppingBag className="h-5 w-5 mr-1.5" />
@@ -171,15 +167,13 @@ export function Navbar() {
               <Link href="/leaderboard" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <Trophy className="h-5 w-5 mr-1.5" />
                 <span>Leaderboard</span>
-              </Link>
-              
+              </Link>             
               {/* Gold Create Twin Button */}
               <Link href="/create" className="flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ml-4 text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-colors shadow-lg hover:shadow-amber-500/20 border border-amber-300">
                 <PlusCircle className="h-5 w-5 mr-1.5" />
                 <span className="font-semibold">Create Twin</span>
               </Link>
             </div>
-
             {/* Login/Logout Button */}
             <div className="flex items-center">
               {isLoggedIn ? (
@@ -192,7 +186,6 @@ export function Navbar() {
                 </button>
               )}
             </div>
-
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center ml-2">
               <button className="p-2 text-purple-300 hover:text-purple-200 rounded-full hover:bg-white/5">

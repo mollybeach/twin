@@ -43,6 +43,9 @@ const TransactionGroup: $TransactionGroup = $.makeType<$TransactionGroup>(_.spec
 export type $TwinIdType = $.ScalarType<"std::str", string>;
 const TwinIdType: $.scalarTypeWithConstructor<_std.$str, never> = $.makeType<$.scalarTypeWithConstructor<_std.$str, never>>(_.spec, "6a6abb22-e51c-11ef-a749-b32b777280c1", _.syntax.literal);
 
+export type $UserIdType = $.ScalarType<"std::str", string>;
+const UserIdType: $.scalarTypeWithConstructor<_std.$str, never> = $.makeType<$.scalarTypeWithConstructor<_std.$str, never>>(_.spec, "de29a0e4-e528-11ef-a0e2-a3946697e098", _.syntax.literal);
+
 export type $AnalyticsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "clickThroughRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "engagementRate": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
@@ -242,6 +245,7 @@ export type $TwinλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "twinHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, true, false, false, false>;
   "twitterHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, false, false, false, true>;
   "analytics": $.LinkDesc<$Analytics, $.Cardinality.One, {}, false, false,  false, false>;
   "fetchedTweets": $.LinkDesc<$FetchedTweet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "tokenShares": $.LinkDesc<$TokenShare, $.Cardinality.One, {}, false, false,  false, false>;
@@ -296,13 +300,13 @@ const $Twineet = $.makeType<$Twineet>(_.spec, "a43a93cc-e51c-11ef-bd82-95e2112a9
 const Twineet: $.$expr_PathNode<$.TypeSet<$Twineet, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Twineet, $.Cardinality.Many), null);
 
 export type $UserλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "birthday": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, false>;
   "createdAt": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "email": $.PropertyDesc<_std.$str, $.Cardinality.One, true, false, false, false>;
   "passwordHash": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
-  "userId": $.PropertyDesc<_std.$str, $.Cardinality.One, true, false, false, false>;
   "username": $.PropertyDesc<_std.$str, $.Cardinality.One, true, false, false, false>;
   "walletAddress": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "birthday": $.PropertyDesc<_std.$datetime, $.Cardinality.AtMostOne, false, false, false, false>;
+  "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, true, false, false, false>;
   "transactions": $.LinkDesc<$Transaction, $.Cardinality.Many, {}, false, false,  false, false>;
   "twins": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -310,7 +314,7 @@ type $User = $.ObjectType<"default::User", $UserλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
   {username: {__element__: _std.$str, __cardinality__: $.Cardinality.One | $.Cardinality.AtMostOne },},
   {email: {__element__: _std.$str, __cardinality__: $.Cardinality.One | $.Cardinality.AtMostOne },},
-  {userId: {__element__: _std.$str, __cardinality__: $.Cardinality.One | $.Cardinality.AtMostOne },},
+  {userId: {__element__: $UserIdType, __cardinality__: $.Cardinality.One | $.Cardinality.AtMostOne },},
 ]>;
 const $User = $.makeType<$User>(_.spec, "a4432988-e51c-11ef-974c-ff98e995d7df", _.syntax.literal);
 
@@ -348,7 +352,7 @@ const Verification: $.$expr_PathNode<$.TypeSet<$Verification, $.Cardinality.Many
 
 
 
-export { AgeGroup, InteractionGroup, NotificationGroup, PlatformType, TransactionGroup, TwinIdType, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twin, Twin, $TwinStats, TwinStats, $Twineet, Twineet, $User, User, $UserTokenShare, UserTokenShare, $Verification, Verification };
+export { AgeGroup, InteractionGroup, NotificationGroup, PlatformType, TransactionGroup, TwinIdType, UserIdType, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twin, Twin, $TwinStats, TwinStats, $Twineet, Twineet, $User, User, $UserTokenShare, UserTokenShare, $Verification, Verification };
 
 type __defaultExports = {
   "AgeGroup": typeof AgeGroup;
@@ -357,6 +361,7 @@ type __defaultExports = {
   "PlatformType": typeof PlatformType;
   "TransactionGroup": typeof TransactionGroup;
   "TwinIdType": typeof TwinIdType;
+  "UserIdType": typeof UserIdType;
   "Analytics": typeof Analytics;
   "CryptoHolding": typeof CryptoHolding;
   "DailyImpressions": typeof DailyImpressions;
@@ -383,6 +388,7 @@ const __defaultExports: __defaultExports = {
   "PlatformType": PlatformType,
   "TransactionGroup": TransactionGroup,
   "TwinIdType": TwinIdType,
+  "UserIdType": UserIdType,
   "Analytics": Analytics,
   "CryptoHolding": CryptoHolding,
   "DailyImpressions": DailyImpressions,

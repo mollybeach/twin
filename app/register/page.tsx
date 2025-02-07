@@ -16,23 +16,29 @@ export default function RegisterPage() {
         e.preventDefault();
         setError('');
         const userId = crypto.randomUUID();
-
+        
         try {
             const response = await fetch('/api/users/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId, username, password, email, birthday: new Date(birthday), walletAddress }),
+                body: JSON.stringify({ 
+                    userId, 
+                    username, 
+                    password, 
+                    email, 
+                    birthday,
+                    walletAddress 
+                }),
             });
 
             if (!response.ok) {
                 throw new Error('Registration failed');
             }
 
-            router.push('/login'); 
+            router.push('/portfolio'); 
         } catch (err) {
-
             if (err instanceof Error) {
                 setError(err.message);
             } else {

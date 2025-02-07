@@ -1,5 +1,6 @@
 // path: src/types/types.tsx
 
+export type UserIdType = string;
 export type TwinIdType = string;
 export type AgeGroup = '18-24' | '25-34' | '35-44' | '45-54' | '55+';
 export type InteractionGroup = 'likes' | 'retwineets' | 'replies' | 'quotes';
@@ -23,6 +24,7 @@ export interface AnalyticsType {
 
 export interface TwinType {
     id?: string;
+    userId?: UserIdType;
     twinId: TwinIdType;
     autoReply: boolean;
     createdAt: Date;
@@ -163,16 +165,15 @@ export interface TwineetType {
     isLiked: boolean;
     isRetwineeted: boolean;
 }
-
 export interface UserType {
-    userId: string;
+    userId: UserIdType;
     username: string;
     email: string;
     passwordHash: string;
-    birthday: Date;
+    birthday?: Date;
     walletAddress: string;
-    twins: TwinType[];
-    transactions: TransactionType[];
+    twins?: TwinType[];
+    transactions?: TransactionType[];
     createdAt: Date;
 }
 export interface VerificationResponseType {

@@ -5,18 +5,15 @@ import { hashPassword } from '../../../../lib/auth';
 import { UserType } from '../../../types/types';
 
 export async function POST(req: NextRequest) {
-    const { userId, username, password, email, birthday, walletAddress } = await req.json();
+    
+    let { userId, username, password, email, birthday, walletAddress } = await req.json();
 
-    // Validate input
     if (!username || !password || !email || !birthday || !walletAddress) {
         return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
-
     try {
-        // Hash the password
         const passwordHash = await hashPassword(password);
 
-        // Insert the new user into the database
         const query = `
             INSERT User {
                 userId := <str>$userId,

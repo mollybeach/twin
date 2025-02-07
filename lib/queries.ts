@@ -32,7 +32,8 @@ const eQlString = (value: string) => {
     console.log('String', value)
     return value;
 }
-const eQlDate = (date: Date) => {
+
+export const eQlDate = (date: Date) => {
     console.log('Date', date)
     return edgeql.cast(edgeql.datetime, date);
 }

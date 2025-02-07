@@ -74,14 +74,11 @@ export default function MarketplacePage() {
   }, []);
 
   const handleBuyShares = (twinId: string) => {
-    if (sharesToBuy <= 0) {
-      alert('Please enter a valid number of shares');
-      return;
-    }
-    
     const twin = twins.find(a => a.twinId === twinId);
     if (!twin) return;
-    
+
+    console.log('Price per share:', twin.tokenShares.pricePerShare); // Debugging line
+
     if (sharesToBuy > twin.tokenShares.availableShares) {
       alert('Not enough shares available');
       return;
@@ -218,7 +215,7 @@ export default function MarketplacePage() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Price per share:</span>
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          ${twin.tokenShares.pricePerShare.toFixed(4)}
+                          ${typeof twin.tokenShares.pricePerShare === 'number' ? twin.tokenShares.pricePerShare.toFixed(4) : 'N/A'}
                         </span>
                       </div>
                       {userSharesCount > 0 && (

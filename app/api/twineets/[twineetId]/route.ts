@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         const query = `
             SELECT Twineet {
                 id,
-                agentId,
+                twinId,
                 content,
                 timestamp,
                 likes,
@@ -46,16 +46,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     const newTwineet = await req.json();
-    const { agentId, content } = newTwineet;
+    const { twinId, content } = newTwineet;
 
-    if (!agentId || !content) {
-        return NextResponse.json({ message: 'Agent ID and content are required' }, { status: 400 });
+    if (!twinId || !content) {
+        return NextResponse.json({ message: 'Twin ID and content are required' }, { status: 400 });
     }
 
     try {
         const query = `
             INSERT Twineet {
-                agentId := <str>$agentId,
+                twinId := <str>$twinId,
                 content := <str>$content,
                 timestamp := datetime_current(),
                 likes := 0,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             };
         `;
 
-        await edgeDBCloudClient.execute(query, { agentId, content });
+        await edgeDBCloudClient.execute(query, { twinId, content });
         return NextResponse.json({ message: 'Twineet created successfully' }, { status: 201 });
     } catch (error) {
         console.error('Error creating twineet:', error);

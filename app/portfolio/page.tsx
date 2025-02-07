@@ -19,25 +19,25 @@ import Link from 'next/link';
 import { SharePriceChart } from '../components/SharePriceChart';
 
 export default function PortfolioPage() {
-  const { agents, getUserShares, getTransactionHistory } = useMarketplaceStore();
-  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const { twins, getUserShares, getTransactionHistory } = useMarketplaceStore();
+  const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [showTransactions, setShowTransactions] = useState(false);
 
 
-  const holdings = agents.map(agent => {
-    const shares = getUserShares(agent.agentId);
-    const value = shares * agent.tokenShares.pricePerShare;
+  const holdings = twins.map(twin => {
+    const shares = getUserShares(twin.twinId);
+    const value = shares * twin.tokenShares.pricePerShare;
     return {
-      id: agent.agentId,
-      twinHandle: agent.twinHandle,
+      id: twin.twinId,
+      twinHandle: twin.twinHandle,
       shares,
       value,
-      pricePerShare: agent.tokenShares.pricePerShare,
-      isVerified: agent.verification.isVerified,
-      profileImage: agent.profileImage,
-      availableShares: agent.tokenShares.availableShares,
-      personality: agent.personality,
-      analytics: agent.analytics
+      pricePerShare: twin.tokenShares.pricePerShare,
+      isVerified: twin.verification.isVerified,
+      profileImage: twin.profileImage,
+      availableShares: twin.tokenShares.availableShares,
+      personality: twin.personality,
+      analytics: twin.analytics
     };
   }).filter(holding => holding.shares > 0);
 
@@ -45,7 +45,7 @@ export default function PortfolioPage() {
   const totalShares = holdings.reduce((sum, holding) => sum + holding.shares, 0);
   const averagePrice = totalValue / totalShares || 0;
 
-  const transactions = getTransactionHistory(selectedAgent || undefined);
+  const transactions = getTransactionHistory(selectedTwin || undefined);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -138,8 +138,8 @@ export default function PortfolioPage() {
               <div className="flex items-center space-x-2">
                 <Filter className="w-5 h-5 text-purple-400" />
                 <select
-                  value={selectedAgent || ''}
-                  onChange={(e) => setSelectedAgent(e.target.value || null)}
+                  value={selectedTwin || ''}
+                  onChange={(e) => setSelectedTwin(e.target.value || null)}
                   className="bg-white/10 border border-purple-500/30 rounded-lg px-3 py-1 text-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="">All Twins</option>
@@ -166,19 +166,19 @@ export default function PortfolioPage() {
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {transactions.map((transaction) => {
-                    const agent = agents.find(a => a.agentId === transaction.agentId);
-                    if (!agent) return null;
+                    const twin = twins.find(a => a.twinId === transaction.twinId);
+                    if (!twin) return null;
 
                     return (
-                      <tr key={transaction.agentId} className="text-white">
+                      <tr key={transaction.twinId} className="text-white">
                         <td className="py-4">
                           <div className="flex items-center space-x-3">
                             <img
-                              src={agent.profileImage}
-                              alt={agent.twinHandle}
+                              src={twin.profileImage}
+                              alt={twin.twinHandle}
                               className="w-8 h-8 rounded-full"
                             />
-                            <span>@{agent.twinHandle}</span>
+                            <span>@{twin.twinHandle}</span>
                           </div>
                         </td>
                         <td className="py-4">
@@ -260,8 +260,8 @@ export default function PortfolioPage() {
 
                 <div className="mb-6">
                   <SharePriceChart
-                    agentId={holding.id}
-                    shareholders={agents.find(a => a.agentId === holding.id)?.tokenShares.shareholders || []}
+                    twinId={holding.id}
+                    shareholders={twins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
                     pricePerShare={holding.pricePerShare}
                     isExpanded={true}
                   />

@@ -3,29 +3,29 @@
 import { useEffect, useState } from 'react';
 //import { useMarketplaceStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles, Send } from 'lucide-react';
-import { AgentType, TwineetType } from '../types/types';
+import { TwinType, TwineetType } from '../types/types';
 
 export default function TimelinePage() {
- // const agents = useMarketplaceStore((state) => state.agents);
+ // const twins = useMarketplaceStore((state) => state.twins);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
-  const [followedAgents, setFollowedAgents] = useState<Set<string>>(new Set());
-  const [agents, setAgents] = useState<AgentType[]>([]);
+  const [followedTwins, setFollowedTwins] = useState<Set<string>>(new Set());
+  const [twins, setTwins] = useState<TwinType[]>([]);
   const [loading, setLoading] = useState<boolean>(true); 
   const [replyInputVisible, setReplyInputVisible] = useState<{ [key: string]: boolean }>({});
   const [replyContent, setReplyContent] = useState<{ [key: string]: string[] }>({});
   const [tempReplyContent, setTempReplyContent] = useState<{ [key: string]: string }>({});
 
-  const fetchAgents = async () => {
+  const fetchTwins = async () => {
     setLoading(true);
-    const response = await fetch('/api/agents', {
+    const response = await fetch('/api/twins', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    const agentsResult = await response.json();
-    setAgents(agentsResult);
+    const twinsResult = await response.json();
+    setTwins(twinsResult);
   };
 
   const fetchAndDisplayTwineets = async () => {
@@ -50,7 +50,7 @@ export default function TimelinePage() {
   };
 
   useEffect(() => {
-    fetchAgents();
+    fetchTwins();
     fetchAndDisplayTwineets();
   }, []);
 
@@ -159,13 +159,13 @@ export default function TimelinePage() {
     setReplyInputVisible(prev => ({ ...prev, [twineetId]: false }));
   };
 
-  const toggleFollow = (agentId: string) => {
-    setFollowedAgents(prev => {
+  const toggleFollow = (twinId: string) => {
+    setFollowedTwins(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(agentId)) {
-        newSet.delete(agentId);
+      if (newSet.has(twinId)) {
+        newSet.delete(twinId);
       } else {
-        newSet.add(agentId);
+        newSet.add(twinId);
       }
       return newSet;
     });
@@ -222,7 +222,7 @@ export default function TimelinePage() {
           </div>
         </div>
 
-        {agents.length === 0 ? (
+        {twins.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <Bot className="w-16 h-16 text-purple-400 mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">No AI Twins Yet</h2>
@@ -234,7 +234,7 @@ export default function TimelinePage() {
               Visit Marketplace
             </a>
           </div>
-        ) : activeTab === 'following' && followedAgents.size === 0 ? (
+        ) : activeTab === 'following' && followedTwins.size === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <Users className="w-16 h-16 text-purple-400 mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">No Twins Followed</h2>
@@ -243,34 +243,34 @@ export default function TimelinePage() {
         ) : (
           <div className="divide-y divide-white/10">
             {twineets.map((twineet) => {
-              const agent = agents.find(a => a.agentId === twineet.agentId);
-              if (!agent) return null;
+              const twin = twins.find(a => a.twinId === twineet.twinId);
+              if (!twin) return null;
 
               return (
                 <article key={twineet.id} className="p-4 hover:bg-white/5 transition-colors">
                   <div className="flex space-x-3">
                     <img
-                      src={agent.profileImage}
-                      alt={agent.twinHandle}
+                      src={twin.profileImage}
+                      alt={twin.twinHandle}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <span className="font-bold text-white truncate">
-                          {agent.twinHandle}
+                          {twin.twinHandle}
                         </span>
                         <Bot className="w-4 h-4 text-purple-400" />
                         <span className="text-purple-300">·</span>
                         <span className="text-purple-300">{formatTimestamp(twineet.timestamp.toString())}</span>
                         <button
-                          onClick={() => toggleFollow(agent.agentId)}
+                          onClick={() => toggleFollow(twin.twinId)}
                           className={`ml-2 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                            followedAgents.has(agent.agentId)
+                            followedTwins.has(twin.twinId)
                               ? 'bg-purple-500/50 text-white hover:bg-purple-500/70'
                               : 'border border-purple-500 text-purple-400 hover:bg-purple-500/10'
                           }`}
                         >
-                          {followedAgents.has(agent.agentId) ? 'Following' : 'Follow'}
+                          {followedTwins.has(twin.twinId) ? 'Following' : 'Follow'}
                         </button>
                         <button className="ml-auto text-purple-300 hover:text-purple-200">
                           <MoreHorizontal className="w-5 h-5" />
@@ -335,15 +335,15 @@ export default function TimelinePage() {
                         <div key={index} className="mt-2 text-white bg-purple-500/10 p-2 rounded-xl">
                           <div className="flex space-x-3">
                             <img
-                              src={agent.profileImage}
-                              alt={agent.twinHandle}
+                              src={twin.profileImage}
+                              alt={twin.twinHandle}
                               className="w-8 h-8 rounded-full object-cover"
                             />
                             <div className="flex items-center justify-between">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-2">
                                   <span className="font-bold text-white truncate">
-                                  {agent.twinHandle}
+                                  {twin.twinHandle}
                                 </span>
                                 <Bot className="w-4 h-4 text-purple-400" />
                                 <span className="text-purple-300">·</span>

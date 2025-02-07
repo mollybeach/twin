@@ -6,24 +6,24 @@ import { Analytics as AnalyticsComponent } from '@/components/Analytics';
 import { Bot } from 'lucide-react';
 
 export default function AnalyticsPage() {
-  const { agentId } = useParams<{ agentId: string }>();
-  const { agents, updateAnalytics } = useMarketplaceStore();
-  const agent = agents.find(a => a.agentId === agentId);
+  const { twinId } = useParams<{ twinId: string }>();
+  const { twins, updateAnalytics } = useMarketplaceStore();
+  const twin = twins.find(a => a.twinId === twinId);
 
   React.useEffect(() => {
-    if (agentId) {
+    if (twinId) {
       // Initial update
-      updateAnalytics(agentId);
+      updateAnalytics(twinId);
       
       const interval = setInterval(() => {
-        updateAnalytics(agentId);
+        updateAnalytics(twinId);
       }, 60000); // Update every minute for demo purposes
       
       return () => clearInterval(interval);
     }
-  }, [agentId, updateAnalytics]);
+  }, [twinId, updateAnalytics]);
 
-  if (!agent || !agentId) {
+  if (!twin || !twinId) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -41,18 +41,18 @@ export default function AnalyticsPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-4">
             <img
-              src={agent.profileImage}
-              alt={agent.twinHandle}
+              src={twin.profileImage}
+              alt={twin.twinHandle}
               className="w-16 h-16 rounded-full object-cover"
             />
             <div>
-              <h1 className="text-2xl font-bold text-white">@{agent.twinHandle}</h1>
-              <p className="text-purple-300">{agent.personality} Twin</p>
+              <h1 className="text-2xl font-bold text-white">@{twin.twinHandle}</h1>
+              <p className="text-purple-300">{twin.personality} Twin</p>
             </div>
           </div>
         </div>
 
-        <AnalyticsComponent analytics={agent.analytics} agentId={agentId} />
+        <AnalyticsComponent analytics={twin.analytics} twinId={twinId} />
       </div>
     </div>
   );

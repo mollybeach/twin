@@ -1,5 +1,5 @@
 module default {
-    scalar type AgentIdType extending str;
+    scalar type TwinIdType extending str;
     scalar type AgeGroup extending enum<'18-24', '25-34', '35-44', '45-54', '55+'>;
     scalar type InteractionGroup extending enum<'likes', 'retwineets', 'replies', 'quotes'>;
     scalar type NotificationGroup extending enum<'create', 'buy', 'sell'>;
@@ -7,7 +7,7 @@ module default {
     scalar type TransactionGroup extending enum<'buy', 'sell'>;
 
     type CryptoHolding {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property amount -> decimal;
         required property symbol -> str;
         required property change24h -> decimal;
@@ -15,37 +15,37 @@ module default {
     } 
 
     type Demographics {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property age -> AgeGroup;
         required property percentage -> decimal;
     }
 
     type DailyImpressions {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property date -> datetime;
         required property count -> int16;
     }
 
     type PeakHours {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property hour -> int16;
         required property engagement -> decimal;
     }
 
     type ReachByPlatform {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property platform -> PlatformType;
         required property count -> int16;
     }
 
     type TopInteractions {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property kind -> InteractionGroup;
         required property count -> int16;
     }
 
     type Analytics {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property clickThroughRate -> decimal;
         required property engagementRate -> decimal;
         required property impressions -> int16;
@@ -58,7 +58,7 @@ module default {
     }
 
     type UserTokenShare {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property userId -> str;
         required property shares -> decimal;
         required property purchasePrice -> decimal;
@@ -66,7 +66,7 @@ module default {
     }
 
     type TokenShare {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property totalShares -> int16;
         required property availableShares -> int16;
         required property pricePerShare -> decimal;
@@ -75,7 +75,7 @@ module default {
 
     # Define the TokenStats type
     type TokenStats {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property price -> decimal;
         required property change24h -> decimal;
         required property volume24h -> decimal;
@@ -84,7 +84,7 @@ module default {
 
     # Define the Transaction type
     type Transaction {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property kind -> TransactionGroup;
         required property shares -> int16;
         required property pricePerShare -> decimal;
@@ -96,7 +96,7 @@ module default {
 
     # Define the FetchedTweet type
     type FetchedTweet {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property text -> str;
         required property edit_history_tweet_ids -> array<str>;
         required property timestamp -> datetime {
@@ -106,7 +106,7 @@ module default {
 
     # Define the Twineet type
     type Twineet {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property content -> str;
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
@@ -129,22 +129,22 @@ module default {
     }
 
     type Verification {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property isVerified -> bool;
         required property verificationDate -> datetime;
     }
 
-    # Define the AgentStats type
-    type AgentStats {
-        required property agentId -> AgentIdType;
+    # Define the TwinStats type
+    type TwinStats {
+        required property twinId -> TwinIdType;
         required property replies -> int16;
         required property interactions -> int16;
         required property uptime -> str;
     }
 
-    # Define the Agent type
-    type Agent {
-        required property agentId -> AgentIdType { 
+    # Define the Twin type
+    type Twin {
+        required property twinId -> TwinIdType { 
             constraint exclusive
         }
         required property createdAt -> datetime {
@@ -158,7 +158,7 @@ module default {
         required property autoReply -> bool;
         required property isListed -> bool;
         required property price -> decimal;
-        required link stats -> AgentStats;
+        required link stats -> TwinStats;
         required link verification -> Verification;
         required link analytics -> Analytics;
         required property modelData -> json;
@@ -170,9 +170,30 @@ module default {
         required multi link transactions -> Transaction;
     }
 
+    # Define the User type
+    type User {
+        required property userId -> str {
+                constraint exclusive
+        }
+        required property username -> str {
+                constraint exclusive
+        }
+        required property email -> str {
+                constraint exclusive
+        }
+        required property passwordHash -> str;
+        required property birthday -> datetime;
+        required property createdAt -> datetime {
+            default := datetime_current(); 
+        }
+        required property walletAddress -> str;
+        optional multi link transactions -> Transaction;
+        optional multi link twins -> Twin;
+    }
+
     # Define the Notification type
     type Notification {
-        required property agentId -> AgentIdType;
+        required property twinId -> TwinIdType;
         required property kind -> NotificationGroup;
         required property message -> str;
         required property twinHandle -> str;

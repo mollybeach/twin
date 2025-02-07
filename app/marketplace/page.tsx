@@ -7,53 +7,53 @@ import { PriceChart } from '../components/PriceChart';
 const VERIFICATION_FEE = 100;
 
 export default function MarketplacePage() {
-  const { agents, buyShares, sellShares, verifyAgent, getUserShares } = useMarketplaceStore();
-  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const { twins, buyShares, sellShares, verifyTwin, getUserShares } = useMarketplaceStore();
+  const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
 
-  const handleBuyShares = (agentId: string) => {
+  const handleBuyShares = (twinId: string) => {
     if (sharesToBuy <= 0) {
       alert('Please enter a valid number of shares');
       return;
     }
     
-    const agent = agents.find(a => a.agentId === agentId);
-    if (!agent) return;
+    const twin = twins.find(a => a.twinId === twinId);
+    if (!twin) return;
     
-    if (sharesToBuy > agent.tokenShares.availableShares) {
+    if (sharesToBuy > twin.tokenShares.availableShares) {
       alert('Not enough shares available');
       return;
     }
 
-    buyShares(agentId, sharesToBuy);
-    setSelectedAgent(null);
+    buyShares(twinId, sharesToBuy);
+    setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
   };
 
-  const handleSellShares = (agentId: string) => {
+  const handleSellShares = (twinId: string) => {
     if (sharesToBuy <= 0) {
       alert('Please enter a valid number of shares');
       return;
     }
 
-    const userShares = getUserShares(agentId);
+    const userShares = getUserShares(twinId);
     if (sharesToBuy > userShares) {
       alert('You don\'t have enough shares to sell');
       return;
     }
 
-    sellShares(agentId, sharesToBuy);
-    setSelectedAgent(null);
+    sellShares(twinId, sharesToBuy);
+    setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
   };
 
-  const handleVerification = async (agentId: string) => {
+  const handleVerification = async (twinId: string) => {
     setVerificationError(null);
-    const success = await verifyAgent(agentId);
+    const success = await verifyTwin(twinId);
     if (!success) {
       setVerificationError(`You need to own at least $${VERIFICATION_FEE} worth of shares to verify this Twin`);
     }
@@ -67,7 +67,7 @@ export default function MarketplacePage() {
           <p className="text-lg text-white/80">Invest in your favorite digital twins</p>
         </div>
 
-        {agents.length === 0 ? (
+        {twins.length === 0 ? (
           <div className="text-center py-12">
             <Bot className="w-12 h-12 text-white mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-white mb-2">No Twins Available Yet</h2>
@@ -75,13 +75,13 @@ export default function MarketplacePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {agents.map((agent) => {
-              const userShares = getUserShares(agent.agentId);
-              const userValue = userShares * agent.tokenShares.pricePerShare;
+            {twins.map((twin) => {
+              const userShares = getUserShares(twin.twinId);
+              const userValue = userShares * twin.tokenShares.pricePerShare;
               
               return (
                 <div
-                  key={agent.agentId}
+                  key={twin.twinId}
                   className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative rainbow-border"
                 >
                   <div className="absolute inset-0 marketplace-card-bg"></div>
@@ -90,41 +90,41 @@ export default function MarketplacePage() {
                       <div className="flex items-center space-x-3">
                         <div className="relative">
                           <img
-                            src={agent.profileImage}
-                            alt={`@${agent.twinHandle}`}
+                            src={twin.profileImage}
+                            alt={`@${twin.twinHandle}`}
                             className={`w-16 h-16 rounded-full object-cover border-2 ${
-                              agent.verification.isVerified ? 'border-blue-500' : 'border-white/20'
+                              twin.verification.isVerified ? 'border-blue-500' : 'border-white/20'
                             }`}
                           />
-                          {agent.verification.isVerified && (
+                          {twin.verification.isVerified && (
                             <BadgeCheck className="absolute -bottom-1 -right-1 w-6 h-6 text-blue-500 bg-white rounded-full" />
                           )}
                         </div>
                         <div>
                           <div className="flex items-center space-x-1">
-                            <span className="font-semibold text-gray-900 dark:text-white">@{agent.twinHandle}</span>
-                            {agent.verification.isVerified && (
+                            <span className="font-semibold text-gray-900 dark:text-white">@{twin.twinHandle}</span>
+                            {twin.verification.isVerified && (
                               <BadgeCheck className="w-4 h-4 text-blue-500" />
                             )}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">{agent.personality}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{twin.personality}</div>
                         </div>
                       </div>
                       <span className="flex items-center text-gray-900 dark:text-white font-semibold">
                         <DollarSign className="h-4 w-4" />
-                        {agent.price.toFixed(2)}
+                        {twin.price.toFixed(2)}
                       </span>
                     </div>
 
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{agent.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{twin.description}</p>
 
                     <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                       <div className="flex items-center">
                         <MessageCircle className="h-4 w-4 mr-1" />
-                        {agent.stats.replies.toLocaleString()} replies
+                        {twin.stats.replies.toLocaleString()} replies
                       </div>
                       <div>
-                        {agent.stats.interactions.toLocaleString()} friends
+                        {twin.stats.interactions.toLocaleString()} friends
                       </div>
                     </div>
 
@@ -136,9 +136,9 @@ export default function MarketplacePage() {
                         </div>
                       </div>
                       <PriceChart
-                        agentId={agent.agentId}
-                        shareholders={agent.tokenShares.shareholders}
-                        pricePerShare={agent.tokenShares.pricePerShare}
+                        twinId={twin.twinId}
+                        shareholders={twin.tokenShares.shareholders}
+                        pricePerShare={twin.tokenShares.pricePerShare}
                       />
                     </div>
 
@@ -149,13 +149,13 @@ export default function MarketplacePage() {
                           <span className="text-sm font-medium text-gray-900 dark:text-white">Token Shares</span>
                         </div>
                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {agent.tokenShares.availableShares} / {agent.tokenShares.totalShares} available
+                          {twin.tokenShares.availableShares} / {twin.tokenShares.totalShares} available
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Price per share:</span>
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          ${agent.tokenShares.pricePerShare.toFixed(4)}
+                          ${twin.tokenShares.pricePerShare.toFixed(4)}
                         </span>
                       </div>
                       {userShares > 0 && (
@@ -168,10 +168,10 @@ export default function MarketplacePage() {
                       )}
                     </div>
 
-                    {!agent.verification.isVerified && userValue >= VERIFICATION_FEE && (
+                    {!twin.verification.isVerified && userValue >= VERIFICATION_FEE && (
                       <div className="mb-4">
                         <button
-                          onClick={() => handleVerification(agent.agentId)}
+                          onClick={() => handleVerification(twin.twinId)}
                           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
                         >
                           <BadgeCheck className="w-4 h-4" />
@@ -183,30 +183,30 @@ export default function MarketplacePage() {
                       </div>
                     )}
 
-                    {verificationError && selectedAgent === agent.agentId && (
+                    {verificationError && selectedTwin === twin.twinId && (
                       <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-md flex items-start space-x-2">
                         <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-red-600 dark:text-red-400">{verificationError}</p>
                       </div>
                     )}
 
-                    {selectedAgent === agent.agentId ? (
+                    {selectedTwin === twin.twinId ? (
                       <div className="space-y-3">
                         <div className="flex items-center space-x-2">
                           <input
                             type="number"
                             min="1"
-                            max={isSellingShares ? userShares : agent.tokenShares.availableShares}
+                            max={isSellingShares ? userShares : twin.tokenShares.availableShares}
                             value={sharesToBuy}
                             onChange={(e) => {
-                              const max = isSellingShares ? userShares : agent.tokenShares.availableShares;
+                              const max = isSellingShares ? userShares : twin.tokenShares.availableShares;
                               setSharesToBuy(Math.min(parseInt(e.target.value) || 0, max));
                             }}
                             className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
                             placeholder="Number of shares"
                           />
                           <button
-                            onClick={() => isSellingShares ? handleSellShares(agent.agentId) : handleBuyShares(agent.agentId)}
+                            onClick={() => isSellingShares ? handleSellShares(twin.twinId) : handleBuyShares(twin.twinId)}
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center"
                           >
                             {isSellingShares ? (
@@ -232,7 +232,7 @@ export default function MarketplacePage() {
                         )}
                         <button
                           onClick={() => {
-                            setSelectedAgent(null);
+                            setSelectedTwin(null);
                             setIsSellingShares(false);
                             setVerificationError(null);
                           }}
@@ -245,7 +245,7 @@ export default function MarketplacePage() {
                       <div className="space-y-2">
                         <button
                           onClick={() => {
-                            setSelectedAgent(agent.agentId);
+                            setSelectedTwin(twin.twinId);
                             setIsSellingShares(false);
                           }}
                           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
@@ -256,7 +256,7 @@ export default function MarketplacePage() {
                         {userShares > 0 && (
                           <button
                             onClick={() => {
-                              setSelectedAgent(agent.agentId);
+                              setSelectedTwin(twin.twinId);
                               setIsSellingShares(true);
                             }}
                             className="w-full border border-blue-500 text-blue-500 py-2 px-4 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 flex items-center justify-center space-x-2"
@@ -268,11 +268,11 @@ export default function MarketplacePage() {
                       </div>
                     )}
 
-                    {agent.tokenShares.shareholders.length > 0 && (
+                    {twin.tokenShares.shareholders.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">Shareholders</div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {agent.tokenShares.shareholders.length} investors own shares
+                          {twin.tokenShares.shareholders.length} investors own shares
                         </div>
                       </div>
                     )}

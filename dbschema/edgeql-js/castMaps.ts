@@ -51,12 +51,12 @@ export type scalarAssignableBy<T extends $.ScalarType> =
   T extends _fts.$LuceneLanguage ? _fts.$LuceneLanguage : 
   T extends _fts.$Language ? _fts.$Language : 
   T extends _fts.$ElasticLanguage ? _fts.$ElasticLanguage : 
+  T extends _default.$TwinIdType ? _default.$TwinIdType : 
+  T extends _std.$str ? _std.$str : 
   T extends _default.$TransactionGroup ? _default.$TransactionGroup : 
   T extends _default.$PlatformType ? _default.$PlatformType : 
   T extends _default.$NotificationGroup ? _default.$NotificationGroup : 
   T extends _default.$InteractionGroup ? _default.$InteractionGroup : 
-  T extends _default.$AgentIdType ? _default.$AgentIdType : 
-  T extends _std.$str ? _std.$str : 
   T extends _default.$AgeGroup ? _default.$AgeGroup : 
   T extends _cfg.$memory ? _cfg.$memory : 
   T extends _cfg.$QueryCacheMode ? _cfg.$QueryCacheMode : 
@@ -109,12 +109,12 @@ export type scalarCastableFrom<T extends $.ScalarType> =
   T extends _fts.$LuceneLanguage ? _fts.$LuceneLanguage : 
   T extends _fts.$Language ? _fts.$Language : 
   T extends _fts.$ElasticLanguage ? _fts.$ElasticLanguage : 
+  T extends _default.$TwinIdType ? _default.$TwinIdType : 
+  T extends _std.$str ? _std.$str : 
   T extends _default.$TransactionGroup ? _default.$TransactionGroup : 
   T extends _default.$PlatformType ? _default.$PlatformType : 
   T extends _default.$NotificationGroup ? _default.$NotificationGroup : 
   T extends _default.$InteractionGroup ? _default.$InteractionGroup : 
-  T extends _default.$AgentIdType ? _default.$AgentIdType : 
-  T extends _std.$str ? _std.$str : 
   T extends _default.$AgeGroup ? _default.$AgeGroup : 
   T extends _cfg.$memory ? _cfg.$memory : 
   T extends _cfg.$QueryCacheMode ? _cfg.$QueryCacheMode : 
@@ -368,6 +368,18 @@ type getSharedParentScalar<A, B> =
     :
     never
   :
+  A extends _default.$TwinIdType ?
+    B extends _default.$TwinIdType ?
+    B
+    :
+    never
+  :
+  A extends _std.$str ?
+    B extends _std.$str ?
+    B
+    :
+    never
+  :
   A extends _default.$TransactionGroup ?
     B extends _default.$TransactionGroup ?
     B
@@ -388,18 +400,6 @@ type getSharedParentScalar<A, B> =
   :
   A extends _default.$InteractionGroup ?
     B extends _default.$InteractionGroup ?
-    B
-    :
-    never
-  :
-  A extends _default.$AgentIdType ?
-    B extends _default.$AgentIdType ?
-    B
-    :
-    never
-  :
-  A extends _std.$str ?
-    B extends _std.$str ?
     B
     :
     never
@@ -721,6 +721,18 @@ function getSharedParentScalar<A extends $.ScalarType, B extends $.ScalarType>(a
     }
     throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
     }
+  if (a.__name__ === "default::TwinIdType") {
+    if(b.__name__ === "default::TwinIdType") {
+      return b;
+    }
+    throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
+    }
+  if (a.__name__ === "std::str") {
+    if(b.__name__ === "std::str") {
+      return b;
+    }
+    throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
+    }
   if (a.__name__ === "default::TransactionGroup") {
     if(b.__name__ === "default::TransactionGroup") {
       return b;
@@ -741,18 +753,6 @@ function getSharedParentScalar<A extends $.ScalarType, B extends $.ScalarType>(a
     }
   if (a.__name__ === "default::InteractionGroup") {
     if(b.__name__ === "default::InteractionGroup") {
-      return b;
-    }
-    throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
-    }
-  if (a.__name__ === "default::AgentIdType") {
-    if(b.__name__ === "default::AgentIdType") {
-      return b;
-    }
-    throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);
-    }
-  if (a.__name__ === "std::str") {
-    if(b.__name__ === "std::str") {
       return b;
     }
     throw new Error(`Types are not castable: ${a.__name__}, ${b.__name__}`);

@@ -12,14 +12,14 @@ export async function verifyTwitterAccount(handle: string): Promise<Verification
       // For demo purposes, verify all handles except "invalid_user"
       if (handle === 'invalid_user') {
         resolve({ 
-          agentId: '',
+          twinId: '',
           isVerified: false, 
           verificationDate: new Date(),
           error: 'Account not found' 
         });
       } else {
         resolve({ 
-          agentId: '',
+          twinId: '',
           isVerified: true, 
           verificationDate: new Date(),
           error: '' 

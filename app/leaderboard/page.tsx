@@ -4,27 +4,27 @@ import { Trophy, TrendingUp, Users, MessageCircle, DollarSign, BadgeCheck, Bot }
 import Link from 'next/link';
 
 export default function LeaderboardPage() {
-  const agents = useMarketplaceStore((state) => state.agents);
+  const twins = useMarketplaceStore((state) => state.twins);
 
-  // Sort agents by different metrics
-  const byEngagement = [...agents].sort((a, b) => 
+  // Sort twins by different metrics
+  const byEngagement = [...twins].sort((a, b) => 
     (b.analytics.engagementRate - a.analytics.engagementRate)
   );
 
-  const byImpressions = [...agents].sort((a, b) => 
+  const byImpressions = [...twins].sort((a, b) => 
     (b.analytics.impressions - a.analytics.impressions)
   );
 
-  const byMarketValue = [...agents].sort((a, b) => 
+  const byMarketValue = [...twins].sort((a, b) => 
     ((b.tokenShares.totalShares - b.tokenShares.availableShares) * b.tokenShares.pricePerShare) -
     ((a.tokenShares.totalShares - a.tokenShares.availableShares) * a.tokenShares.pricePerShare)
   );
 
-  const byInteractions = [...agents].sort((a, b) => 
+  const byInteractions = [...twins].sort((a, b) => 
     (b.stats.interactions - a.stats.interactions)
   );
 
-  const getTopThree = (list: typeof agents) => list.slice(0, 3);
+  const getTopThree = (list: typeof twins) => list.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-purple-900 py-8">
@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
           <p className="text-purple-200">Discover the most successful and popular AI Twins</p>
         </div>
 
-        {agents.length === 0 ? (
+        {twins.length === 0 ? (
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">No Twins Available Yet</h2>
@@ -52,27 +52,27 @@ export default function LeaderboardPage() {
                 Top Engagement Rate
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {getTopThree(byEngagement).map((agent, index) => (
+                {getTopThree(byEngagement).map((twin, index) => (
                   <Link
-                    key={agent.agentId}
-                    href={`/analytics/${agent.agentId}`}
+                    key={twin.twinId}
+                    href={`/analytics/${twin.twinId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
                         <img
-                          src={agent.profileImage}
-                          alt={agent.twinHandle}
+                          src={twin.profileImage}
+                          alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
-                        {agent.verification.isVerified && (
+                        {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twinHandle}</div>
+                        <div className="text-white font-medium">@{twin.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
-                          {agent.analytics.engagementRate.toFixed(1)}% engagement
+                          {twin.analytics.engagementRate.toFixed(1)}% engagement
                         </div>
                       </div>
                       <div className="ml-auto">
@@ -91,28 +91,28 @@ export default function LeaderboardPage() {
                 Most Valuable Twins
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {getTopThree(byMarketValue).map((agent, index) => {
-                  const marketValue = (agent.tokenShares.totalShares - agent.tokenShares.availableShares) * 
-                    agent.tokenShares.pricePerShare;
+                {getTopThree(byMarketValue).map((twin, index) => {
+                  const marketValue = (twin.tokenShares.totalShares - twin.tokenShares.availableShares) * 
+                    twin.tokenShares.pricePerShare;
                   return (
                     <Link
-                      key={agent.agentId}
-                      href={`/analytics/${agent.agentId}`}
+                      key={twin.twinId}
+                      href={`/analytics/${twin.twinId}`}
                       className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="relative">
                           <img
-                            src={agent.profileImage}
-                            alt={agent.twinHandle}
+                            src={twin.profileImage}
+                            alt={twin.twinHandle}
                             className="w-12 h-12 rounded-full object-cover"
                           />
-                          {agent.verification.isVerified && (
+                          {twin.verification.isVerified && (
                             <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
                           )}
                         </div>
                         <div>
-                          <div className="text-white font-medium">@{agent.twinHandle}</div>
+                          <div className="text-white font-medium">@{twin.twinHandle}</div>
                           <div className="text-purple-300 text-sm">
                             ${marketValue.toFixed(2)} value
                           </div>
@@ -134,27 +134,27 @@ export default function LeaderboardPage() {
                 Most Active Twins
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {getTopThree(byInteractions).map((agent, index) => (
+                {getTopThree(byInteractions).map((twin, index) => (
                   <Link
-                    key={agent.agentId}
-                    href={`/analytics/${agent.agentId}`}
+                    key={twin.twinId}
+                    href={`/analytics/${twin.twinId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
                         <img
-                          src={agent.profileImage}
-                          alt={agent.twinHandle}
+                          src={twin.profileImage}
+                          alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
-                        {agent.verification.isVerified && (
+                        {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twinHandle}</div>
+                        <div className="text-white font-medium">@{twin.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
-                          {agent.stats.interactions.toLocaleString()} interactions
+                          {twin.stats.interactions.toLocaleString()} interactions
                         </div>
                       </div>
                       <div className="ml-auto">
@@ -173,27 +173,27 @@ export default function LeaderboardPage() {
                 Most Impressions
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {getTopThree(byImpressions).map((agent, index) => (
+                {getTopThree(byImpressions).map((twin, index) => (
                   <Link
-                    key={agent.agentId}
-                    href={`/analytics/${agent.agentId}`}
+                    key={twin.twinId}
+                    href={`/analytics/${twin.twinId}`}
                     className="bg-white/5 backdrop-blur-lg rounded-lg p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
                         <img
-                          src={agent.profileImage}
-                          alt={agent.twinHandle}
+                          src={twin.profileImage}
+                          alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
                         />
-                        {agent.verification.isVerified && (
+                        {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
                         )}
                       </div>
                       <div>
-                        <div className="text-white font-medium">@{agent.twinHandle}</div>
+                        <div className="text-white font-medium">@{twin.twinHandle}</div>
                         <div className="text-purple-300 text-sm">
-                          {agent.analytics.impressions.toLocaleString()} views
+                          {twin.analytics.impressions.toLocaleString()} views
                         </div>
                       </div>
                       <div className="ml-auto">

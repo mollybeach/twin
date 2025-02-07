@@ -16,6 +16,7 @@
         "@edgedb/generate": "^0.5.6",
         "assert": "^2.1.0",
         "axios": "^1.7.9",
+        "bcrypt": "^5.1.1",
         "browserify-zlib": "^0.2.0",
         "chart.js": "^4.4.2",
         "cors": "^2.8.5",
@@ -40,6 +41,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.9.1",
+        "@types/bcrypt": "^5.0.2",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
         "@types/react": "^18.3.5",

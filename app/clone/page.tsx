@@ -4,28 +4,28 @@ import React, { useState } from 'react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { GitMerge, Dna, Sparkles, Bot, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { AgentType } from '../types/types';
+import { TwinType } from '../types/types';
 
 export default function ClonePage() {
-  const { agents, addAgent } = useMarketplaceStore();
-  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
-  const [draggedAgent, setDraggedAgent] = useState<string | null>(null);
+  const { twins, addTwin } = useMarketplaceStore();
+  const [selectedTwins, setSelectedTwins] = useState<string[]>([]);
+  const [draggedTwin, setDraggedTwin] = useState<string | null>(null);
   const [isCloning, setIsCloning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cloneResult, setCloneResult] = useState<AgentType | null>(null);
+  const [cloneResult, setCloneResult] = useState<TwinType | null>(null);
   const router = useRouter();
 
-  const handleDragStart = (agentId: string, e: React.DragEvent) => {
-    setDraggedAgent(agentId);
+  const handleDragStart = (twinId: string, e: React.DragEvent) => {
+    setDraggedTwin(twinId);
     const element = e.currentTarget as HTMLElement;
     element.classList.add('dragging');
-    e.dataTransfer.setData('text/plain', agentId);
+    e.dataTransfer.setData('text/plain', twinId);
   };
 
   const handleDragEnd = (e: React.DragEvent) => {
     const element = e.currentTarget as HTMLElement;
     element.classList.remove('dragging');
-    setDraggedAgent(null);
+    setDraggedTwin(null);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -44,69 +44,69 @@ export default function ClonePage() {
     const element = e.currentTarget as HTMLElement;
     element.classList.remove('drag-over');
     
-    const agentId = e.dataTransfer.getData('text/plain');
+    const twinId = e.dataTransfer.getData('text/plain');
     
-    if (selectedAgents.includes(agentId)) {
-      // If agent is already in another slot, remove it first
-      setSelectedAgents(prev => prev.filter(id => id !== agentId));
+    if (selectedTwins.includes(twinId)) {
+      // If twin is already in another slot, remove it first
+      setSelectedTwins(prev => prev.filter(id => id !== twinId));
     }
 
-    setSelectedAgents(prev => {
+    setSelectedTwins(prev => {
       const newSelected = [...prev];
       if (slot === 'left') {
-        newSelected[0] = agentId;
+        newSelected[0] = twinId;
       } else {
-        newSelected[1] = agentId;
+        newSelected[1] = twinId;
       }
       return newSelected;
     });
   };
 
   const handleClone = async () => {
-    if (selectedAgents.length !== 2) return;
+    if (selectedTwins.length !== 2) return;
 
     setIsCloning(true);
-    const agent1 = agents.find((a: AgentType) => a.agentId === selectedAgents[0]);
-    const agent2 = agents.find((a: AgentType) => a.agentId === selectedAgents[1]);
+    const twin1 = twins.find((a: TwinType) => a.twinId === selectedTwins[0]);
+    const twin2 = twins.find((a: TwinType) => a.twinId === selectedTwins[1]);
 
-    if (!agent1 || !agent2) return;
+    if (!twin1 || !twin2) return;
 
     // Simulate DNA fusion process
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Calculate base price as average of both agents' share prices
-    const basePrice = (agent1.tokenShares.pricePerShare + agent2.tokenShares.pricePerShare) / 2;
+    // Calculate base price as average of both twins' share prices
+    const basePrice = (twin1.tokenShares.pricePerShare + twin2.tokenShares.pricePerShare) / 2;
     const totalPrice = basePrice * 1000; // Example calculation
 
-    const newTwin: AgentType = {
-      agentId: `${agent1.agentId}_${agent2.agentId}`,
+    const newTwin: TwinType = {
+      twinId: `${twin1.twinId}_${twin2.twinId}`,
       createdAt: new Date(),
-      twitterHandle: `${agent1.twitterHandle}_${agent2.twitterHandle}`,
-      twinHandle: `${agent1.twinHandle}_${agent2.twinHandle}`,
-      personality: `${agent1.personality} + ${agent2.personality}`,
-      description: `A fusion of @${agent1.twitterHandle} and @${agent2.twitterHandle}. Combining the best of both twins!`,
-      profileImage: agent1.profileImage,
+      twitterHandle: `${twin1.twitterHandle}_${twin2.twitterHandle}`,
+      twinHandle: `${twin1.twinHandle}_${twin2.twinHandle}`,
+      personality: `${twin1.personality} + ${twin2.personality}`,
+      description: `A fusion of @${twin1.twitterHandle} and @${twin2.twitterHandle}. Combining the best of both twins!`,
+      profileImage: twin1.profileImage,
       price: totalPrice,
       stats: { 
-        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        twinId: `${twin1.twinId}_${twin2.twinId}`,
         replies: 0, 
         interactions: 0, 
         uptime: '0h 0m' 
       },
       tokenShares: {
-        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        twinId: `${twin1.twinId}_${twin2.twinId}`,
         totalShares: 1000,
         availableShares: 1000,
         pricePerShare: totalPrice / 1000,
         shareholders: []
       },
       verification: {
-        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        twinId: `${twin1.twinId}_${twin2.twinId}`,
         isVerified: false,
         verificationDate: new Date()
       },
       analytics: {
-        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        twinId: `${twin1.twinId}_${twin2.twinId}`,
         impressions: 0,
         engagementRate: 0,
         clickThroughRate: 0,
@@ -123,7 +123,7 @@ export default function ClonePage() {
       autoReply: false,
       isListed: true,
       tokenStats: {
-        agentId: `${agent1.agentId}_${agent2.agentId}`,
+        twinId: `${twin1.twinId}_${twin2.twinId}`,
         price: totalPrice,
         change24h: 0,
         volume24h: 0,
@@ -142,21 +142,21 @@ export default function ClonePage() {
     try {
       setIsCloning(true);
       setError(null);
-      const agent1 = agents.find(a => a.agentId === selectedAgents[0]);
-      const agent2 = agents.find(a => a.agentId === selectedAgents[1]);
+      const twin1 = twins.find(a => a.twinId === selectedTwins[0]);
+      const twin2 = twins.find(a => a.twinId === selectedTwins[1]);
 
-      if (!agent1 || !agent2) {
-        setError('Selected agents not found.');
+      if (!twin1 || !twin2) {
+        setError('Selected twins not found.');
         setIsCloning(false);
         return;
       }
 
       // Create the new clone
-      const newAgentId = await addAgent({
-        agentId: `${agent1.agentId}_${agent2.agentId}`,  
+      const newTwinId = await addTwin({
+        twinId: `${twin1.twinId}_${twin2.twinId}`,  
         createdAt: new Date(),
         stats: {
-          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          twinId: `${twin1.twinId}_${twin2.twinId}`,
           replies: 0,
           interactions: 0,
           uptime: '0h 0m'
@@ -168,12 +168,12 @@ export default function ClonePage() {
         profileImage: cloneResult.profileImage,
         price: cloneResult.price,
         verification: {
-          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          twinId: `${twin1.twinId}_${twin2.twinId}`,
           isVerified: false,
           verificationDate: new Date()
         },
         analytics: {
-          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          twinId: `${twin1.twinId}_${twin2.twinId}`,
           impressions: 0,
           engagementRate: 0,
           clickThroughRate: 0,
@@ -186,7 +186,7 @@ export default function ClonePage() {
         },
 
         tokenShares: {
-          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          twinId: `${twin1.twinId}_${twin2.twinId}`,
           totalShares: 1000,
           availableShares: 1000,
           pricePerShare: cloneResult.price / 1000,
@@ -198,7 +198,7 @@ export default function ClonePage() {
         autoReply: false,
         isListed: true,
         tokenStats: {
-          agentId: `${agent1.agentId}_${agent2.agentId}`,
+          twinId: `${twin1.twinId}_${twin2.twinId}`,
           price: cloneResult.price,
           change24h: 0,
           volume24h: 0,
@@ -208,11 +208,11 @@ export default function ClonePage() {
       });
       
       // Reset state
-      setSelectedAgents([]);
+      setSelectedTwins([]);
       setCloneResult(null);
       
       // Navigate to the new clone's analytics page
-      router.push(`/analytics/${newAgentId}`);
+      router.push(`/analytics/${newTwinId}`);
     } catch (error) {
       console.error('Failed to create clone:', error);
       setError('Failed to create clone. Please try again.');
@@ -232,7 +232,7 @@ export default function ClonePage() {
           <p className="text-purple-200">Drag two AI Twins into the Yinyang to create a powerful new hybrid!</p>
         </div>
 
-        {agents.length < 2 ? (
+        {twins.length < 2 ? (
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">Not Enough Twins</h2>
@@ -246,27 +246,27 @@ export default function ClonePage() {
                 Available Twins
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {agents.map((agent) => (
+                {twins.map((twin) => (
                   <div
-                    key={agent.agentId}
+                    key={twin.twinId}
                     draggable
-                    onDragStart={(e) => handleDragStart(agent.agentId, e)}
+                    onDragStart={(e) => handleDragStart(twin.twinId, e)}
                     onDragEnd={handleDragEnd}
-                    className={`agent-card bg-white/5 backdrop-blur-lg rounded-lg p-4 transition-all ${
-                      selectedAgents.includes(agent.agentId)
+                    className={`twin-card bg-white/5 backdrop-blur-lg rounded-lg p-4 transition-all ${
+                      selectedTwins.includes(twin.twinId)
                         ? 'ring-2 ring-purple-400 bg-white/10'
                         : 'hover:bg-white/10'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
                       <img
-                        src={agent.profileImage}
-                        alt={agent.twinHandle}
+                        src={twin.profileImage}
+                        alt={twin.twinHandle}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div>
-                        <div className="text-white font-medium">@{agent.twinHandle}</div>
-                        <div className="text-purple-300 text-sm">{agent.personality}</div>
+                        <div className="text-white font-medium">@{twin.twinHandle}</div>
+                        <div className="text-purple-300 text-sm">{twin.personality}</div>
                       </div>
                     </div>
                   </div>
@@ -281,14 +281,14 @@ export default function ClonePage() {
               </div>
               
               <div
-                className={`fusion-slot left ${selectedAgents[0] ? 'filled' : ''}`}
+                className={`fusion-slot left ${selectedTwins[0] ? 'filled' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop('left', e)}
               >
-                {selectedAgents[0] && (
+                {selectedTwins[0] && (
                   <img
-                    src={agents.find(a => a.agentId === selectedAgents[0])?.profileImage}
+                    src={twins.find(a => a.twinId === selectedTwins[0])?.profileImage}
                     alt="Left Twin"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -296,14 +296,14 @@ export default function ClonePage() {
               </div>
               
               <div
-                className={`fusion-slot right ${selectedAgents[1] ? 'filled' : ''}`}
+                className={`fusion-slot right ${selectedTwins[1] ? 'filled' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop('right', e)}
               >
-                {selectedAgents[1] && (
+                {selectedTwins[1] && (
                   <img
-                    src={agents.find(a => a.agentId === selectedAgents[1])?.profileImage}
+                    src={twins.find(a => a.twinId === selectedTwins[1])?.profileImage}
                     alt="Right Twin"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -311,13 +311,13 @@ export default function ClonePage() {
               </div>
             </div>
 
-            {draggedAgent && (
-              <div className="dragged-agent-info">
-                <p>Currently dragging: {agents.find(a => a.agentId === draggedAgent)?.twinHandle}</p>
+            {draggedTwin && (
+              <div className="dragged-twin-info">
+                <p>Currently dragging: {twins.find(a => a.twinId === draggedTwin)?.twinHandle}</p>
               </div>
             )}
 
-            {selectedAgents.length === 2 && !cloneResult && (
+            {selectedTwins.length === 2 && !cloneResult && (
               <div className="flex justify-center">
                 <button
                   onClick={handleClone}

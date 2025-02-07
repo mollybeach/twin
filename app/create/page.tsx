@@ -3,15 +3,15 @@ import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useMarketplaceStore } from '../store/marketplace';
 import { useRouter } from 'next/navigation';
-import {  AgentType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
-import { defaultAgent } from '../utils/defaultData';
+import {  TwinType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
+import { defaultTwin } from '../utils/defaultData';
 
 export default function CreatePage() {
   const router = useRouter();
-  const addAgent = useMarketplaceStore((state) => state.addAgent);
+  const addTwin = useMarketplaceStore((state) => state.addTwin);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<AgentType>(defaultAgent);
+  const [config, setConfig] = useState<TwinType>(defaultTwin);
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
@@ -54,7 +54,7 @@ export default function CreatePage() {
 };
 
 const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Record<string, unknown>> => {
-  const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI agent.`;
+  const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI twin.`;
   try {
       const response = await fetch('/api/generate', {
           method: 'POST',
@@ -75,14 +75,14 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
           ...prev,
           twineets: [...(prev.twineets || []), {
               id: crypto.randomUUID(),
-              agentId: config.agentId,
+              twinId: config.twinId,
               content: generatedText,
               timestamp: new Date(),
               likes: Math.floor(Math.random() * 100),
               retwineets: Math.floor(Math.random() * 100),
               replies: Math.floor(Math.random() * 100),
-              isLiked: Math.random() < 0.5,
-              isRetwineeted: Math.random() < 0.5,
+              isLiked: false,
+              isRetwineeted: false,
           }]
       }));
 
@@ -93,28 +93,28 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
   }
 };
 
-  const setAgentIdInConfig = (obj: any, myAgentId: string) => {
+  const setTwinIdInConfig = (obj: any, myTwinId: string) => {
     if (Array.isArray(obj)) {
-        obj.forEach(item => setAgentIdInConfig(item, myAgentId));
+        obj.forEach(item => setTwinIdInConfig(item, myTwinId));
     } else if (typeof obj === 'object' && obj !== null) {
 
         for (const key in obj) {
-            if (key === 'agentId') {
-                obj[key] = myAgentId; 
+            if (key === 'twinId') {
+                obj[key] = myTwinId; 
             } else if (key === 'timestamp' && obj[key] === null) {
                 obj[key] = new Date();
             } else if (key === 'fetchedTweets' && Array.isArray(obj[key])) {
                 obj[key].forEach(tweet => {
                     if (!tweet.timestamp) {
-                        tweet.agentId = myAgentId;
+                        tweet.twinId = myTwinId;
                         tweet.timestamp = new Date();
                     }
                 });
             } else {
-                if (!obj.hasOwnProperty('agentId')) {
-                    obj.agentId = myAgentId;
+                if (!obj.hasOwnProperty('twinId')) {
+                    obj.twinId = myTwinId;
                 }
-                setAgentIdInConfig(obj[key], myAgentId);
+                setTwinIdInConfig(obj[key], myTwinId);
             }
         }
     }
@@ -127,12 +127,12 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
     setIsDeploying(true);
     setDeployError(null);
 
-    const myAgentId = crypto.randomUUID();
-    setAgentIdInConfig(config, myAgentId);
+    const myTwinId = crypto.randomUUID();
+    setTwinIdInConfig(config, myTwinId);
 
     
     try {
-      const response = await fetch('/api/agents', {
+      const response = await fetch('/api/twins', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,13 +141,13 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create agent', { cause: response.statusText });
+        throw new Error('Failed to create twin', { cause: response.statusText });
       }
 
       const result = await response.json();
-      console.log('Agent created successfully:', result);
+      console.log('Twin created successfully:', result);
 
-      addAgent(config);
+      addTwin(config);
 
       setIsDeployed(true);
       setTimeout(() => {
@@ -162,15 +162,15 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
   };
 
 /*
-  const generateMultipleTwineets = async (agentId: string): Promise<TwineetType[]> => {
+  const generateMultipleTwineets = async (twinId: string): Promise<TwineetType[]> => {
     const twineets: TwineetType[] = [];
     for (let i = 0; i < 5; i++) {
-      const prompt = `Generate a twineet for a ${config.personality} AI agent based on the following tweets: ${config.fetchedTweets
+      const prompt = `Generate a twineet for a ${config.personality} AI twin based on the following tweets: ${config.fetchedTweets
         .map((tweet) => tweet.text)
         .join(', ')}`;
       const content = await generateResponse(prompt);
       const newTwineet: TwineetType = {
-        agentId: agentId,
+        twinId: twinId,
         content: content,
         timestamp: new Date(),
         likes: 0,

@@ -3,12 +3,12 @@
 import {
     UserTokenShareType,
     TokenShareType,
-    AgentType,
+    TwinType,
     AnalyticsType,
     FetchedTweetType,
     TwineetType,
     VerificationResponseType,
-    AgentStatsType,
+    TwinStatsType,
     TokenStatsType,
     CryptoHoldingType,
     DailyImpressionsType,
@@ -21,7 +21,7 @@ import {
 
 export function formatUserTokenShare(share: UserTokenShareType) {
     return {
-        agentId: share.agentId,
+        twinId: share.twinId,
         userId: share.userId,
         shares: parseFloat(share.shares.toString()),
         purchasePrice: parseFloat(share.purchasePrice.toString()),
@@ -31,7 +31,7 @@ export function formatUserTokenShare(share: UserTokenShareType) {
 
 export function formatTokenShare(tokenShare: TokenShareType) {
     return {
-        agentId: tokenShare.agentId,
+        twinId: tokenShare.twinId,
         totalShares: tokenShare.totalShares,
         availableShares: tokenShare.availableShares,
         pricePerShare: parseFloat(tokenShare.pricePerShare.toString()),
@@ -39,33 +39,33 @@ export function formatTokenShare(tokenShare: TokenShareType) {
     };
 }
 
-export function formatAgent(agent: any): AgentType {
+export function formatTwin(twin: any): TwinType {
     return {
-        agentId: agent.agentId,
-        twinHandle: agent.twinHandle,
-        twitterHandle: agent.twitterHandle,
-        profileImage: agent.profileImage,
-        personality: agent.personality,
-        description: agent.description,
-        autoReply: agent.autoReply,
-        isListed: agent.isListed,
-        price: parseFloat(agent.price),
-        modelData: agent.modelData, 
-        createdAt: new Date(agent.createdAt),
-        analytics: formatAnalytics(agent.analytics),
-        fetchedTweets: agent.fetchedTweets?.map(formatFetchedTweet) || [],
-        twineets: agent.twineets?.map(formatTwineet) || [],
-        verification: formatVerification(agent.verification),
-        stats: formatAgentStats(agent.stats),
-        tokenShares: formatTokenShare(agent.tokenShares),
-        tokenStats: formatTokenStats(agent.tokenStats),
-        transactions: agent.transactions?.map(formatTransaction) || [],
+        twinId: twin.twinId,
+        twinHandle: twin.twinHandle,
+        twitterHandle: twin.twitterHandle,
+        profileImage: twin.profileImage,
+        personality: twin.personality,
+        description: twin.description,
+        autoReply: twin.autoReply,
+        isListed: twin.isListed,
+        price: parseFloat(twin.price),
+        modelData: twin.modelData, 
+        createdAt: new Date(twin.createdAt),
+        analytics: formatAnalytics(twin.analytics),
+        fetchedTweets: twin.fetchedTweets?.map(formatFetchedTweet) || [],
+        twineets: twin.twineets?.map(formatTwineet) || [],
+        verification: formatVerification(twin.verification),
+        stats: formatTwinStats(twin.stats),
+        tokenShares: formatTokenShare(twin.tokenShares),
+        tokenStats: formatTokenStats(twin.tokenStats),
+        transactions: twin.transactions?.map(formatTransaction) || [],
     };
 }
 
 export function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
     return {
-        agentId: cryptoHolding.agentId,
+        twinId: cryptoHolding.twinId,
         amount: parseFloat(cryptoHolding.amount.toString()), 
         symbol: cryptoHolding.symbol,
         change24h: parseFloat(cryptoHolding.change24h.toString()), 
@@ -75,7 +75,7 @@ export function formatCryptoHolding(cryptoHolding: CryptoHoldingType) {
 
 export function formatAnalytics(analytics: AnalyticsType) {
     return {
-        agentId: analytics.agentId,
+        twinId: analytics.twinId,
         clickThroughRate: parseFloat(analytics.clickThroughRate.toString()),
         engagementRate: parseFloat(analytics.engagementRate.toString()), 
         impressions: analytics.impressions,
@@ -88,9 +88,9 @@ export function formatAnalytics(analytics: AnalyticsType) {
     };
 }
 
-export function formatAgentStats(stats: AgentStatsType) {
+export function formatTwinStats(stats: TwinStatsType) {
     return {
-        agentId: stats.agentId,
+        twinId: stats.twinId,
         replies: stats.replies,
         interactions: stats.interactions,
         uptime: stats.uptime,
@@ -99,7 +99,7 @@ export function formatAgentStats(stats: AgentStatsType) {
 
 export function formatTokenStats(tokenStats: TokenStatsType) {
     return {
-        agentId: tokenStats.agentId,
+        twinId: tokenStats.twinId,
         price: parseFloat(tokenStats.price.toString()), 
         change24h: parseFloat(tokenStats.change24h.toString()), 
         volume24h: parseFloat(tokenStats.volume24h.toString()), 
@@ -109,7 +109,7 @@ export function formatTokenStats(tokenStats: TokenStatsType) {
 
 export function formatDemographics(demographics: DemographicsType) {
     return {
-        agentId: demographics.agentId,
+        twinId: demographics.twinId,
         age: demographics.age,
         percentage: parseFloat(demographics.percentage.toString()), 
     };
@@ -117,7 +117,7 @@ export function formatDemographics(demographics: DemographicsType) {
 
 export function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
     return {
-        agentId: dailyImpressions.agentId,
+        twinId: dailyImpressions.twinId,
         date: dailyImpressions.date,
         count: parseInt(dailyImpressions.count.toString()), 
     };
@@ -125,7 +125,7 @@ export function formatDailyImpressions(dailyImpressions: DailyImpressionsType) {
 
 export function formatPeakHours(peakHours: PeakHoursType) {
     return {
-        agentId: peakHours.agentId,
+        twinId: peakHours.twinId,
         hour: parseInt(peakHours.hour.toString()), 
         engagement: parseFloat(peakHours.engagement.toString()), 
     };
@@ -133,7 +133,7 @@ export function formatPeakHours(peakHours: PeakHoursType) {
 
 export function formatReachByPlatform(reach: ReachByPlatformType) {
     return {
-        agentId: reach.agentId,
+        twinId: reach.twinId,
         platform: reach.platform,
         count: parseInt(reach.count.toString()), 
     };
@@ -141,7 +141,7 @@ export function formatReachByPlatform(reach: ReachByPlatformType) {
 
 export function formatTopInteractions(interactions: TopInteractionsType) {
     return {
-        agentId: interactions.agentId,
+        twinId: interactions.twinId,
         kind: interactions.kind,
         count: parseInt(interactions.count.toString()), 
     };
@@ -149,7 +149,7 @@ export function formatTopInteractions(interactions: TopInteractionsType) {
 
 export function formatFetchedTweet(tweet: FetchedTweetType) {
     return {
-        agentId: tweet.agentId,
+        twinId: tweet.twinId,
         text: tweet.text,
         edit_history_tweet_ids: tweet.edit_history_tweet_ids,
         timestamp: new Date(tweet.timestamp), 
@@ -158,7 +158,7 @@ export function formatFetchedTweet(tweet: FetchedTweetType) {
 
 export function formatTwineet(twineet: TwineetType) {
     return {
-        agentId: twineet.agentId,
+        twinId: twineet.twinId,
         content: twineet.content,
         timestamp: twineet.timestamp, 
         likes: twineet.likes,
@@ -171,7 +171,7 @@ export function formatTwineet(twineet: TwineetType) {
 
 export function formatVerification(verification: VerificationResponseType) {
     return {
-        agentId: verification.agentId,
+        twinId: verification.twinId,
         isVerified: verification.isVerified,
         verificationDate: verification.verificationDate,
     };
@@ -179,7 +179,7 @@ export function formatVerification(verification: VerificationResponseType) {
 
 export function formatTransaction(transaction: TransactionType) {
     return {
-        agentId: transaction.agentId,
+        twinId: transaction.twinId,
         kind: transaction.kind,
         shares: transaction.shares,
         pricePerShare: transaction.pricePerShare,

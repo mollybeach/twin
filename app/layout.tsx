@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="sticky top-0 z-50">
                     <Navbar />
                     <NotificationBar
-                        agentId={notification?.agentId || ''}
+                        twinId={notification?.twinId || ''}
                         notification={notification}
                         onClose={() => setNotification(null)}
                     />

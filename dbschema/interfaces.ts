@@ -74,13 +74,13 @@ export namespace cfg {
   }
 }
 export namespace $default {
-  export interface Agent extends std.$Object {
+  export interface Twin extends std.$Object {
     "analytics": Analytics;
-    "stats": AgentStats;
+    "stats": TwinStats;
     "tokenShares": TokenShare;
     "tokenStats": TokenStats;
     "verification": Verification;
-    "agentId": string;
+    "twinId": string;
     "autoReply": boolean;
     "createdAt": Date;
     "description": string;
@@ -95,8 +95,8 @@ export namespace $default {
     "transactions": Transaction[];
     "twineets": Twineet[];
   }
-  export interface AgentStats extends std.$Object {
-    "agentId": string;
+  export interface TwinStats extends std.$Object {
+    "twinId": string;
     "interactions": number;
     "replies": number;
     "uptime": string;
@@ -108,36 +108,36 @@ export namespace $default {
     "peakHours": PeakHours;
     "reachByPlatform": ReachByPlatform;
     "topInteractions": TopInteractions;
-    "agentId": string;
+    "twinId": string;
     "clickThroughRate": string;
     "engagementRate": string;
     "impressions": number;
   }
   export interface CryptoHolding extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "amount": string;
     "change24h": string;
     "symbol": string;
     "value": string;
   }
   export interface DailyImpressions extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "count": number;
     "date": string;
   }
   export interface Demographics extends std.$Object {
     "age": string;
-    "agentId": string;
+    "twinId": string;
     "percentage": string;
   }
   export interface FetchedTweet extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "edit_history_tweet_ids": string[];
     "text": string;
     "timestamp": Date;
   }
   export interface Notification extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "kind": NotificationType;
     "message": string;
     "timestamp": Date;
@@ -146,36 +146,36 @@ export namespace $default {
   }
   export type NotificationType = "create" | "buy" | "sell";
   export interface PeakHours extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "engagement": string;
     "hour": number;
   }
   export interface ReachByPlatform extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "count": number;
     "platform": string;
   }
   export interface TokenShare extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "availableShares": number;
     "pricePerShare": string;
     "totalShares": number;
     "shareholders": UserTokenShare[];
   }
   export interface TokenStats extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "change24h": string;
     "marketCap": string;
     "price": string;
     "volume24h": string;
   }
   export interface TopInteractions extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "count": number;
     "kind": string;
   }
   export interface Transaction extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "kind": TransactionType;
     "pricePerShare": string;
     "shares": number;
@@ -184,7 +184,7 @@ export namespace $default {
   }
   export type TransactionType = "buy" | "sell";
   export interface Twineet extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "content": string;
     "isLiked": boolean;
     "isRetwineeted": boolean;
@@ -194,20 +194,20 @@ export namespace $default {
     "timestamp": Date;
   }
   export interface UserTokenShare extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "purchaseDate": Date;
     "purchasePrice": string;
     "userId": string;
     "shares": string;
   }
   export interface Verification extends std.$Object {
-    "agentId": string;
+    "twinId": string;
     "isVerified": boolean;
     "verificationDate": Date;
   }
 }
-export type Agent = $default.Agent;
-export type AgentStats = $default.AgentStats;
+export type Twin = $default.Twin;
+export type TwinStats = $default.TwinStats;
 export type Analytics = $default.Analytics;
 export type CryptoHolding = $default.CryptoHolding;
 export type DailyImpressions = $default.DailyImpressions;
@@ -486,8 +486,8 @@ export interface types {
     "mTLS": cfg.mTLS;
   };
   "default": {
-    "Agent": $default.Agent;
-    "AgentStats": $default.AgentStats;
+    "Twin": $default.Twin;
+    "TwinStats": $default.TwinStats;
     "Analytics": $default.Analytics;
     "CryptoHolding": $default.CryptoHolding;
     "DailyImpressions": $default.DailyImpressions;

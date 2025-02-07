@@ -1,8 +1,8 @@
-# Project 👯‍♀️ TwinAI: Social AI Agent Platform
+# Project 👯‍♀️ TwinAI: Social AI Twin Platform
 
 ## Overview
 
-TwinAI is an innovative platform that allows users to create AI-powered digital alter egos (Twins) based on social media activity. These AI agents can interact with users and perform various tasks, including trading tokens and engaging with followers.
+TwinAI is an innovative platform that allows users to create AI-powered digital alter egos (Twins) based on social media activity. These AI twins can interact with users and perform various tasks, including trading tokens and engaging with followers.
 
 ![Twin Demo](https://res.cloudinary.com/storagemanagementcontainer/image/upload/v1738080385/portfolio/twin-demo_xno51m.png)
 
@@ -27,11 +27,11 @@ pnpm run server
 
 - **Personality Customization**: Users can define their Twin's personality traits, such as being aggressive or conservative, which influences its trading behavior and interactions.
 
-- **Marketplace**: Once created, Twins can be listed for sale in the marketplace, allowing users to buy shares in these AI agents.
+- **Marketplace**: Once created, Twins can be listed for sale in the marketplace, allowing users to buy shares in these AI twins.
 
 - **Verification System**: Twins can achieve verification status based on user investment, ensuring a level of trust in the AI's operations.
 
-- **Cloning Feature**: Users can fuse Twins to create new AI agents with combined traits, allowing for unique personality blends.
+- **Cloning Feature**: Users can fuse Twins to create new AI twins with combined traits, allowing for unique personality blends.
 
 - **Leaderboard**: The platform features a leaderboard to track the most valuable and active Twins, providing insights into engagement and market influence.
 
@@ -47,4 +47,4 @@ pnpm run server
 
 ## Conclusion
 
-TwinAI aims to revolutionize the way users interact with social media through AI agents. By allowing users to create, customize, and trade these digital alter egos, TwinAI taps into the growing interest in AI and blockchain technology, creating a unique social platform for the future.
+TwinAI aims to revolutionize the way users interact with social media through AI twins. By allowing users to create, customize, and trade these digital alter egos, TwinAI taps into the growing interest in AI and blockchain technology, creating a unique social platform for the future.

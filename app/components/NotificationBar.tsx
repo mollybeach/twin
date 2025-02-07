@@ -5,7 +5,7 @@ import { Bot, Check, AlertCircle } from 'lucide-react';
 import { NotificationType} from '../types/types';
 
 interface NotificationBarProps {
-  agentId: string;
+  twinId: string;
   notification: NotificationType | null;
   onClose: () => void;
 }
@@ -18,7 +18,7 @@ export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, 
     if (notification) {
       // Ensure we don't add duplicate notifications
       setNotifications(prev => {
-        const exists = prev.some(n => n.agentId === notification.agentId);
+        const exists = prev.some(n => n.twinId === notification.twinId);
         if (exists) return prev;
         return [notification, ...prev].slice(0, 5) as NotificationType[];
       });
@@ -77,7 +77,7 @@ export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, 
 
   if (!notification) return null;
 
-  const { agentId, kind, message, twitterHandle, twinHandle, timestamp } = notification;
+  const { twinId, kind, message, twitterHandle, twinHandle, timestamp } = notification;
 
   return (
     <div className="sticky top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm">
@@ -95,7 +95,7 @@ export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, 
         <div className="flex items-center justify-between h-10">
           <div className="flex items-center space-x-6 text-sm">
             {notifications.map((notif, index) => {
-              const uniqueKey = `${notif.agentId}-${index}`;
+              const uniqueKey = `${notif.twinId}-${index}`;
               return (
                 <div
                   key={uniqueKey}
@@ -111,7 +111,7 @@ export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, 
           </div>
           <div className="flex items-center space-x-4">
             <p className="text-sm text-gray-400">Kind: {kind}</p>
-            <p className="text-sm text-gray-400">Agent ID: {agentId}</p>
+            <p className="text-sm text-gray-400">Twin ID: {twinId}</p>
             <p className="text-sm text-gray-400">Twitter Handle: {twitterHandle}</p>
             <p className="text-sm text-gray-400">Twin Handle: {twinHandle}</p>
             <p className="text-sm text-gray-400">Timestamp: {timestamp.toString()}</p>

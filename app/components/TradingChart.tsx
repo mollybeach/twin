@@ -3,10 +3,10 @@ import { Line } from 'react-chartjs-2';
 import { TradingChartPropsType } from '../types/types';
 import { useMarketplaceStore } from '../store/marketplace';
 
-const TradingChart: React.FC<TradingChartPropsType> = ({ agentId }) => {
-    // Fetch the relevant data for the specific agent using agentId
+const TradingChart: React.FC<TradingChartPropsType> = ({ twinId }) => {
+    // Fetch the relevant data for the specific twin using twinId
     const { getTransactionHistory } = useMarketplaceStore();
-    const transactionHistory = getTransactionHistory(agentId);
+    const transactionHistory = getTransactionHistory(twinId);
 
     // Prepare data for the chart
     const chartData = {
@@ -23,7 +23,7 @@ const TradingChart: React.FC<TradingChartPropsType> = ({ agentId }) => {
 
     return (
         <div>
-            <h2>Trading Chart for Agent {agentId}</h2>
+            <h2>Trading Chart for Twin {twinId}</h2>
             <Line data={chartData} />
         </div>
     );

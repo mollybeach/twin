@@ -55,7 +55,7 @@ const Home = () => {
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg">
                         <h2 className="text-xl font-semibold text-white">Cloning Feature</h2>
-                        <p className="text-gray-300 mt-2">Fuse Twins to create new AI agents with combined traits.</p>
+                        <p className="text-gray-300 mt-2">Fuse Twins to create new AI twins with combined traits.</p>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg">
                         <h2 className="text-xl font-semibold text-white">Leaderboard</h2>

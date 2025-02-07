@@ -129,13 +129,13 @@ const $SubclassableObject = $.makeType<$SubclassableObject>(_.spec, "145b7b6f-8f
 const SubclassableObject: $.$expr_PathNode<$.TypeSet<$SubclassableObject, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($SubclassableObject, $.Cardinality.Many), null);
 
 export type $InheritingObjectλShape = $.typeutil.flatten<$SubclassableObjectλShape & {
+  "inherited_fields": $.PropertyDesc<$.ArrayType<_std.$str>, $.Cardinality.AtMostOne, false, false, false, false>;
   "bases": $.LinkDesc<$InheritingObject, $.Cardinality.Many, {
     "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
   }, false, false, false, false>;
   "ancestors": $.LinkDesc<$InheritingObject, $.Cardinality.Many, {
     "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
   }, false, false, false, false>;
-  "inherited_fields": $.PropertyDesc<$.ArrayType<_std.$str>, $.Cardinality.AtMostOne, false, false, false, false>;
   "<bases[is schema::InheritingObject]": $.LinkDesc<$InheritingObject, $.Cardinality.Many, {}, false, false,  false, false>;
   "<ancestors[is schema::InheritingObject]": $.LinkDesc<$InheritingObject, $.Cardinality.Many, {}, false, false,  false, false>;
   "<ancestors[is sys::Role]": $.LinkDesc<_sys.$Role, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -187,12 +187,12 @@ const $AnnotationSubject = $.makeType<$AnnotationSubject>(_.spec, "970b2d83-85d8
 const AnnotationSubject: $.$expr_PathNode<$.TypeSet<$AnnotationSubject, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($AnnotationSubject, $.Cardinality.Many), null);
 
 export type $AccessPolicyλShape = $.typeutil.flatten<$InheritingObjectλShape & $AnnotationSubjectλShape & {
-  "subject": $.LinkDesc<$ObjectType, $.Cardinality.One, {}, false, false,  false, false>;
   "access_kinds": $.PropertyDesc<$AccessKind, $.Cardinality.Many, false, false, false, false>;
   "condition": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "action": $.PropertyDesc<$AccessPolicyAction, $.Cardinality.One, false, false, false, false>;
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "errmessage": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "subject": $.LinkDesc<$ObjectType, $.Cardinality.One, {}, false, false,  false, false>;
   "<access_policies[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<access_policies": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -306,8 +306,8 @@ const $CollectionType = $.makeType<$CollectionType>(_.spec, "e3a7ccf7-4a20-5151-
 const CollectionType: $.$expr_PathNode<$.TypeSet<$CollectionType, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($CollectionType, $.Cardinality.Many), null);
 
 export type $ArrayλShape = $.typeutil.flatten<$CollectionTypeλShape & {
-  "element_type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
   "dimensions": $.PropertyDesc<$.ArrayType<_std.$int16>, $.Cardinality.AtMostOne, false, false, false, false>;
+  "element_type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
 }>;
 type $Array = $.ObjectType<"schema::Array", $ArrayλShape, null, [
   ...$CollectionType['__exclusives__'],
@@ -326,11 +326,11 @@ const $ArrayExprAlias = $.makeType<$ArrayExprAlias>(_.spec, "2e55d7f5-18ed-54b4-
 const ArrayExprAlias: $.$expr_PathNode<$.TypeSet<$ArrayExprAlias, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($ArrayExprAlias, $.Cardinality.Many), null);
 
 export type $CallableObjectλShape = $.typeutil.flatten<$AnnotationSubjectλShape & {
+  "return_typemod": $.PropertyDesc<$TypeModifier, $.Cardinality.AtMostOne, false, false, false, false>;
   "params": $.LinkDesc<$Parameter, $.Cardinality.Many, {
     "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
   }, false, false, false, false>;
   "return_type": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
-  "return_typemod": $.PropertyDesc<$TypeModifier, $.Cardinality.AtMostOne, false, false, false, false>;
 }>;
 type $CallableObject = $.ObjectType<"schema::CallableObject", $CallableObjectλShape, null, [
   ...$AnnotationSubject['__exclusives__'],
@@ -350,10 +350,10 @@ const $VolatilitySubject = $.makeType<$VolatilitySubject>(_.spec, "ed8e20ca-f2dc
 const VolatilitySubject: $.$expr_PathNode<$.TypeSet<$VolatilitySubject, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($VolatilitySubject, $.Cardinality.Many), null);
 
 export type $CastλShape = $.typeutil.flatten<$AnnotationSubjectλShape & $VolatilitySubjectλShape & {
-  "from_type": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
-  "to_type": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "allow_implicit": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, false>;
   "allow_assignment": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, false>;
+  "from_type": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
+  "to_type": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
 }>;
 type $Cast = $.ObjectType<"schema::Cast", $CastλShape, null, [
   ...$AnnotationSubject['__exclusives__'],
@@ -381,10 +381,6 @@ const $ConsistencySubject = $.makeType<$ConsistencySubject>(_.spec, "883ec593-74
 const ConsistencySubject: $.$expr_PathNode<$.TypeSet<$ConsistencySubject, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($ConsistencySubject, $.Cardinality.Many), null);
 
 export type $ConstraintλShape = $.typeutil.flatten<Omit<$CallableObjectλShape, "params"> & $InheritingObjectλShape & {
-  "params": $.LinkDesc<$Parameter, $.Cardinality.Many, {
-    "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
-    "@value": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne>;
-  }, false, false, false, false>;
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "subjectexpr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "finalexpr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
@@ -392,6 +388,10 @@ export type $ConstraintλShape = $.typeutil.flatten<Omit<$CallableObjectλShape,
   "delegated": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, false>;
   "except_expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "subject": $.LinkDesc<$ConsistencySubject, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
+  "params": $.LinkDesc<$Parameter, $.Cardinality.Many, {
+    "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
+    "@value": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne>;
+  }, false, false, false, false>;
   "<constraints[is schema::ConsistencySubject]": $.LinkDesc<$ConsistencySubject, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<constraints[is schema::Pointer]": $.LinkDesc<$Pointer, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<constraints[is schema::Property]": $.LinkDesc<$Property, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
@@ -458,11 +458,11 @@ const $FutureBehavior = $.makeType<$FutureBehavior>(_.spec, "003feed0-dc7d-564e-
 const FutureBehavior: $.$expr_PathNode<$.TypeSet<$FutureBehavior, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($FutureBehavior, $.Cardinality.Many), null);
 
 export type $GlobalλShape = $.typeutil.flatten<$AnnotationSubjectλShape & {
-  "target": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "required": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, false>;
   "cardinality": $.PropertyDesc<$Cardinality, $.Cardinality.AtMostOne, false, false, false, false>;
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "default": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "target": $.LinkDesc<$Type, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<used_globals[is schema::Function]": $.LinkDesc<$Function, $.Cardinality.Many, {}, false, false,  false, false>;
   "<used_globals": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -476,10 +476,10 @@ const Global: $.$expr_PathNode<$.TypeSet<$Global, $.Cardinality.Many>, null> = _
 export type $IndexλShape = $.typeutil.flatten<$InheritingObjectλShape & $AnnotationSubjectλShape & {
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "except_expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "kwargs": $.PropertyDesc<$.ArrayType<$.NamedTupleType<{name: _std.$str, expr: _std.$str}>>, $.Cardinality.AtMostOne, false, false, false, false>;
   "params": $.LinkDesc<$Parameter, $.Cardinality.Many, {
     "@index": $.PropertyDesc<_std.$int64, $.Cardinality.AtMostOne>;
   }, false, false, false, false>;
-  "kwargs": $.PropertyDesc<$.ArrayType<$.NamedTupleType<{name: _std.$str, expr: _std.$str}>>, $.Cardinality.AtMostOne, false, false, false, false>;
   "<indexes[is schema::Source]": $.LinkDesc<$Source, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<indexes[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<indexes[is schema::Link]": $.LinkDesc<$Link, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
@@ -523,11 +523,11 @@ const $Pointer = $.makeType<$Pointer>(_.spec, "57e1c6b1-ce76-5b5b-943f-f01f1e6a1
 const Pointer: $.$expr_PathNode<$.TypeSet<$Pointer, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Pointer, $.Cardinality.Many), null);
 
 export type $SourceλShape = $.typeutil.flatten<$Object_32faaa35947553cf88fce68ecf1be4d9λShape & {
-  "indexes": $.LinkDesc<$Index, $.Cardinality.Many, {
+  "pointers": $.LinkDesc<$Pointer, $.Cardinality.Many, {
     "@owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
     "@is_owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
   }, true, false, false, false>;
-  "pointers": $.LinkDesc<$Pointer, $.Cardinality.Many, {
+  "indexes": $.LinkDesc<$Index, $.Cardinality.Many, {
     "@owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
     "@is_owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
   }, true, false, false, false>;
@@ -546,10 +546,10 @@ const $Source = $.makeType<$Source>(_.spec, "0368bb5e-ae06-5c00-9316-15095185b82
 const Source: $.$expr_PathNode<$.TypeSet<$Source, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Source, $.Cardinality.Many), null);
 
 export type $LinkλShape = $.typeutil.flatten<Omit<$PointerλShape, "target"> & $SourceλShape & {
-  "target": $.LinkDesc<$ObjectType, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
-  "properties": $.LinkDesc<$Property, $.Cardinality.Many, {}, false, true,  false, false>;
   "on_target_delete": $.PropertyDesc<$TargetDeleteAction, $.Cardinality.AtMostOne, false, false, false, false>;
   "on_source_delete": $.PropertyDesc<$SourceDeleteAction, $.Cardinality.AtMostOne, false, false, false, false>;
+  "target": $.LinkDesc<$ObjectType, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
+  "properties": $.LinkDesc<$Property, $.Cardinality.Many, {}, false, true,  false, false>;
   "<links[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<links": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -562,10 +562,10 @@ const $Link = $.makeType<$Link>(_.spec, "98fe77cc-128e-58fe-b87a-1251c3288548", 
 const Link: $.$expr_PathNode<$.TypeSet<$Link, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Link, $.Cardinality.Many), null);
 
 export type $MigrationλShape = $.typeutil.flatten<$AnnotationSubjectλShape & $Object_32faaa35947553cf88fce68ecf1be4d9λShape & {
-  "parents": $.LinkDesc<$Migration, $.Cardinality.Many, {}, false, false,  false, false>;
   "script": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "message": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "generated_by": $.PropertyDesc<$MigrationGeneratedBy, $.Cardinality.AtMostOne, false, false, false, false>;
+  "parents": $.LinkDesc<$Migration, $.Cardinality.Many, {}, false, false,  false, false>;
   "<parents[is schema::Migration]": $.LinkDesc<$Migration, $.Cardinality.Many, {}, false, false,  false, false>;
   "<parents": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -607,8 +607,12 @@ const $MultiRangeExprAlias = $.makeType<$MultiRangeExprAlias>(_.spec, "a92ef6fd-
 const MultiRangeExprAlias: $.$expr_PathNode<$.TypeSet<$MultiRangeExprAlias, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($MultiRangeExprAlias, $.Cardinality.Many), null);
 
 export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$ConsistencySubjectλShape, "<subject"> & $InheritingObjectλShape & Omit<$TypeλShape, "<target"> & $AnnotationSubjectλShape & {
+  "compound_type": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, true, false, false>;
+  "is_compound_type": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, true, false, false>;
   "union_of": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "intersection_of": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
+  "links": $.LinkDesc<$Link, $.Cardinality.Many, {}, false, true,  false, false>;
+  "properties": $.LinkDesc<$Property, $.Cardinality.Many, {}, false, true,  false, false>;
   "access_policies": $.LinkDesc<$AccessPolicy, $.Cardinality.Many, {
     "@owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
     "@is_owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
@@ -617,10 +621,6 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
     "@owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
     "@is_owned": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne>;
   }, true, false, false, false>;
-  "compound_type": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, true, false, false>;
-  "is_compound_type": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, true, false, false>;
-  "links": $.LinkDesc<$Link, $.Cardinality.Many, {}, false, true,  false, false>;
-  "properties": $.LinkDesc<$Property, $.Cardinality.Many, {}, false, true,  false, false>;
   "<__type__[is std::BaseObject]": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::TupleElement]": $.LinkDesc<$TupleElement, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::Object]": $.LinkDesc<$Object_32faaa35947553cf88fce68ecf1be4d9, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -691,23 +691,24 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
   "<__type__[is schema::Trigger]": $.LinkDesc<$Trigger, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::Extension]": $.LinkDesc<$Extension, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is PeakHours]": $.LinkDesc<_default.$PeakHours, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is AgentStats]": $.LinkDesc<_default.$AgentStats, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is ReachByPlatform]": $.LinkDesc<_default.$ReachByPlatform, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is TopInteractions]": $.LinkDesc<_default.$TopInteractions, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Analytics]": $.LinkDesc<_default.$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is CryptoHolding]": $.LinkDesc<_default.$CryptoHolding, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is DailyImpressions]": $.LinkDesc<_default.$DailyImpressions, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Demographics]": $.LinkDesc<_default.$Demographics, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is PeakHours]": $.LinkDesc<_default.$PeakHours, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is ReachByPlatform]": $.LinkDesc<_default.$ReachByPlatform, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is TopInteractions]": $.LinkDesc<_default.$TopInteractions, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Analytics]": $.LinkDesc<_default.$Analytics, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is FetchedTweet]": $.LinkDesc<_default.$FetchedTweet, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is UserTokenShare]": $.LinkDesc<_default.$UserTokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is TokenShare]": $.LinkDesc<_default.$TokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is TokenStats]": $.LinkDesc<_default.$TokenStats, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Transaction]": $.LinkDesc<_default.$Transaction, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is TwinStats]": $.LinkDesc<_default.$TwinStats, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Twineet]": $.LinkDesc<_default.$Twineet, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Verification]": $.LinkDesc<_default.$Verification, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Agent]": $.LinkDesc<_default.$Agent, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Twin]": $.LinkDesc<_default.$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Notification]": $.LinkDesc<_default.$Notification, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is User]": $.LinkDesc<_default.$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<intersection_of": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<subject": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -729,8 +730,8 @@ const ObjectType: $.$expr_PathNode<$.TypeSet<$ObjectType, $.Cardinality.Many>, n
 
 export type $OperatorλShape = $.typeutil.flatten<$CallableObjectλShape & $VolatilitySubjectλShape & {
   "operator_kind": $.PropertyDesc<$OperatorKind, $.Cardinality.AtMostOne, false, false, false, false>;
-  "abstract": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, true>;
   "is_abstract": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, true, false, false>;
+  "abstract": $.PropertyDesc<_std.$bool, $.Cardinality.AtMostOne, false, false, false, true>;
 }>;
 type $Operator = $.ObjectType<"schema::Operator", $OperatorλShape, null, [
   ...$CallableObject['__exclusives__'],
@@ -741,11 +742,11 @@ const $Operator = $.makeType<$Operator>(_.spec, "e37bd85e-5e2f-5daa-9dd9-d21d419
 const Operator: $.$expr_PathNode<$.TypeSet<$Operator, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Operator, $.Cardinality.Many), null);
 
 export type $ParameterλShape = $.typeutil.flatten<$Object_32faaa35947553cf88fce68ecf1be4d9λShape & {
-  "type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
   "typemod": $.PropertyDesc<$TypeModifier, $.Cardinality.One, false, false, false, false>;
   "kind": $.PropertyDesc<$ParameterKind, $.Cardinality.One, false, false, false, false>;
   "num": $.PropertyDesc<_std.$int64, $.Cardinality.One, false, false, false, false>;
   "default": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
   "<params[is schema::CallableObject]": $.LinkDesc<$CallableObject, $.Cardinality.Many, {}, false, false,  false, false>;
   "<params[is schema::Index]": $.LinkDesc<$Index, $.Cardinality.Many, {}, false, false,  false, false>;
   "<params[is schema::Function]": $.LinkDesc<$Function, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -802,9 +803,9 @@ const $RangeExprAlias = $.makeType<$RangeExprAlias>(_.spec, "bc63491c-2a88-5353-
 const RangeExprAlias: $.$expr_PathNode<$.TypeSet<$RangeExprAlias, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($RangeExprAlias, $.Cardinality.Many), null);
 
 export type $RewriteλShape = $.typeutil.flatten<$InheritingObjectλShape & $AnnotationSubjectλShape & {
-  "subject": $.LinkDesc<$Pointer, $.Cardinality.One, {}, false, false,  false, false>;
   "kind": $.PropertyDesc<$TriggerKind, $.Cardinality.One, false, false, false, false>;
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "subject": $.LinkDesc<$Pointer, $.Cardinality.One, {}, false, false,  false, false>;
   "<rewrites[is schema::Pointer]": $.LinkDesc<$Pointer, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<rewrites[is schema::Property]": $.LinkDesc<$Property, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<rewrites[is schema::Link]": $.LinkDesc<$Link, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
@@ -833,12 +834,12 @@ const $ScalarType = $.makeType<$ScalarType>(_.spec, "d055dd47-3eb9-5a31-9d8f-5e7
 const ScalarType: $.$expr_PathNode<$.TypeSet<$ScalarType, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($ScalarType, $.Cardinality.Many), null);
 
 export type $TriggerλShape = $.typeutil.flatten<$InheritingObjectλShape & $AnnotationSubjectλShape & {
-  "subject": $.LinkDesc<$ObjectType, $.Cardinality.One, {}, false, false,  false, false>;
   "timing": $.PropertyDesc<$TriggerTiming, $.Cardinality.One, false, false, false, false>;
   "kinds": $.PropertyDesc<$TriggerKind, $.Cardinality.Many, false, false, false, false>;
   "scope": $.PropertyDesc<$TriggerScope, $.Cardinality.One, false, false, false, false>;
   "expr": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
   "condition": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "subject": $.LinkDesc<$ObjectType, $.Cardinality.One, {}, false, false,  false, false>;
   "<triggers[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<triggers": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -865,8 +866,8 @@ const $Tuple = $.makeType<$Tuple>(_.spec, "d88b4a0c-9561-56f4-b0a9-7b24027b4de8"
 const Tuple: $.$expr_PathNode<$.TypeSet<$Tuple, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Tuple, $.Cardinality.Many), null);
 
 export type $TupleElementλShape = $.typeutil.flatten<_std.$BaseObjectλShape & {
-  "type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
   "name": $.PropertyDesc<_std.$str, $.Cardinality.AtMostOne, false, false, false, false>;
+  "type": $.LinkDesc<$Type, $.Cardinality.One, {}, false, false,  false, false>;
   "<element_types[is schema::Tuple]": $.LinkDesc<$Tuple, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<element_types[is schema::TupleExprAlias]": $.LinkDesc<$TupleExprAlias, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<element_types": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;

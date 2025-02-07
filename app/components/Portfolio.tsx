@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
 import { TradeModalPropsType } from '../types/types';
 
-function TradeModal({ agentId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
+function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
   const [shares, setShares] = useState<number>(1);
   const { buyShares, sellShares } = useMarketplaceStore();
 
@@ -26,9 +26,9 @@ function TradeModal({ agentId, twinHandle, currentShares, availableShares, price
     if (shares <= 0 || shares > maxShares) return;
 
     if (isSelling) {
-      await sellShares(agentId, shares);
+      await sellShares(twinId, shares);
     } else {
-      await buyShares(agentId, shares);
+      await buyShares(twinId, shares);
     }
     onClose();
   };
@@ -102,7 +102,7 @@ function TradeModal({ agentId, twinHandle, currentShares, availableShares, price
 export function Portfolio() {
   const [isExpanded, setIsExpanded] = useState(true);
   const [tradeModal, setTradeModal] = useState<{
-    agentId: string;
+    twinId: string;
     twinHandle: string;
     currentShares: number;
     availableShares: number;
@@ -110,20 +110,20 @@ export function Portfolio() {
     isSelling: boolean;
   } | null>(null);
   
-  const { agents, getUserShares } = useMarketplaceStore();
+  const { twins, getUserShares } = useMarketplaceStore();
 
-  const holdings = agents.map(agent => {
-    const shares = getUserShares(agent.agentId);
-    const value = shares * agent.tokenShares.pricePerShare;
+  const holdings = twins.map(twin => {
+    const shares = getUserShares(twin.twinId);
+    const value = shares * twin.tokenShares.pricePerShare;
     return {
-      id: agent.agentId,
-      twinHandle: agent.twinHandle,
+      id: twin.twinId,
+      twinHandle: twin.twinHandle,
       shares,
       value,
-      pricePerShare: agent.tokenShares.pricePerShare,
-      isVerified: agent.verification.isVerified,
-      profileImage: agent.profileImage,
-      availableShares: agent.tokenShares.availableShares
+      pricePerShare: twin.tokenShares.pricePerShare,
+      isVerified: twin.verification.isVerified,
+      profileImage: twin.profileImage,
+      availableShares: twin.tokenShares.availableShares
     };
   }).filter(holding => holding.shares > 0);
 
@@ -198,8 +198,8 @@ export function Portfolio() {
 
                     <div className="mb-4">
                       <SharePriceChart
-                        agentId={holding.id}
-                        shareholders={agents.find(a => a.agentId === holding.id)?.tokenShares.shareholders || []}
+                        twinId={holding.id}
+                        shareholders={twins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
                         pricePerShare={holding.pricePerShare}
                         isExpanded={isExpanded}
                       />
@@ -227,7 +227,7 @@ export function Portfolio() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => setTradeModal({
-                          agentId: holding.id,
+                          twinId: holding.id,
                           twinHandle: holding.twinHandle,
                           currentShares: holding.shares,
                           availableShares: holding.availableShares,
@@ -241,7 +241,7 @@ export function Portfolio() {
                       </button>
                       <button
                         onClick={() => setTradeModal({
-                          agentId: holding.id,
+                          twinId: holding.id,
                           twinHandle: holding.twinHandle,
                           currentShares: holding.shares,
                           availableShares: holding.availableShares,

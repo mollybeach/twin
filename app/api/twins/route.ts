@@ -1,22 +1,14 @@
-// path: app/api/agents/[agentId]/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
-import { edgeDBCloudClient } from '../../../../lib/client';
-import { AgentType } from '../../../types/types';
+import { TwinType } from '../../types/types';
+import { insertTwin } from '../../../lib/queries';
+import { edgeDBCloudClient } from '../../../lib/client';
 
-export async function GET(req: NextRequest) {
-    const { pathname } = req.nextUrl;
-    const agentId = pathname.split('/')[3];
-
-    if (!agentId) {
-        return NextResponse.json({ message: 'Agent ID is required' }, { status: 400 });
-    }
-
+export async function GET() {
     try {
         const query = `
-            SELECT Agent {
+            SELECT Twin {
                 id,
-                agentId,
+                twinId,
                 autoReply,
                 createdAt,
                 description,
@@ -27,63 +19,63 @@ export async function GET(req: NextRequest) {
                 twinHandle,
                 twitterHandle,
                 analytics: {
-                    agentId,
+                    twinId,
                     clickThroughRate,
                     engagementRate,
                     impressions,
                     cryptoHoldings: {
-                        agentId,
+                        twinId,
                         amount,
                         symbol,
                         value,
                         change24h
                     },
                     demographics: {
-                        agentId,
+                        twinId,
                         age,
                         percentage
                     },
                     dailyImpressions: {
-                        agentId,
+                        twinId,
                         count,
                         date
                     },
                     peakHours: {
-                        agentId,
+                        twinId,
                         engagement,
                         hour
                     },
                     reachByPlatform: {
-                        agentId,
+                        twinId,
                         platform,
                         count
                     },
                     topInteractions: {
-                        agentId,
+                        twinId,
                         kind,
                         count
                     }
                 },
                 fetchedTweets: {
-                    agentId,
+                    twinId,
                     text,
                     edit_history_tweet_ids,
                     timestamp
                 },
                 modelData,
                 stats: {
-                    agentId,
+                    twinId,
                     interactions,
                     replies,
                     uptime
                 },
                 tokenShares: {
-                    agentId,
+                    twinId,
                     totalShares,
                     availableShares,
                     pricePerShare,
                     shareholders: {
-                        agentId,
+                        twinId,
                         userId,
                         shares,
                         purchasePrice,
@@ -91,7 +83,7 @@ export async function GET(req: NextRequest) {
                     }
                 },
                 tokenStats: {
-                    agentId,
+                    twinId,
                     price,
                     change24h,
                     volume24h,
@@ -99,7 +91,7 @@ export async function GET(req: NextRequest) {
                 },
                 twineets: {
                     id,
-                    agentId,
+                    twinId,
                     content,
                     timestamp,
                     likes,
@@ -109,30 +101,38 @@ export async function GET(req: NextRequest) {
                     isRetwineeted
                 },
                 verification: {
-                    agentId,
+                    twinId,
                     isVerified,
                     verificationDate
                 },
                 transactions: {
-                    agentId,
+                    twinId,
                     kind,
                     shares,
                     pricePerShare,
                     totalAmount,
                     timestamp
                 }
-            } FILTER .agentId = <str>$agentId;
+            };
         `;
 
-        const result = await edgeDBCloudClient.querySingle<AgentType>(query, { agentId });
-
-        if (!result) {
-            return NextResponse.json({ message: 'Agent not found' }, { status: 404 });
-        }
-
+        const result = await edgeDBCloudClient.query<TwinType[]>(query);
         return NextResponse.json(result);
+
     } catch (error) {
-        console.error('Error fetching agent:', error);
-        return NextResponse.json({ message: 'Error fetching agent' }, { status: 500 });
+        console.error('Error fetching twins:', error);
+        return NextResponse.json({ message: 'Error fetching twins' }, { status: 500 });
+    }
+}
+
+export async function POST(req: NextRequest) {
+    const newTwinData = await req.json();
+    console.log('POST Request received with data:', newTwinData);
+    try {
+        await insertTwin(newTwinData); 
+        return NextResponse.json({ message: 'Twin created successfully' }, { status: 201 });
+    } catch (error) {
+        console.error('Error creating twin:', error);
+        return NextResponse.json({ message: 'Error creating twin' }, { status: 500 });
     }
 }

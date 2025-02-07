@@ -10,10 +10,11 @@ import { useRouter } from 'next/navigation';
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ agentId: string; twinHandle: string; personality: string }>>([]);
+  const [searchResults, setSearchResults] = useState<Array<{ twinId: string; twinHandle: string; personality: string }>>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const agents = useMarketplaceStore((state) => state.agents);
+  const twins = useMarketplaceStore((state) => state.twins);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +34,11 @@ export function Navbar() {
     }
   }, [isSearchOpen]);
 
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+  }, []);
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim() === '') {
@@ -40,11 +46,11 @@ export function Navbar() {
       return;
     }
 
-    const filtered = agents.filter(agent => 
-      agent.twinHandle.toLowerCase().includes(query.toLowerCase()) ||
-      agent.personality.toLowerCase().includes(query.toLowerCase())
-    ).map(({ agentId, twinHandle, personality }) => ({
-      agentId,
+    const filtered = twins.filter(twin => 
+      twin.twinHandle.toLowerCase().includes(query.toLowerCase()) ||
+      twin.personality.toLowerCase().includes(query.toLowerCase())
+    ).map(({ twinId, twinHandle, personality }) => ({
+      twinId,
       twinHandle,
       personality
     }));
@@ -52,11 +58,36 @@ export function Navbar() {
     setSearchResults(filtered);
   };
 
-  const handleSelectResult = (agentId: string) => {
+  const handleSelectResult = (twinId: string) => {
     setIsSearchOpen(false);
     setSearchQuery('');
     setSearchResults([]);
-    router.push(`/analytics/${agentId}`);
+    router.push(`/analytics/${twinId}`);
+  };
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/users/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      localStorage.removeItem('userId');
+      setIsLoggedIn(false);
+      window.location.href = '/login'; 
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
@@ -111,8 +142,8 @@ export function Navbar() {
                       <div className="absolute mt-2 w-full bg-white/10 backdrop-blur-lg rounded-lg shadow-lg py-1 max-h-96 overflow-y-auto">
                         {searchResults.map((result) => (
                           <button
-                            key={result.agentId}
-                            onClick={() => handleSelectResult(result.agentId)}
+                            key={result.twinId}
+                            onClick={() => handleSelectResult(result.twinId)}
                             className="w-full px-4 py-2 text-left hover:bg-white/5 transition-colors flex items-center justify-between"
                           >
                             <span className="text-white">@{result.twinHandle}</span>
@@ -147,6 +178,19 @@ export function Navbar() {
                 <PlusCircle className="h-5 w-5 mr-1.5" />
                 <span className="font-semibold">Create Twin</span>
               </Link>
+            </div>
+
+            {/* Login/Logout Button */}
+            <div className="flex items-center">
+              {isLoggedIn ? (
+                <button onClick={handleLogout} className="text-purple-400 hover:text-purple-200">
+                  Logout
+                </button>
+              ) : (
+                <button onClick={handleLogin} className="text-purple-400 hover:text-purple-200">
+                  Login
+                </button>
+              )}
             </div>
 
             {/* Mobile menu button */}

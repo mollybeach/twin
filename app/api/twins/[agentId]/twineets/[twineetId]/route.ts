@@ -1,4 +1,4 @@
-// path: app/api/twineets/[agentId]/route.ts
+// path: app/api/twineets/[twinId]/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { TwineetType } from '../../../../types/types';
@@ -6,19 +6,19 @@ import { edgeDBCloudClient } from '../../../../../lib/client';
 
 export async function GET(req: NextRequest) {
     const { pathname } = req.nextUrl;
-    const agentId = pathname.split('/')[3];
+    const twinId = pathname.split('/')[3];
 
-    console.log('Fetching twineets for agentId:', agentId);
+    console.log('Fetching twineets for twinId:', twinId);
 
-    if (!agentId) {
-        return NextResponse.json({ message: 'Agent ID is required' }, { status: 400 });
+    if (!twinId) {
+        return NextResponse.json({ message: 'Twin ID is required' }, { status: 400 });
     }
 
     try {
         const query = `
             SELECT Twineet {
                 id,
-                agentId,
+                twinId,
                 content,
                 timestamp,
                 likes,
@@ -27,13 +27,13 @@ export async function GET(req: NextRequest) {
                 isLiked,
                 isRetwineeted
             } 
-            FILTER .agentId = <str>$agentId;
+            FILTER .twinId = <str>$twinId;
         `;
 
-        const result = await edgeDBCloudClient.query<TwineetType[]>(query, { agentId });
+        const result = await edgeDBCloudClient.query<TwineetType[]>(query, { twinId });
 
         if (result.length === 0) {
-            console.log('No twineets found for agentId:', agentId);
+            console.log('No twineets found for twinId:', twinId);
             return NextResponse.json({ message: 'No twineets found' }, { status: 404 });
         }
 
@@ -46,16 +46,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     const newTwineet = await req.json();
-    const { agentId, content } = newTwineet;
+    const { twinId, content } = newTwineet;
 
-    if (!agentId || !content) {
-        return NextResponse.json({ message: 'Agent ID and content are required' }, { status: 400 });
+    if (!twinId || !content) {
+        return NextResponse.json({ message: 'Twin ID and content are required' }, { status: 400 });
     }
 
     try {
         const query = `
             INSERT Twineet {
-                agentId := <str>$agentId,
+                twinId := <str>$twinId,
                 content := <str>$content,
                 timestamp := datetime_current(),
                 likes := 0,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             };
         `;
 
-        await edgeDBCloudClient.execute(query, { agentId, content });
+        await edgeDBCloudClient.execute(query, { twinId, content });
         return NextResponse.json({ message: 'Twineet created successfully' }, { status: 201 });
     } catch (error) {
         console.error('Error creating twineet:', error);

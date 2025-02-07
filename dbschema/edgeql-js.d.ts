@@ -1,7 +1,7 @@
 // path: /edgeql-js.d.ts
 
 import {
-    AgentType,
+    TwinType,
     AnalyticsType,
     FetchedTweetType,
     TwineetType,
@@ -16,7 +16,7 @@ import {
     ReachByPlatformType,
     TopInteractionsType,
     DemographicsType,
-    AgentStatsType,
+    TwinStatsType,
 } from '@/dbschema/interfaces'; // Import the generated interfaces
 
 export declare module '@/dbschema/edgeql-js' {
@@ -32,7 +32,7 @@ export declare module '@/dbschema/edgeql-js' {
         insert<T>(
             type: T,
             data: 
-            T extends AgentType ? AgentType :
+            T extends TwinType ? TwinType :
             T extends AnalyticsType ? AnalyticsType :
             T extends FetchedTweetType ? FetchedTweetType :
             T extends TwineetType ? TwineetType :
@@ -47,7 +47,7 @@ export declare module '@/dbschema/edgeql-js' {
             T extends ReachByPlatformType ? ReachByPlatformType :
             T extends TopInteractionsType ? TopInteractionsType :
             T extends DemographicsType ? DemographicsType :
-            T extends AgentStatsType ? AgentStatsType :
+            T extends TwinStatsType ? TwinStatsType :
             never,
         ): Promise<{ run: (client: EdgeDBClient) => Promise<void> }>;
         array(arg0: Promise<{ run: (client: EdgeDBClient) => Promise<void>; }>[]): unknown;
@@ -63,23 +63,23 @@ export declare module '@/dbschema/edgeql-js' {
 
         // Adjusted insert method to use specific types
         insert: (
-            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
-            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+            type: EdgeQL.Twin | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: TwinType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
         ) => Promise<{ run: (client: EdgeDBClient) => Promise<void> }>;
 
         // Adjusted update method to use specific types
         update: (
-            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
-            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+            type: EdgeQL.Twin | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: TwinType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
         ) => Promise<{ run: (client: EdgeDBClient) => Promise<void> }>;
 
         // Adjusted select method to return specific types
         select: (
-            type: EdgeQL.Agent | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
-            data: AgentType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
-        ) => Promise<AgentType[] | TwineetType[] | FetchedTweetType[] | TransactionType[] | VerificationResponseType[] | UserTokenShareType[] | TokenStatsType[] | TokenShareType[]>;
+            type: EdgeQL.Twin | EdgeQL.Twineet | EdgeQL.FetchedTweet | EdgeQL.Transaction | EdgeQL.Verification | EdgeQL.UserTokenShare | EdgeQL.TokenStats | EdgeQL.TokenShare, 
+            data: TwinType | TwineetType | FetchedTweetType | TransactionType | VerificationResponseType | UserTokenShareType | TokenStatsType | TokenShareType
+        ) => Promise<TwinType[] | TwineetType[] | FetchedTweetType[] | TransactionType[] | VerificationResponseType[] | UserTokenShareType[] | TokenStatsType[] | TokenShareType[]>;
 
-        op: (agentId: string, comparison: '=', otherAgentId: string) => Promise<void>;
+        op: (twinId: string, comparison: '=', otherTwinId: string) => Promise<void>;
         run: (data: object) => Promise<void>;
         filter: (data: object) => Promise<void>;
         datetime: (date: Date) => Promise<void>;
@@ -93,10 +93,10 @@ export declare module '@/dbschema/edgeql-js' {
         ReachByPlatform: (data: ReachByPlatformType) => Promise<void>;
         TopInteractions: (data: TopInteractionsType) => Promise<void>;
         FetchedTweet: (data: FetchedTweetType) => Promise<void>;
-        Twineet: (agentId: string, data: TwineetType) => Promise<void>;
+        Twineet: (twinId: string, data: TwineetType) => Promise<void>;
         Transaction: (data: TransactionType) => Promise<void>;
-        Agent: (data: AgentType) => Promise<void>;
-        AgentStats: (data: AgentStatsType) => Promise<void>;
+        Twin: (data: TwinType) => Promise<void>;
+        TwinStats: (data: TwinStatsType) => Promise<void>;
         Verification: (data: VerificationResponseType) => Promise<void>;
         UserTokenShare: (data: UserTokenShareType) => Promise<void>;
         TokenStats: (data: TokenStatsType) => Promise<void>;

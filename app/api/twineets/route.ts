@@ -8,7 +8,7 @@ export async function GET() {
         const query = `
             SELECT Twineet {
                 id,
-                agentId,
+                twinId,
                 content,
                 timestamp,
                 likes,

@@ -30,10 +30,10 @@ ChartJS.register(
   Filler
 );
 
-export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
-  const { getTransactionHistory, agents } = useMarketplaceStore();
-  const transactions = getTransactionHistory(agentId);
-  const agent = agents.find((a: { agentId: string }) => a.agentId === agentId);
+export function Analytics({ analytics, twinId }: AnalyticsPropsType) {
+  const { getTransactionHistory, twins } = useMarketplaceStore();
+  const transactions = getTransactionHistory(twinId);
+  const twin = twins.find((a: { twinId: string }) => a.twinId === twinId);
 
   // Ensure analytics data exists with default values if needed
   const safeAnalytics = {
@@ -154,11 +154,11 @@ export function Analytics({ analytics, agentId }: AnalyticsPropsType) {
           Price History
         </h3>
         
-        {transactions.length > 0 && agent ? (
+        {transactions.length > 0 && twin ? (
           <TradingChart
-            agentId={agent.agentId}
+            twinId={twin.twinId}
             transactions={transactions}
-            pricePerShare={agent.tokenShares.pricePerShare}
+            pricePerShare={twin.tokenShares.pricePerShare}
           />
         ) : (
           <div className="w-full h-[400px] bg-white/5 rounded-lg flex items-center justify-center text-purple-300">

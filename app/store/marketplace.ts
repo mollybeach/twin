@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AgentType, TransactionType, NotificationType, UserTokenShareType, AnalyticsType, MarketplaceStoreType } from '../types/types';
+import { TwinType, TransactionType, NotificationType, UserTokenShareType, AnalyticsType, MarketplaceStoreType } from '../types/types';
 
 // Storage limit (4.5MB to stay safely under 5MB limit)
 const STORAGE_LIMIT = 4.5 * 1024 * 1024;
@@ -11,25 +11,25 @@ const estimateStorageSize = (data: unknown): number => {
 };
 
 // Helper function to clean up old data
-const cleanupOldData = (agents: AgentType[]): AgentType[] => {
+const cleanupOldData = (twins: TwinType[]): TwinType[] => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  return agents
-    .filter((agent) => new Date(agent.createdAt) > thirtyDaysAgo)
-    .map((agent) => ({
-      ...agent,
+  return twins
+    .filter((twin) => new Date(twin.createdAt) > thirtyDaysAgo)
+    .map((twin) => ({
+      ...twin,
       tokenShares: {
-        ...agent.tokenShares,
-        shareholders: agent.tokenShares.shareholders.slice(-20), // Keep only last 20 transactions
+        ...twin.tokenShares,
+        shareholders: twin.tokenShares.shareholders.slice(-20), // Keep only last 20 transactions
       },
       analytics: {
-        ...agent.analytics,
-        dailyImpressions: agent.analytics.dailyImpressions.slice(-30), // Keep only last 30 days
-        topInteractions: agent.analytics.topInteractions.slice(0, 5), // Keep only top 5
-        demographics: agent.analytics.demographics.slice(0, 5), // Keep only top 5 age groups
-        peakHours: agent.analytics.peakHours.slice(0, 24), // Keep only 24 hours
-        cryptoHoldings: agent.analytics.cryptoHoldings.slice(0, 4), // Keep only top 4 holdings
+        ...twin.analytics,
+        dailyImpressions: twin.analytics.dailyImpressions.slice(-30), // Keep only last 30 days
+        topInteractions: twin.analytics.topInteractions.slice(0, 5), // Keep only top 5
+        demographics: twin.analytics.demographics.slice(0, 5), // Keep only top 5 age groups
+        peakHours: twin.analytics.peakHours.slice(0, 24), // Keep only 24 hours
+        cryptoHoldings: twin.analytics.cryptoHoldings.slice(0, 4), // Keep only top 4 holdings
       },
     }));
 };
@@ -39,7 +39,7 @@ const createCustomStorage = () => {
   return {
     getItem: (name: string) => {
       const storedData = localStorage.getItem(name);
-      return storedData ? JSON.parse(storedData) : { agents: [], transactions: [], notifications: [] };
+      return storedData ? JSON.parse(storedData) : { twins: [], transactions: [], notifications: [] };
     },
     setItem: (name: string, value: unknown) => {
       try {
@@ -47,14 +47,14 @@ const createCustomStorage = () => {
 
         // Clean up old data if storage exceeds the limit
         if (estimateStorageSize(state) > STORAGE_LIMIT) {
-          state.agents = cleanupOldData(state.agents);
+          state.twins = cleanupOldData(state.twins);
 
-          // Remove oldest agents if still too large
-          while (estimateStorageSize(state) > STORAGE_LIMIT && state.agents.length > 0) {
-            state.agents.sort((a: AgentType, b: AgentType) =>
+          // Remove oldest twins if still too large
+          while (estimateStorageSize(state) > STORAGE_LIMIT && state.twins.length > 0) {
+            state.twins.sort((a: TwinType, b: TwinType) =>
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
-            state.agents.shift();
+            state.twins.shift();
           }
 
           state = JSON.stringify(state);
@@ -73,42 +73,42 @@ const createCustomStorage = () => {
 const useMarketplaceStore = create<MarketplaceStoreType>()(
   persist(
     (set, get) => ({
-      agents: [],
+      twins: [],
       transactions: [],
       notifications: [],
       notification: null,
       setNotification: (notification: NotificationType | null) => set({ notification }),
-      addAgent: async (agent: AgentType) => {
+      addTwin: async (twin: TwinType) => {
         set((state) => ({
-          agents: [
-            ...state.agents,
+          twins: [
+            ...state.twins,
             {
-              ...agent,
+              ...twin,
               verification: {
-                agentId: agent.agentId,
+                twinId: twin.twinId,
                 isVerified: false,
                 verificationDate: new Date(),
               },
             },
           ],
         }));
-        return agent.agentId;
+        return twin.twinId;
       },
-      buyShares: async (agentId: string, shares: number) => {
-        const agent = get().agents.find((a) => a.agentId === agentId);
-        if (!agent) return;
+      buyShares: async (twinId: string, shares: number) => {
+        const twin = get().twins.find((a) => a.twinId === twinId);
+        if (!twin) return;
 
         const newUserTokenShare: UserTokenShareType = {
-          agentId,
+          twinId,
           userId: 'demo-user',
           shares,
-          purchasePrice: agent.tokenShares.pricePerShare,
+          purchasePrice: twin.tokenShares.pricePerShare,
           purchaseDate: new Date(),
         };
 
         set((state) => ({
-          agents: state.agents.map((a) =>
-            a.agentId === agentId
+          twins: state.twins.map((a) =>
+            a.twinId === twinId
               ? {
                   ...a,
                   tokenShares: {
@@ -121,22 +121,22 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           ),
         }));
       },
-      sellShares: async (agentId: string, shares: number) => {
-        const agent = get().agents.find((a) => a.agentId === agentId);
-        if (!agent) return;
+      sellShares: async (twinId: string, shares: number) => {
+        const twin = get().twins.find((a) => a.twinId === twinId);
+        if (!twin) return;
 
         const transaction: TransactionType = {
-          agentId,
+          twinId,
           kind: 'sell',
           shares,
-          pricePerShare: agent.tokenShares.pricePerShare,
-          totalAmount: agent.tokenShares.pricePerShare * shares,
+          pricePerShare: twin.tokenShares.pricePerShare,
+          totalAmount: twin.tokenShares.pricePerShare * shares,
           timestamp: new Date(),
         };
 
         set((state) => ({
-          agents: state.agents.map((a) =>
-            a.agentId === agentId
+          twins: state.twins.map((a) =>
+            a.twinId === twinId
               ? {
                   ...a,
                   tokenShares: {
@@ -149,60 +149,60 @@ const useMarketplaceStore = create<MarketplaceStoreType>()(
           transactions: [transaction, ...state.transactions],
         }));
       },
-      verifyAgent: async (agentId: string) => {
+      verifyTwin: async (twinId: string) => {
         let success = false;
         set((state) => ({
-          agents: state.agents.map((agent) => {
-            if (agent.agentId === agentId && !agent.verification.isVerified) {
-              const userShares = agent.tokenShares.shareholders
+          twins: state.twins.map((twin) => {
+            if (twin.twinId === twinId && !twin.verification.isVerified) {
+              const userShares = twin.tokenShares.shareholders
                 .filter((s) => s.userId === 'demo-user')
                 .reduce((sum, s) => sum + s.shares, 0);
 
-              const userValue = userShares * agent.tokenShares.pricePerShare;
+              const userValue = userShares * twin.tokenShares.pricePerShare;
 
               if (userValue >= 100) {
                 success = true;
                 return {
-                  ...agent,
+                  ...twin,
                   verification: {
-                    agentId: agentId,
+                    twinId: twinId,
                     isVerified: true,
                     verificationDate: new Date(),
                   },
                   tokenShares: {
-                    ...agent.tokenShares,
-                    pricePerShare: agent.tokenShares.pricePerShare * 1.1,
+                    ...twin.tokenShares,
+                    pricePerShare: twin.tokenShares.pricePerShare * 1.1,
                   },
                 };
               }
             }
-            return agent;
+            return twin;
           }),
         }));
         return success;
       },
-      getUserShares: (agentId: string) => {
-        const agent = get().agents.find((a) => a.agentId === agentId);
-        if (!agent) return 0;
+      getUserShares: (twinId: string) => {
+        const twin = get().twins.find((a) => a.twinId === twinId);
+        if (!twin) return 0;
 
-        return agent.tokenShares.shareholders
+        return twin.tokenShares.shareholders
           .filter((s) => s.userId === 'demo-user')
           .reduce((sum, s) => sum + s.shares, 0);
       },
-      getAgents: () => get().agents,
-      updateAnalytics: (agentId: string) => {
+      getTwins: () => get().twins,
+      updateAnalytics: (twinId: string) => {
         set((state) => ({
-          agents: state.agents.map((agent) =>
-            agent.agentId === agentId
-              ? { ...agent, analytics: agent.analytics }
-              : agent
+          twins: state.twins.map((twin) =>
+            twin.twinId === twinId
+              ? { ...twin, analytics: twin.analytics }
+              : twin
           ),
         }));
       },
-      getTransactionHistory: (agentId?: string) => {
+      getTransactionHistory: (twinId?: string) => {
         const state = get();
         return state.transactions
-          .filter((t) => !agentId || t.agentId === agentId)
+          .filter((t) => !twinId || t.twinId === twinId)
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       },
     }),

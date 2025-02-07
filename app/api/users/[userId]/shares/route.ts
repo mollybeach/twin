@@ -1,10 +1,12 @@
 // /api/users/[userId]/shares/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { edgeDBCloudClient } from '../../../../../lib/client'; // Adjust the import based on your project structure
 import { UserTokenShareType } from '../../../../types/types'; // Adjust the import based on your project structure
 
-export async function GET(request: Request, { params }: { params: { userId: string } }) {
-    const { userId } = params;
+
+export async function GET(req: NextRequest) {
+    const { pathname } = req.nextUrl;
+    const userId = pathname.split('/')[3];
 
     try {
         // Query to fetch user token shares

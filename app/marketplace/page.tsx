@@ -5,9 +5,32 @@ import { PriceChart } from '../components/PriceChart';
 
 const VERIFICATION_FEE = 100;
 
+// Define the Twin type based on your schema
+type Twin = {
+  twinId: string;
+  profileImage: string;
+  twinHandle: string;
+  personality: string;
+  description: string;
+  price: number;
+  tokenShares: {
+    availableShares: number;
+    totalShares: number;
+    pricePerShare: number;
+    shareholders: Array<any>; // Adjust this type based on your actual shareholder structure
+  };
+  verification: {
+    isVerified: boolean;
+  };
+  stats: {
+    replies: number;
+    interactions: number;
+  };
+};
+
 export default function MarketplacePage() {
-  const [twins, setTwins] = useState([]);
-  const [userShares, setUserShares] = useState({});
+  const [twins, setTwins] = useState<Twin[]>([]);
+  const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
@@ -20,7 +43,7 @@ export default function MarketplacePage() {
       if (!response.ok) {
         throw new Error('Failed to fetch twins');
       }
-      const twinsData = await response.json();
+      const twinsData: Twin[] = await response.json(); // Ensure the response is typed
       setTwins(twinsData);
     } catch (error) {
       console.error('Error fetching twins:', error);

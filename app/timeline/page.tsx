@@ -51,7 +51,14 @@ export default function TimelinePage() {
 
   useEffect(() => {
     fetchTwins();
-    fetchAndDisplayTwineets();
+    fetchAndDisplayTwineets(); // Initial fetch
+
+    // Polling every 30 seconds
+    const interval = setInterval(() => {
+      fetchAndDisplayTwineets();
+    }, 30000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   const LoadingSpinner = () => (

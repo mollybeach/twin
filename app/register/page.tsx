@@ -7,7 +7,6 @@ export default function RegisterPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [birthday, setBirthday] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
@@ -36,7 +35,7 @@ export default function RegisterPage() {
                 throw new Error('Registration failed');
             }
 
-            router.push('/portfolio'); 
+            router.push('/login'); 
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

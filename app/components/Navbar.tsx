@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge, Twitter } from 'lucide-react';
 import { useMarketplaceStore } from '@/store/marketplace';
-import { ThemeToggle } from './ThemeToggle';
 import { TokenStats } from './TokenStats';
 import { useRouter } from 'next/navigation';
 
@@ -154,7 +153,6 @@ export function Navbar() {
                 )}
               </div>
             </div>
-            <ThemeToggle />
             <div className="hidden md:flex items-center space-x-2">
               <Link href="/marketplace" className="flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-purple-200 hover:text-white hover:bg-white/5 transition-colors">
                 <ShoppingBag className="h-5 w-5 mr-1.5" />

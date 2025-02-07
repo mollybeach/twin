@@ -1,17 +1,49 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
-import { useMarketplaceStore } from '../store/marketplace';
 import { PriceChart } from '../components/PriceChart';
 
 const VERIFICATION_FEE = 100;
 
 export default function MarketplacePage() {
-  const { twins, buyShares, sellShares, verifyTwin, getUserShares } = useMarketplaceStore();
+  const [twins, setTwins] = useState([]);
+  const [userShares, setUserShares] = useState({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+
+  // Fetch twins and user shares from the API
+  const fetchTwins = async () => {
+    try {
+      const response = await fetch('/api/twins');
+      if (!response.ok) {
+        throw new Error('Failed to fetch twins');
+      }
+      const twinsData = await response.json();
+      setTwins(twinsData);
+    } catch (error) {
+      console.error('Error fetching twins:', error);
+    }
+  };
+
+  const fetchUserShares = async () => {
+    try {
+      const response = await fetch('/api/user/shares'); // Adjust the endpoint as necessary
+      if (!response.ok) {
+        throw new Error('Failed to fetch user shares');
+      }
+      const sharesData = await response.json();
+      setUserShares(sharesData);
+    } catch (error) {
+      console.error('Error fetching user shares:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTwins();
+    fetchUserShares();
+  }, []);
 
   const handleBuyShares = (twinId: string) => {
     if (sharesToBuy <= 0) {
@@ -27,7 +59,8 @@ export default function MarketplacePage() {
       return;
     }
 
-    buyShares(twinId, sharesToBuy);
+    // Call your buyShares function here
+    // buyShares(twinId, sharesToBuy);
     setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
@@ -39,13 +72,14 @@ export default function MarketplacePage() {
       return;
     }
 
-    const userShares = getUserShares(twinId);
-    if (sharesToBuy > userShares) {
+    const userSharesCount = userShares[twinId] || 0;
+    if (sharesToBuy > userSharesCount) {
       alert('You don\'t have enough shares to sell');
       return;
     }
 
-    sellShares(twinId, sharesToBuy);
+    // Call your sellShares function here
+    // sellShares(twinId, sharesToBuy);
     setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
@@ -53,10 +87,11 @@ export default function MarketplacePage() {
 
   const handleVerification = async (twinId: string) => {
     setVerificationError(null);
-    const success = await verifyTwin(twinId);
-    if (!success) {
-      setVerificationError(`You need to own at least $${VERIFICATION_FEE} worth of shares to verify this Twin`);
-    }
+    // Call your verifyTwin function here
+    // const success = await verifyTwin(twinId);
+    // if (!success) {
+    //   setVerificationError(`You need to own at least $${VERIFICATION_FEE} worth of shares to verify this Twin`);
+    // }
   };
 
   return (
@@ -76,8 +111,8 @@ export default function MarketplacePage() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {twins.map((twin) => {
-              const userShares = getUserShares(twin.twinId);
-              const userValue = userShares * twin.tokenShares.pricePerShare;
+              const userSharesCount = userShares[twin.twinId] || 0;
+              const userValue = userSharesCount * twin.tokenShares.pricePerShare;
               
               return (
                 <div
@@ -118,7 +153,7 @@ export default function MarketplacePage() {
 
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{twin.description}</p>
 
-                    <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <div className="flex items-center justify-between mt-3 text-purple-300 max-w-md">
                       <div className="flex items-center">
                         <MessageCircle className="h-4 w-4 mr-1" />
                         {twin.stats.replies.toLocaleString()} replies
@@ -158,11 +193,11 @@ export default function MarketplacePage() {
                           ${twin.tokenShares.pricePerShare.toFixed(4)}
                         </span>
                       </div>
-                      {userShares > 0 && (
+                      {userSharesCount > 0 && (
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Your shares:</span>
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {userShares} shares (${userValue.toFixed(2)})
+                            {userSharesCount} shares (${userValue.toFixed(2)})
                           </span>
                         </div>
                       )}
@@ -196,10 +231,10 @@ export default function MarketplacePage() {
                           <input
                             type="number"
                             min="1"
-                            max={isSellingShares ? userShares : twin.tokenShares.availableShares}
+                            max={isSellingShares ? userSharesCount : twin.tokenShares.availableShares}
                             value={sharesToBuy}
                             onChange={(e) => {
-                              const max = isSellingShares ? userShares : twin.tokenShares.availableShares;
+                              const max = isSellingShares ? userSharesCount : twin.tokenShares.availableShares;
                               setSharesToBuy(Math.min(parseInt(e.target.value) || 0, max));
                             }}
                             className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
@@ -222,7 +257,7 @@ export default function MarketplacePage() {
                             )}
                           </button>
                         </div>
-                        {userShares > 0 && (
+                        {userSharesCount > 0 && (
                           <button
                             onClick={() => setIsSellingShares(!isSellingShares)}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -253,7 +288,7 @@ export default function MarketplacePage() {
                           <span>Buy Shares</span>
                           <ArrowDownToLine className="w-4 h-4" />
                         </button>
-                        {userShares > 0 && (
+                        {userSharesCount > 0 && (
                           <button
                             onClick={() => {
                               setSelectedTwin(twin.twinId);

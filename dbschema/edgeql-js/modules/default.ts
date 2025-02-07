@@ -133,6 +133,8 @@ export type $NotificationλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5
   "twinHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "twitterHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "<notifications[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<notifications": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $Notification = $.ObjectType<"default::Notification", $NotificationλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
@@ -176,6 +178,7 @@ export type $TokenShareλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "shareholders": $.LinkDesc<$UserTokenShare, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "<tokenShares[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<tokenShares[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<tokenShares": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $TokenShare = $.ObjectType<"default::TokenShare", $TokenShareλShape, null, [
@@ -192,6 +195,7 @@ export type $TokenStatsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "volume24h": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "<tokenStats[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<tokenStats[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<tokenStats": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $TokenStats = $.ObjectType<"default::TokenStats", $TokenStatsλShape, null, [
@@ -309,6 +313,10 @@ export type $UserλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, true, false, false, false>;
   "transactions": $.LinkDesc<$Transaction, $.Cardinality.Many, {}, false, false,  false, false>;
   "twins": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
+  "notifications": $.LinkDesc<$Notification, $.Cardinality.Many, {}, false, false,  false, false>;
+  "tokenShares": $.LinkDesc<$TokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
+  "tokenStats": $.LinkDesc<$TokenStats, $.Cardinality.Many, {}, false, false,  false, false>;
+  "userTokenShares": $.LinkDesc<$UserTokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $User = $.ObjectType<"default::User", $UserλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
@@ -327,7 +335,9 @@ export type $UserTokenShareλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4f
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "userId": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "<shareholders[is TokenShare]": $.LinkDesc<$TokenShare, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<userTokenShares[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<shareholders": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<userTokenShares": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
 type $UserTokenShare = $.ObjectType<"default::UserTokenShare", $UserTokenShareλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],

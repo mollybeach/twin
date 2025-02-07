@@ -193,6 +193,10 @@ module default {
         required property walletAddress -> str;
         optional multi link transactions -> Transaction;
         optional multi link twins -> Twin;
+        optional multi link notifications -> Notification;
+        optional multi link tokenShares -> TokenShare;
+        optional multi link userTokenShares -> UserTokenShare;
+        optional multi link tokenStats -> TokenStats;
     }
 
     # Define the Notification type

@@ -50,14 +50,18 @@ export default function MarketplacePage() {
     }
   };
 
-  const fetchUserShares = async () => {
+  const fetchUserShares = async (userId: string) => {
     try {
-      const response = await fetch('/api/user/shares'); // Adjust the endpoint as necessary
+      const response = await fetch(`/api/users/${userId}/shares`); // Fetch user shares from the new API endpoint
       if (!response.ok) {
         throw new Error('Failed to fetch user shares');
       }
       const sharesData = await response.json();
-      setUserShares(sharesData);
+      const sharesMap: { [key: string]: number } = {};
+      sharesData.forEach((share: { twinId: string; shares: number }) => {
+        sharesMap[share.twinId] = share.shares;
+      });
+      setUserShares(sharesMap);
     } catch (error) {
       console.error('Error fetching user shares:', error);
     }
@@ -65,7 +69,8 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     fetchTwins();
-    fetchUserShares();
+    const userId = 'some-user-id'; // Replace with actual user ID logic
+    fetchUserShares(userId);
   }, []);
 
   const handleBuyShares = (twinId: string) => {
@@ -200,7 +205,7 @@ export default function MarketplacePage() {
                       />
                     </div>
 
-                    <div className="bg-gray-50/80 dark:bg-gray-800/80 rounded-lg p-4 mb-4">
+                    <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center">
                           <PieChart className="h-4 w-4 mr-2 text-gray-600 dark:text-gray-400" />

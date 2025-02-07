@@ -165,15 +165,20 @@ export interface TwineetType {
     isLiked: boolean;
     isRetwineeted: boolean;
 }
+
 export interface UserType {
     userId: UserIdType;
     username: string;
     email: string;
     passwordHash: string;
     birthday?: Date;
-    walletAddress: string;
+    walletAddress?: string;
     twins?: TwinType[];
     transactions?: TransactionType[];
+    notifications?: NotificationType[];
+    tokenShares?: TokenShareType[];
+    userTokenShares?: UserTokenShareType[];
+    tokenStats?: TokenStatsType[];
     createdAt: Date;
 }
 export interface VerificationResponseType {

@@ -16,7 +16,7 @@ export default function RegisterPage() {
         e.preventDefault();
         setError('');
         const userId = crypto.randomUUID();
-        
+
         try {
             const response = await fetch('/api/users/register', {
                 method: 'POST',
@@ -28,7 +28,6 @@ export default function RegisterPage() {
                     username, 
                     password, 
                     email, 
-                    birthday,
                     walletAddress 
                 }),
             });
@@ -85,17 +84,6 @@ export default function RegisterPage() {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 rounded-lg bg-white/20 border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            required
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-purple-300 mb-1" htmlFor="birthday">Birthday</label>
-                        <input
-                            type="date"
-                            id="birthday"
-                            value={birthday}
-                            onChange={(e) => setBirthday(e.target.value)}
                             className="w-full p-2 rounded-lg bg-white/20 border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                             required
                         />

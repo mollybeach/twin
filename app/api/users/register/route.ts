@@ -6,9 +6,9 @@ import { UserType } from '../../../types/types';
 
 export async function POST(req: NextRequest) {
     
-    let { userId, username, password, email, birthday, walletAddress } = await req.json();
+    let { userId, username, password, email, walletAddress } = await req.json();
 
-    if (!username || !password || !email || !birthday || !walletAddress) {
+    if (!username || !password || !email || !walletAddress) {
         return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
     try {
@@ -20,11 +20,10 @@ export async function POST(req: NextRequest) {
                 username := <str>$username,
                 passwordHash := <str>$passwordHash,
                 email := <str>$email,
-                birthday := <datetime>$birthday,
                 walletAddress := <str>$walletAddress
             };
         `;
-        await edgeDBCloudClient.query<UserType>(query, { userId, username, passwordHash, email, birthday, walletAddress });
+        await edgeDBCloudClient.query<UserType>(query, { userId, username, passwordHash, email, walletAddress });
 
         return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
     } catch (error) {

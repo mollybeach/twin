@@ -709,6 +709,9 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
   "<__type__[is Twin]": $.LinkDesc<_default.$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Notification]": $.LinkDesc<_default.$Notification, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is User]": $.LinkDesc<_default.$User, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Likes]": $.LinkDesc<_default.$Likes, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Replies]": $.LinkDesc<_default.$Replies, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Retwineets]": $.LinkDesc<_default.$Retwineets, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<intersection_of": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<subject": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;

@@ -4,52 +4,76 @@ import { NextRequest, NextResponse } from 'next/server';
 import { edgeDBCloudClient } from '../../../lib/client';
 
 export async function GET(req: NextRequest) {
-    const { pathname } = req.nextUrl;
-    const userId = pathname.split('/')[3];
-
-    if (!userId) {
-        return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
-    }
-
     try {
         const query = `
             SELECT User {
-                id,
+                userId,
                 username,
                 email,
-                birthday,
+                walletBalance,
                 walletAddress,
                 createdAt,
-                transactions,
-                twins,
-                notifications,
-                tokenShares,
-                userTokenShares,
-                twins: {
-                    id,
+                birthday,
+                twins : {
+                    twinId,
                     twinHandle,
+                    twitterHandle,
                     profileImage,
-                    description,
+                    isListed,
                     price,
-                    tokenShares: {
-                        availableShares,
-                        totalShares,
-                        pricePerShare,
-                        shareholders
-                    },
-                    verification: {
-                        isVerified
-                    },
-                    stats: {
-                        replies,
-                        interactions
+                    twineets : {
+                        twinId,
+                        content,
+                        timestamp,
+                        likes,
+                        retwineets,
+                        replies
                     }
-                } FILTER .owner.id != <uuid>$userId
+                },
+                notifications :{
+                    twinId,
+                    kind,
+                    message,
+                    twinHandle,
+                    twitterHandle,
+                    timestamp
+                },
+                tokenShares : {
+                    twinId,
+                    pricePerShare,
+                    totalShares,
+                    availableShares,
+                    shareholders : {
+                        twinId,
+                        userId,
+                        shares,
+                        purchasePrice,
+                        purchaseDate
+                    }
+                },
+                userTokenShares :{
+                    twinId,
+                    shares,
+                    purchasePrice,
+                    purchaseDate
+                },
+                likes :{
+                    twinId,
+                    userId
+                },
+                retwineets :{
+                    twinId,
+                    userId
+                },
+                replies :{
+                    twinId,
+                    userId
+                }
             }
         `;
 
         const result = await edgeDBCloudClient.query(query);
-        console.log('User data:', result);
+        console.log('All users data:', result);
 
         return NextResponse.json(result, { status: 200 });  
     } catch (error) {

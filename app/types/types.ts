@@ -166,12 +166,29 @@ export interface TwineetType {
     isRetwineeted: boolean;
 }
 
+export interface LikesType {
+    twinId: TwinIdType;
+    userId: UserIdType;
+}
+
+export interface RetwineetsType {
+    twinId: TwinIdType;
+    userId: UserIdType;
+}
+
+export interface RepliesType {
+    content: string;
+    timestamp: Date;
+    twinId: TwinIdType;
+    userId: UserIdType;
+}
 export interface UserType {
     userId: UserIdType;
     username: string;
     email: string;
     passwordHash: string;
     birthday?: Date;
+    walletBalance?: number;
     walletAddress?: string;
     twins?: TwinType[];
     transactions?: TransactionType[];
@@ -180,6 +197,9 @@ export interface UserType {
     userTokenShares?: UserTokenShareType[];
     tokenStats?: TokenStatsType[];
     createdAt: Date;
+    likes?: LikesType[];
+    retwineets?: RetwineetsType[];
+    replies?: RepliesType[];
 }
 export interface VerificationResponseType {
     twinId: TwinIdType;

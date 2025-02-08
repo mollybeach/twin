@@ -174,29 +174,53 @@ module default {
         required multi link transactions -> Transaction;
     }
 
+    type Likes {
+        required property twinId -> TwinIdType;
+        required property userId -> UserIdType;
+    }
+
+    type Retwineets {
+        required property twinId -> TwinIdType;
+        required property userId -> UserIdType;
+    }
+
+    type Replies {
+        required property content -> str;
+        required property likes -> int16;
+        required property timestamp -> datetime;
+        required property twinId -> TwinIdType;
+        required property userId -> UserIdType;
+    }
+
     # Define the User type
     type User {
-        required property userId -> UserIdType {
-                constraint exclusive
-        }
-        required property username -> str {
-                constraint exclusive
-        }
-        required property email -> str {
-                constraint exclusive
-        }
-        required property passwordHash -> str;
+        optional property birthday -> datetime;
         required property createdAt -> datetime {
             default := datetime_current(); 
         }
-        optional property birthday -> datetime;
-        required property walletAddress -> str;
+        required property email -> str {
+            constraint exclusive
+        }
+        optional multi link likes -> Likes;
+        optional multi link notifications -> Notification;
+        required property passwordHash -> str;
+        optional multi link replies -> Replies;
+        optional multi link retwineets -> Retwineets;
+        optional multi link tokenShares -> TokenShare;
+        optional multi link tokenStats -> TokenStats;
         optional multi link transactions -> Transaction;
         optional multi link twins -> Twin;
-        optional multi link notifications -> Notification;
-        optional multi link tokenShares -> TokenShare;
+        required property userId -> UserIdType {
+            constraint exclusive
+        }
+        required property username -> str {
+            constraint exclusive
+        }
         optional multi link userTokenShares -> UserTokenShare;
-        optional multi link tokenStats -> TokenStats;
+        required property walletAddress -> str;
+        required property walletBalance -> decimal{
+            default := <decimal>1000000;
+        }
     }
 
     # Define the Notification type

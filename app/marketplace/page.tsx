@@ -14,8 +14,10 @@ export default function MarketplacePage() {
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [userBalance, setUserBalance] = useState<number>(0);
 
-  const userId = 'some-user-id'; // Replace with actual user ID logic
+  // Fetch user ID from session (this is a placeholder, implement your session logic)
+  const userId = 'some-user-id'; // Replace with actual logic to get user ID from session
 
   // Fetch twins and user shares from the API
   const fetchTwins = async () => {
@@ -24,17 +26,18 @@ export default function MarketplacePage() {
       if (!response.ok) {
         throw new Error('Failed to fetch twins');
       }
-      const allTwins: TwinType[] = await response.json(); // Ensure the response is typed
+      const allTwins: TwinType[] = await response.json();
       const filteredTwins = allTwins.filter(twin => twin.userId !== userId); // Filter out twins owned by the user
-      setTwins(filteredTwins); // Update state with filtered twins
+      setTwins(filteredTwins);
     } catch (error) {
       console.error('Error fetching twins:', error);
     }
   };
 
-  const fetchUserShares = async (userId: string) => {
+  // Fetch user shares
+  const fetchUserShares = async () => {
     try {
-      const response = await fetch(`/api/users/${userId}/shares`); // Fetch user shares from the new API endpoint
+      const response = await fetch(`/api/users/${userId}/shares`); // Fetch user shares
       if (!response.ok) {
         throw new Error('Failed to fetch user shares');
       }
@@ -51,28 +54,36 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     fetchTwins();
-    fetchUserShares(userId);
+    fetchUserShares();
   }, []);
 
-  const handleBuyShares = (twinId: string) => {
+  const handleBuyShares = async (twinId: string) => {
     const twin = twins.find(a => a.twinId === twinId);
     if (!twin) return;
-
-    console.log('Price per share:', twin.tokenShares.pricePerShare); // Debugging line
 
     if (sharesToBuy > twin.tokenShares.availableShares) {
       alert('Not enough shares available');
       return;
     }
 
+    const totalCost = sharesToBuy * twin.price; // Calculate total cost
+
+    if (totalCost > userBalance) {
+      alert('Not enough balance to buy shares');
+      return;
+    }
+
     // Call your buyShares function here
     // buyShares(twinId, sharesToBuy);
+    
+    // Update user balance
+    setUserBalance(prevBalance => prevBalance - totalCost);
     setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
   };
 
-  const handleSellShares = (twinId: string) => {
+  const handleSellShares = async (twinId: string) => {
     if (sharesToBuy <= 0) {
       alert('Please enter a valid number of shares');
       return;
@@ -86,6 +97,14 @@ export default function MarketplacePage() {
 
     // Call your sellShares function here
     // sellShares(twinId, sharesToBuy);
+
+    const twin = twins.find(a => a.twinId === twinId);
+    if (twin) {
+      const totalSale = sharesToBuy * twin.price; // Calculate total sale
+      // Update user balance
+      setUserBalance(prevBalance => prevBalance + totalSale);
+    }
+
     setSelectedTwin(null);
     setSharesToBuy(1);
     setIsSellingShares(false);
@@ -107,7 +126,6 @@ export default function MarketplacePage() {
           <h1 className="text-3xl font-bold text-white mb-4 rainbow-text">Twin.fun Marketplace</h1>
           <p className="text-lg text-white/80">Invest in your favorite digital twins</p>
         </div>
-
         {twins.length === 0 ? (
           <div className="text-center py-12">
             <Bot className="w-12 h-12 text-white mx-auto mb-4" />

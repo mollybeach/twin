@@ -95,23 +95,35 @@ These are the main route handlers for the application.
 
 Backend endpoints responsible for handling data and API interactions.
 
-| API Endpoint                          | File                             | Description                                      |
-|---------------------------------------|----------------------------------|--------------------------------------------------|
-| /api/generate                         | api/generate/route.ts           | Generates data (possibly AI-generated content). |
-| /api/tweets                           | api/tweets/route.ts             | Handles tweet-related API calls.                 |
-| /api/twineets                         | api/twineets/route.ts           | Manages "twineets" (possibly retweets or clones). |
-| /api/twineets/:twineetId             | api/twineets/[twineetId]/route.ts | Specific twineet interactions.                   |
-| /api/twineets/:twineetId/isliked     | api/twineets/[twineetId]/isliked/route.ts | Checks if a twineet is liked.                   |
-| /api/twineets/:twineetId/isretwineeted| api/twineets/[twineetId]/isretwineeted/route.ts | Checks if a twineet is retweeted.                |
-| /api/twineets/:twineetId/replies     | api/twineets/[twineetId]/replies/route.ts | Fetches replies to a twineet.                   |
-| /api/twins                            | api/twins/route.ts              | Manages "twins" (cloned profiles or entities).  |
-| /api/twins/:twinId                  | api/twins/[twinId]/route.ts    | Handles twin actions per twin.                  |
-| /api/twins/:twinId/twineets/:twineetId | api/twins/[twinId]/twineets/[twineetId]/route.ts | Manages twineets of a twin.                      |
-| /api/users                            | api/users/route.ts              | General user management API.                     |
-| /api/users/:userId                   | api/users/[userId]/route.ts     | Fetches a specific user's data.                  |
-| /api/users/login                      | api/users/login/route.ts        | Handles user login.                              |
-| /api/users/logout                     | api/users/logout/route.ts       | Logs out the user.                              |
-| /api/users/register                   | api/users/register/route.ts     | Handles new user registration.                   |
+| API Endpoint                              | File                                           | Description                                      |
+|-------------------------------------------|----------------------------------------------|--------------------------------------------------|
+| **General API Routes**                    |                                              |                                                  |
+| `/api/generate`                           | `api/generate/route.ts`                      | Generates data (possibly AI-generated content). |
+| `/api/tweets`                             | `api/tweets/route.ts`                        | Handles tweet-related API calls.                 |
+|                                           |                                              |                                                  |
+| **Twineet API Routes**                    |                                              |                                                  |
+| `/api/twineets`                           | `api/twineets/route.ts`                      | Manages "twineets" (possibly retweets or clones). |
+| `/api/twineets/:twineetId`                | `api/twineets/[twineetId]/route.ts`          | Specific twineet interactions.                   |
+| `/api/twineets/:twineetId/isliked`        | `api/twineets/[twineetId]/isliked/route.ts`  | Checks if a twineet is liked.                    |
+| `/api/twineets/:twineetId/isretwineeted`  | `api/twineets/[twineetId]/isretwineeted/route.ts` | Checks if a twineet is retweeted.               |
+| `/api/twineets/:twineetId/replies`        | `api/twineets/[twineetId]/replies/route.ts`  | Fetches replies to a twineet.                    |
+|                                           |                                              |                                                  |
+| **Twin API Routes**                       |                                              |                                                  |
+| `/api/twins`                              | `api/twins/route.ts`                         | Manages "twins" (cloned profiles or entities).   |
+| `/api/twins/:twinId`                      | `api/twins/[twinId]/route.ts`                | Handles twin actions per twin.                   |
+| `/api/twins/:twinId/buy`                  | `api/twins/[twinId]/buy/route.ts`            | Handles the purchase of twin shares.            |
+| `/api/twins/:twinId/twineets`             | `api/twins/[twinId]/twineets/route.ts`       | Retrieves all twineets associated with a twin.  |
+| `/api/twins/:twinId/twineets/:twineetId`  | `api/twins/[twinId]/twineets/[twineetId]/route.ts` | Fetches a specific twineet under a twin.   |
+|                                           |                                              |                                                  |
+| **User API Routes**                       |                                              |                                                  |
+| `/api/users`                              | `api/users/route.ts`                         | General user management API.                     |
+| `/api/users/:userId`                      | `api/users/[userId]/route.ts`                | Fetches a specific user's data.                  |
+| `/api/users/:userId/balance`              | `api/users/[userId]/balance/route.tsx`       | Retrieves the balance of a user.                 |
+| `/api/users/:userId/shares`               | `api/users/[userId]/shares/route.ts`         | Retrieves shares owned by a user.                |
+| `/api/users/login`                        | `api/users/login/route.ts`                   | Handles user login.                              |
+| `/api/users/logout`                       | `api/users/logout/route.ts`                  | Logs out the user.                               |
+| `/api/users/register`                     | `api/users/register/route.ts`                | Handles new user registration.                   |
+
 
 ## Components
 
@@ -275,63 +287,36 @@ Backend scripts for server-side logic.
 | reachByPlatform   | ReachByPlatform | Multi-link to ReachByPlatform objects  |
 | topInteractions   | TopInteractions | Multi-link to TopInteractions objects  |
 
+### 9. User Table
+| Column Name | Type | Constraints | Description |
+|------------------|----------------|--------------------------------------|-----------------------------------------|
+| userId | UserIdType (str) | Primary Key, Unique | Unique identifier for the user. |
+| username | str | Unique, Required | User's chosen username. |
+| email | str | Unique, Required | User's email address. |
+| passwordHash | str | Required | Hashed password for authentication. |
+| walletAddress | str | Required | Blockchain wallet address. |
+| walletBalance | decimal | Default: 1,000,000 | User's token balance. |
+| birthday | datetime | Optional | User's date of birth. |
+| createdAt | datetime | Default: Now | Timestamp of account creation. |
+
+### 10 User Relationships
+| Relation | Type | Constraints | Description |
+|------------------|----------------|--------------------------------------|-----------------------------------------|
+| likes | multi link → Likes | Optional | Tweets liked by the user. |
+| notifications | multi link → Notification | Optional | Notifications associated with the user. |
+| replies | multi link → Replies | Optional | User's replies to tweets. |
+| retwineets | multi link → Retwineets | Optional | User's retweets. |
+| tokenShares | multi link → TokenShare | Optional | User's owned token shares. |
+| tokenStats | multi link → TokenStats | Optional | Statistics related to user's token shares. |
+| transactions | multi link → Transaction | Optional | Buy/sell transactions by the user. |
+| twins | multi link → Twin | Optional | Twins created/owned by the user. |
+| userTokenShares | multi link → UserTokenShare | Optional | User's share purchases in twins. |
 ## Project Structure
 
 ```
 twin/
 ├── .git/
 ├── .next/
-│   ├── cache/
-│   │   ├── eslint/
-│   │   │   └── .cache_1o25e43
-│   │   ├── swc/
-│   │   │   └── plugins/
-│   │   │   │   └── v7_macos_aarch64_4.0.0/
-│   │   ├── webpack/
-│   │   ├── .rscinfo
-│   │   └── .tsbuildinfo
-│   ├── server/
-│   │   ├── app/
-│   │   │   ├── api/
-│   │   │   │   ├── generate/
-│   │   │   │   │   └── route.js
-│   │   │   │   ├── tweets/
-│   │   │   │   │   └── route.js
-│   │   │   │   ├── twineets/
-│   │   │   │   │   └── route.js
-│   │   │   │   └── twins/
-│   │   │   │   │   └── route.js
-│   │   │   ├── createtwin/
-│   │   │   │   └── page.js
-│   │   │   ├── timeline/
-│   │   │   │   └── page.js
-│   │   │   └── page.js
-│   │   └── webpack-runtime.js
-│   ├── static/
-│   ├── types/
-│   │   ├── app/
-│   │   │   ├── api/
-│   │   │   │   ├── generate/
-│   │   │   │   │   └── route.ts
-│   │   │   │   ├── tweets/
-│   │   │   │   │   └── route.ts
-│   │   │   │   ├── twineets/
-│   │   │   │   │   └── route.ts
-│   │   │   │   └── twins/
-│   │   │   │   │   └── route.ts
-│   │   │   ├── createtwin/
-│   │   │   │   └── page.ts
-│   │   │   ├── timeline/
-│   │   │   │   └── page.ts
-│   │   │   ├── layout.ts
-│   │   │   └── page.ts
-│   │   ├── cache-life.d.ts
-│   │   └── package.json
-│   ├── app-build-manifest.json
-│   ├── build-manifest.json
-│   ├── package.json
-│   ├── react-loadable-manifest.json
-│   └── trace
 ├── app/
 │   ├── analytics/
 │   │   └── page.tsx
@@ -355,6 +340,8 @@ twin/
 │   │   │   └── route.ts
 │   │   ├── twins/
 │   │   │   ├── [twinId]/
+│   │   │   │   ├── buy/
+│   │   │   │   │   └── route.ts
 │   │   │   │   ├── twineets/
 │   │   │   │   │   ├── [twineetId]/
 │   │   │   │   │   │   └── route.ts
@@ -365,6 +352,10 @@ twin/
 │   │   │   └── route.ts
 │   │   ├── users/
 │   │   │   ├── [userId]/
+│   │   │   │   ├── balance/
+│   │   │   │   │   └── route.tsx
+│   │   │   │   ├── shares/
+│   │   │   │   │   └── route.ts
 │   │   │   │   └── route.ts
 │   │   │   ├── login/
 │   │   │   │   └── route.ts
@@ -385,7 +376,8 @@ twin/
 │   │   ├── SharePriceChart.tsx
 │   │   ├── ThemeToggle.tsx
 │   │   ├── TokenStats.tsx
-│   │   └── TradingChart.tsx
+│   │   ├── TradingChart.tsx
+│   │   └── Wallet.tsx
 │   ├── createtwin/
 │   │   └── page.tsx
 │   ├── leaderboard/
@@ -420,6 +412,7 @@ twin/
 │   ├── layout.tsx
 │   └── page.tsx
 ├── dbschema/
+│   ├── edgeql-js/
 │   ├── migrations/
 │   ├── .DS_Store
 │   ├── default.esdl

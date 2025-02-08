@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
 import { PriceChart } from '../components/PriceChart';
 import { TwinType } from '../types/types';
+import { UserType } from '../types/types';
 
 const VERIFICATION_FEE = 100;
 
-export default function MarketplacePage({ userData }: { userData: any }) {
+export default function MarketplacePage({ userData }: { userData: UserType }) {
   const [twins, setTwins] = useState<TwinType[]>([]);
   const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);

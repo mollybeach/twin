@@ -9,6 +9,7 @@ import "@/styles/globals.css"; // Import global styles
 import { useMarketplaceStore } from '@/store/marketplace';
 import { useThemeStore } from '@/store/themeStore';
 import { useEffect, useState } from 'react';
+import { UserType } from './types/types';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const { notification, setNotification } = useMarketplaceStore();
@@ -54,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <main className="p-8">
                     {React.Children.map(children, child => {
                         // Pass the user data as a prop to each child
-                        return React.cloneElement(child as React.ReactElement, { userData });
+                        return React.cloneElement(child as React.ReactElement, { userData: userData as UserType });
                     })}
                 </main>
                 <footer className="bg-gray-800 text-white p-4 text-center">

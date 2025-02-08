@@ -8,7 +8,7 @@ import { UserType } from '../types/types';
 
 const VERIFICATION_FEE = 100;
 
-export default function MarketplacePage({ userData }: { userData: UserType }) {
+const MarketplacePage = ({ userData }: { userData: UserType }) => {
   const [twins, setTwins] = useState<TwinType[]>([]);
   const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
@@ -363,3 +363,5 @@ export default function MarketplacePage({ userData }: { userData: UserType }) {
     </div>
   );
 }
+
+export default MarketplacePage;

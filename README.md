@@ -105,8 +105,8 @@ Backend endpoints responsible for handling data and API interactions.
 | /api/twineets/:twineetId/isretwineeted| api/twineets/[twineetId]/isretwineeted/route.ts | Checks if a twineet is retweeted.                |
 | /api/twineets/:twineetId/replies     | api/twineets/[twineetId]/replies/route.ts | Fetches replies to a twineet.                   |
 | /api/twins                            | api/twins/route.ts              | Manages "twins" (cloned profiles or entities).  |
-| /api/twins/:agentId                  | api/twins/[agentId]/route.ts    | Handles twin actions per agent.                  |
-| /api/twins/:agentId/twineets/:twineetId | api/twins/[agentId]/twineets/[twineetId]/route.ts | Manages twineets of a twin.                      |
+| /api/twins/:twinId                  | api/twins/[twinId]/route.ts    | Handles twin actions per twin.                  |
+| /api/twins/:twinId/twineets/:twineetId | api/twins/[twinId]/twineets/[twineetId]/route.ts | Manages twineets of a twin.                      |
 | /api/users                            | api/users/route.ts              | General user management API.                     |
 | /api/users/:userId                   | api/users/[userId]/route.ts     | Fetches a specific user's data.                  |
 | /api/users/login                      | api/users/login/route.ts        | Handles user login.                              |
@@ -354,7 +354,7 @@ twin/
 │   │   │   ├── .DS_Store
 │   │   │   └── route.ts
 │   │   ├── twins/
-│   │   │   ├── [agentId]/
+│   │   │   ├── [twinId]/
 │   │   │   │   ├── twineets/
 │   │   │   │   │   ├── [twineetId]/
 │   │   │   │   │   │   └── route.ts

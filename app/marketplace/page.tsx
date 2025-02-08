@@ -7,17 +7,14 @@ import { TwinType } from '../types/types';
 
 const VERIFICATION_FEE = 100;
 
-export default function MarketplacePage() {
+export default function MarketplacePage({ userData }: { userData: any }) {
   const [twins, setTwins] = useState<TwinType[]>([]);
   const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [userBalance, setUserBalance] = useState<number>(0);
-
-  // Fetch user ID from session (this is a placeholder, implement your session logic)
-  const userId = 'some-user-id'; // Replace with actual logic to get user ID from session
+  const [userBalance, setUserBalance] = useState<number>(userData?.walletBalance || 0);
 
   // Fetch twins and user shares from the API
   const fetchTwins = async () => {
@@ -27,7 +24,7 @@ export default function MarketplacePage() {
         throw new Error('Failed to fetch twins');
       }
       const allTwins: TwinType[] = await response.json();
-      const filteredTwins = allTwins.filter(twin => twin.userId !== userId); // Filter out twins owned by the user
+      const filteredTwins = allTwins.filter(twin => twin.userId !== userData?.userId); // Filter out twins owned by the user
       setTwins(filteredTwins);
     } catch (error) {
       console.error('Error fetching twins:', error);
@@ -37,7 +34,7 @@ export default function MarketplacePage() {
   // Fetch user shares
   const fetchUserShares = async () => {
     try {
-      const response = await fetch(`/api/users/${userId}/shares`); // Fetch user shares
+      const response = await fetch(`/api/users/${userData?.userId}/shares`); // Fetch user shares
       if (!response.ok) {
         throw new Error('Failed to fetch user shares');
       }
@@ -66,21 +63,40 @@ export default function MarketplacePage() {
       return;
     }
 
-    const totalCost = sharesToBuy * twin.price; // Calculate total cost
+    const numericPrice = typeof twin.price === 'string' ? parseFloat(twin.price) : twin.price;
+    const totalCost = sharesToBuy * numericPrice; // Calculate total cost
 
     if (totalCost > userBalance) {
       alert('Not enough balance to buy shares');
       return;
     }
 
-    // Call your buyShares function here
-    // buyShares(twinId, sharesToBuy);
-    
-    // Update user balance
-    setUserBalance(prevBalance => prevBalance - totalCost);
-    setSelectedTwin(null);
-    setSharesToBuy(1);
-    setIsSellingShares(false);
+    // Call the API to buy shares
+    try {
+      const response = await fetch(`/api/twins/${twinId}/buy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          twinId,
+          userId: userData.userId, // Pass the user ID
+          sharesToBuy,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to buy shares');
+      }
+
+      // Update user balance
+      setUserBalance(prevBalance => prevBalance - totalCost);
+      setSelectedTwin(null);
+      setSharesToBuy(1);
+      setIsSellingShares(false);
+    } catch (error) {
+      console.error('Error buying shares:', error);
+    }
   };
 
   const handleSellShares = async (twinId: string) => {
@@ -100,7 +116,8 @@ export default function MarketplacePage() {
 
     const twin = twins.find(a => a.twinId === twinId);
     if (twin) {
-      const totalSale = sharesToBuy * twin.price; // Calculate total sale
+      const numericBalance = typeof twin.price === 'string' ? parseFloat(twin.price) : twin.price;
+      const totalSale = sharesToBuy * numericBalance; // Calculate total sale
       // Update user balance
       setUserBalance(prevBalance => prevBalance + totalSale);
     }
@@ -171,7 +188,7 @@ export default function MarketplacePage() {
                       </div>
                       <span className="flex items-center text-gray-900 dark:text-white font-semibold">
                         <DollarSign className="h-4 w-4" />
-                        {typeof twin.price === 'number' ? twin.price.toFixed(2) : 'N/A'}
+                        { typeof twin.price === 'string' ? parseFloat(twin.price).toFixed(2) : twin.price.toFixed(2)}
                       </span>
                     </div>
 

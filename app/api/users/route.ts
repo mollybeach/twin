@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { edgeDBCloudClient } from '../../../lib/client';
 
 export async function GET(req: NextRequest) {
+    console.log('Fetching users', req);
     try {
         const query = `
             SELECT User {
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
                 email,
                 walletBalance,
                 walletAddress,
-                createdAt,
+                timestamp,
                 birthday,
                 twins : {
                     twinId,
@@ -25,9 +26,9 @@ export async function GET(req: NextRequest) {
                         twinId,
                         content,
                         timestamp,
-                        likes,
-                        retwineets,
-                        replies
+                        likesCount,
+                        retwineetsCount,
+                        repliesCount
                     }
                 },
                 notifications :{

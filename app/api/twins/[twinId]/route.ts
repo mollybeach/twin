@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
                 id,
                 twinId,
                 autoReply,
-                createdAt,
+                timestamp,
                 description,
                 personality,
                 price,
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
                 stats: {
                     twinId,
                     interactions,
-                    replies,
+                    repliesCount
                     uptime
                 },
                 tokenShares: {
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
                     timestamp,
                     likes,
                     retwineets,
-                    replies,
+                    repliesCount
                     isLiked,
                     isRetwineeted
                 },
@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
                 },
                 transactions: {
                     twinId,
-                    kind,
+                    trade,
                     shares,
                     pricePerShare,
                     totalAmount,

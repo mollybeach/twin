@@ -39,7 +39,7 @@ export function formatTokenShare(tokenShare: TokenShareType) {
     };
 }
 
-export function formatTwin(twin: any): TwinType {
+export function formatTwin(twin: TwinType) {
     return {
         twinId: twin.twinId,
         twinHandle: twin.twinHandle,
@@ -49,9 +49,9 @@ export function formatTwin(twin: any): TwinType {
         description: twin.description,
         autoReply: twin.autoReply,
         isListed: twin.isListed,
-        price: parseFloat(twin.price),
+        price: parseFloat(twin.price.toString()),
         modelData: twin.modelData, 
-        createdAt: new Date(twin.createdAt),
+        timestamp: new Date(twin.timestamp),
         analytics: formatAnalytics(twin.analytics),
         fetchedTweets: twin.fetchedTweets?.map(formatFetchedTweet) || [],
         twineets: twin.twineets?.map(formatTwineet) || [],
@@ -91,7 +91,7 @@ export function formatAnalytics(analytics: AnalyticsType) {
 export function formatTwinStats(stats: TwinStatsType) {
     return {
         twinId: stats.twinId,
-        replies: stats.replies,
+        repliesCount: stats.repliesCount,
         interactions: stats.interactions,
         uptime: stats.uptime,
     };
@@ -161,9 +161,9 @@ export function formatTwineet(twineet: TwineetType) {
         twinId: twineet.twinId,
         content: twineet.content,
         timestamp: twineet.timestamp, 
-        likes: twineet.likes,
-        retwineets: twineet.retwineets,
-        replies: twineet.replies,
+        likesCount: twineet.likesCount,
+        retwineetsCount: twineet.retwineetsCount,
+        repliesCount: twineet.repliesCount,
         isLiked: twineet.isLiked,
         isRetwineeted: twineet.isRetwineeted,
     };
@@ -180,7 +180,7 @@ export function formatVerification(verification: VerificationResponseType) {
 export function formatTransaction(transaction: TransactionType) {
     return {
         twinId: transaction.twinId,
-        kind: transaction.kind,
+        trade: transaction.trade,
         shares: transaction.shares,
         pricePerShare: transaction.pricePerShare,
         totalAmount: transaction.totalAmount,

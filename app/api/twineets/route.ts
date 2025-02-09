@@ -11,9 +11,9 @@ export async function GET() {
                 twinId,
                 content,
                 timestamp,
-                likes,
-                retwineets,
-                replies,
+                likesCount,
+                retwineetsCount,
+                repliesCount,
                 isLiked,
                 isRetwineeted
             };

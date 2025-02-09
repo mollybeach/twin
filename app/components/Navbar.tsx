@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, PlusCircle, Trophy, Search, X, GitMerge, Twitter } from 'lucide-react';
-import { useMarketplaceStore } from '@/store/marketplace';
+import { useStore } from '@/store/store';
 import { TokenStats } from './TokenStats';
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +13,7 @@ export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const twins = useMarketplaceStore((state) => state.twins);
+  const allTwins = useStore((state) => state.allTwins);
   const router = useRouter();
 
   useEffect(() => {
@@ -45,10 +45,10 @@ export function Navbar() {
       return;
     }
 
-    const filtered = twins.filter(twin => 
+    const filtered = allTwins.filter((twin: { twinHandle: string; personality: string }) => 
       twin.twinHandle.toLowerCase().includes(query.toLowerCase()) ||
       twin.personality.toLowerCase().includes(query.toLowerCase())
-    ).map(({ twinId, twinHandle, personality }) => ({
+    ).map(({ twinId, twinHandle, personality }: { twinId: string; twinHandle: string; personality: string }) => ({
       twinId,
       twinHandle,
       personality

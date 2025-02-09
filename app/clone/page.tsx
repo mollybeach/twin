@@ -1,13 +1,14 @@
 // path: app/clone/page.tsx
 "use client";
 import React, { useState } from 'react';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 import { GitMerge, Dna, Sparkles, Bot, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TwinType } from '../types/types';
+import Image from 'next/image';
 
 export default function ClonePage() {
-  const { twins, addTwin } = useMarketplaceStore();
+  const { allTwins, addTwin } = useStore();
   const [selectedTwins, setSelectedTwins] = useState<string[]>([]);
   const [draggedTwin, setDraggedTwin] = useState<string | null>(null);
   const [isCloning, setIsCloning] = useState(false);
@@ -66,8 +67,8 @@ export default function ClonePage() {
     if (selectedTwins.length !== 2) return;
 
     setIsCloning(true);
-    const twin1 = twins.find((a: TwinType) => a.twinId === selectedTwins[0]);
-    const twin2 = twins.find((a: TwinType) => a.twinId === selectedTwins[1]);
+    const twin1 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[0]);
+    const twin2 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[1]);
 
     if (!twin1 || !twin2) return;
 
@@ -80,7 +81,7 @@ export default function ClonePage() {
 
     const newTwin: TwinType = {
       twinId: `${twin1.twinId}_${twin2.twinId}`,
-      createdAt: new Date(),
+      timestamp: new Date(),
       twitterHandle: `${twin1.twitterHandle}_${twin2.twitterHandle}`,
       twinHandle: `${twin1.twinHandle}_${twin2.twinHandle}`,
       personality: `${twin1.personality} + ${twin2.personality}`,
@@ -89,7 +90,7 @@ export default function ClonePage() {
       price: totalPrice,
       stats: { 
         twinId: `${twin1.twinId}_${twin2.twinId}`,
-        replies: 0, 
+        repliesCount: 0, 
         interactions: 0, 
         uptime: '0h 0m' 
       },
@@ -142,8 +143,8 @@ export default function ClonePage() {
     try {
       setIsCloning(true);
       setError(null);
-      const twin1 = twins.find(a => a.twinId === selectedTwins[0]);
-      const twin2 = twins.find(a => a.twinId === selectedTwins[1]);
+      const twin1 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[0]);
+      const twin2 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[1]);
 
       if (!twin1 || !twin2) {
         setError('Selected twins not found.');
@@ -154,10 +155,10 @@ export default function ClonePage() {
       // Create the new clone
       const newTwinId = await addTwin({
         twinId: `${twin1.twinId}_${twin2.twinId}`,  
-        createdAt: new Date(),
+        timestamp: new Date(),
         stats: {
           twinId: `${twin1.twinId}_${twin2.twinId}`,
-          replies: 0,
+          repliesCount: 0,
           interactions: 0,
           uptime: '0h 0m'
         },
@@ -232,7 +233,7 @@ export default function ClonePage() {
           <p className="text-purple-200">Drag two AI Twins into the Yinyang to create a powerful new hybrid!</p>
         </div>
 
-        {twins.length < 2 ? (
+        {allTwins.length < 2 ? (
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">Not Enough Twins</h2>
@@ -246,7 +247,7 @@ export default function ClonePage() {
                 Available Twins
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {twins.map((twin) => (
+                {allTwins.map((twin) => (
                   <div
                     key={twin.twinId}
                     draggable
@@ -259,9 +260,11 @@ export default function ClonePage() {
                     }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <img
+                        <Image
                         src={twin.profileImage}
                         alt={twin.twinHandle}
+                        width={12}
+                        height={12}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div>
@@ -287,10 +290,12 @@ export default function ClonePage() {
                 onDrop={(e) => handleDrop('left', e)}
               >
                 {selectedTwins[0] && (
-                  <img
-                    src={twins.find(a => a.twinId === selectedTwins[0])?.profileImage}
+                  <Image
+                    src={allTwins.find(a => a.twinId === selectedTwins[0])?.profileImage || ''}
                     alt="Left Twin"
                     className="w-full h-full rounded-full object-cover"
+                    width={12}
+                    height={12}
                   />
                 )}
               </div>
@@ -302,10 +307,12 @@ export default function ClonePage() {
                 onDrop={(e) => handleDrop('right', e)}
               >
                 {selectedTwins[1] && (
-                  <img
-                    src={twins.find(a => a.twinId === selectedTwins[1])?.profileImage}
+                  <Image
+                    src={allTwins.find(a => a.twinId === selectedTwins[1])?.profileImage || ''}
                     alt="Right Twin"
                     className="w-full h-full rounded-full object-cover"
+                    width={12}
+                    height={12}
                   />
                 )}
               </div>
@@ -313,7 +320,7 @@ export default function ClonePage() {
 
             {draggedTwin && (
               <div className="dragged-twin-info">
-                <p>Currently dragging: {twins.find(a => a.twinId === draggedTwin)?.twinHandle}</p>
+                <p>Currently dragging: {allTwins.find(a => a.twinId === draggedTwin)?.twinHandle}</p>
               </div>
             )}
 
@@ -346,10 +353,12 @@ export default function ClonePage() {
                   Fusion Result
                 </h2>
                 <div className="flex items-center space-x-6">
-                  <img
+                  <Image
                     src={cloneResult.profileImage}
                     alt={cloneResult.twinHandle}
                     className="w-24 h-24 rounded-full object-cover"
+                    width={24}
+                    height={24}
                   />
                   <div>
                     <div className="text-white font-medium text-lg">@{cloneResult.twinHandle}</div>

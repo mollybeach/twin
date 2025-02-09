@@ -102,7 +102,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
 
     const transactionsQuery = edgeql.insert(edgeql.Transaction, {
         twinId: formattedTransactions.twinId,
-        kind: formattedTransactions.kind,
+        trade: formattedTransactions.trade,
         shares: formattedTransactions.shares,
         pricePerShare: edgeql.decimal(formattedTransactions.pricePerShare.toString()),
         totalAmount: edgeql.decimal(formattedTransactions.totalAmount.toString()),
@@ -143,7 +143,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         autoReply: formattedTwin.autoReply,
         isListed: formattedTwin.isListed,
         price: formattedTwin.price,
-        createdAt: edgeql.cast(edgeql.datetime, formattedTwin.createdAt),
+        timestamp: edgeql.cast(edgeql.datetime, formattedTwin.timestamp),
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedTwin.verification)),
         stats: edgeql.insert(edgeql.TwinStats, formatTwinStats(formattedTwin.stats)),
@@ -205,9 +205,9 @@ export async function fetchTwineets(): Promise<TwineetType[]> {
         twinId: true,
         content: true,
         timestamp: true,
-        likes: true,
-        retwineets: true,
-        replies: true,
+        likesCount: true,
+        retwineetsCount: true,
+        repliesCount: true,
         isLiked: true,
         isRetwineeted: true,
     }));

@@ -262,12 +262,12 @@ const $TopInteractions = $.makeType<$TopInteractions>(_.spec, "a4308bb6-e51c-11e
 const TopInteractions: $.$expr_PathNode<$.TypeSet<$TopInteractions, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($TopInteractions, $.Cardinality.Many), null);
 
 export type $TransactionλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "kind": $.PropertyDesc<$TransactionGroup, $.Cardinality.One, false, false, false, false>;
   "pricePerShare": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
-  "shares": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
   "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "totalAmount": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
+  "shares": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
+  "trade": $.PropertyDesc<$TransactionGroup, $.Cardinality.One, false, false, false, false>;
   "<transactions[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<transactions[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<transactions": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -283,7 +283,6 @@ export type $TwinλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "modelData": $.PropertyDesc<_std.$json, $.Cardinality.One, false, false, false, false>;
   "isListed": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, false, false, false>;
   "autoReply": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, false, false, false>;
-  "createdAt": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "description": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "personality": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "price": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, false>;
@@ -292,6 +291,7 @@ export type $TwinλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, true, false, false, false>;
   "twitterHandle": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, false, false, false, true>;
+  "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "analytics": $.LinkDesc<$Analytics, $.Cardinality.One, {}, false, false,  false, false>;
   "fetchedTweets": $.LinkDesc<$FetchedTweet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "tokenShares": $.LinkDesc<$TokenShare, $.Cardinality.One, {}, false, false,  false, false>;
@@ -313,9 +313,9 @@ const Twin: $.$expr_PathNode<$.TypeSet<$Twin, $.Cardinality.Many>, null> = _.syn
 
 export type $TwinStatsλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "interactions": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
-  "replies": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "uptime": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
+  "repliesCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, false>;
   "<stats[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<stats": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -330,11 +330,11 @@ export type $TwineetλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7384
   "content": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "isLiked": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, false, false, true>;
   "isRetwineeted": $.PropertyDesc<_std.$bool, $.Cardinality.One, false, false, false, true>;
-  "likes": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
-  "replies": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
-  "retwineets": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
   "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
+  "likesCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
+  "repliesCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
+  "retwineetsCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
   "<twineets[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<twineets": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -346,7 +346,6 @@ const $Twineet = $.makeType<$Twineet>(_.spec, "a43a93cc-e51c-11ef-bd82-95e2112a9
 const Twineet: $.$expr_PathNode<$.TypeSet<$Twineet, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Twineet, $.Cardinality.Many), null);
 
 export type $UserλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
-  "createdAt": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "email": $.PropertyDesc<_std.$str, $.Cardinality.One, true, false, false, false>;
   "passwordHash": $.PropertyDesc<_std.$str, $.Cardinality.One, false, false, false, false>;
   "username": $.PropertyDesc<_std.$str, $.Cardinality.One, true, false, false, false>;
@@ -354,6 +353,7 @@ export type $UserλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "birthday": $.PropertyDesc<_std.$datetime, $.Cardinality.AtMostOne, false, false, false, false>;
   "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, true, false, false, false>;
   "walletBalance": $.PropertyDesc<_std.$decimal, $.Cardinality.One, false, false, false, true>;
+  "timestamp": $.PropertyDesc<_std.$datetime, $.Cardinality.One, false, false, false, true>;
   "transactions": $.LinkDesc<$Transaction, $.Cardinality.Many, {}, false, false,  false, false>;
   "twins": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "notifications": $.LinkDesc<$Notification, $.Cardinality.Many, {}, false, false,  false, false>;

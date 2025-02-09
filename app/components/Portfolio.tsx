@@ -1,6 +1,6 @@
 // path: src/components/Portfolio.tsx
 import { useState } from 'react';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 import { 
   TrendingUp, 
   ChevronRight, 
@@ -14,10 +14,10 @@ import {
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
 import { TradeModalPropsType } from '../types/types';
-
+import Image from 'next/image';
 function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
   const [shares, setShares] = useState<number>(1);
-  const { buyShares, sellShares } = useMarketplaceStore();
+  const { buyShares, sellShares } = useStore();
 
   const maxShares = isSelling ? currentShares : availableShares;
   const totalCost = shares * pricePerShare;
@@ -110,9 +110,9 @@ export function Portfolio() {
     isSelling: boolean;
   } | null>(null);
   
-  const { twins, getUserShares } = useMarketplaceStore();
+  const { currentUserTwins, getUserShares } = useStore();
 
-  const holdings = twins.map(twin => {
+  const holdings = currentUserTwins.map(twin => {
     const shares = getUserShares(twin.twinId);
     const value = shares * twin.tokenShares.pricePerShare;
     return {
@@ -176,10 +176,12 @@ export function Portfolio() {
                     >
                       <div className="flex items-center space-x-3">
                         <div className="relative">
-                          <img
+                          <Image
                             src={holding.profileImage}
                             alt={holding.twinHandle}
                             className="w-10 h-10 rounded-full object-cover"
+                            width={10}
+                            height={10}
                           />
                           {holding.isVerified && (
                             <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
@@ -199,7 +201,7 @@ export function Portfolio() {
                     <div className="mb-4">
                       <SharePriceChart
                         twinId={holding.id}
-                        shareholders={twins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
+                        shareholders={currentUserTwins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
                         pricePerShare={holding.pricePerShare}
                         isExpanded={isExpanded}
                       />

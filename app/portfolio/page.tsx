@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 import { 
   Wallet, 
   TrendingUp, 
@@ -17,14 +17,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from '../components/SharePriceChart';
+import Image from 'next/image';
 
 export default function PortfolioPage() {
-  const { twins, getUserShares, getTransactionHistory } = useMarketplaceStore();
+  const { currentUserTwins, getUserShares, getTransactionHistory } = useStore();
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [showTransactions, setShowTransactions] = useState(false);
 
 
-  const holdings = twins.map(twin => {
+    const holdings = currentUserTwins.map(twin => {
     const shares = getUserShares(twin.twinId);
     const value = shares * twin.tokenShares.pricePerShare;
     return {
@@ -166,31 +167,33 @@ export default function PortfolioPage() {
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {transactions.map((transaction) => {
-                    const twin = twins.find(a => a.twinId === transaction.twinId);
+                    const twin = currentUserTwins.find(a => a.twinId === transaction.twinId);
                     if (!twin) return null;
 
                     return (
                       <tr key={transaction.twinId} className="text-white">
                         <td className="py-4">
                           <div className="flex items-center space-x-3">
-                            <img
+                            <Image
                               src={twin.profileImage}
                               alt={twin.twinHandle}
                               className="w-8 h-8 rounded-full"
+                              width={12}
+                              height={12}
                             />
                             <span>@{twin.twinHandle}</span>
                           </div>
                         </td>
                         <td className="py-4">
                           <span className={`inline-flex items-center space-x-1 ${
-                            transaction.kind === 'buy' ? 'text-green-400' : 'text-red-400'
+                            transaction.trade === 'buy' ? 'text-green-400' : 'text-red-400'
                           }`}>
-                            {transaction.kind === 'buy' ? (
+                            {transaction.trade === 'buy' ? (
                               <ArrowDownToLine className="w-4 h-4" />
                             ) : (
                               <ArrowUpToLine className="w-4 h-4" />
                             )}
-                            <span>{transaction.kind === 'buy' ? 'Buy' : 'Sell'}</span>
+                            <span>{transaction.trade === 'buy' ? 'Buy' : 'Sell'}</span>
                           </span>
                         </td>
                         <td className="py-4">{transaction.shares}</td>
@@ -236,7 +239,7 @@ export default function PortfolioPage() {
                     className="flex items-center space-x-4 hover:opacity-80 transition-opacity"
                   >
                     <div className="relative">
-                      <img
+                      <Image
                         src={holding.profileImage}
                         alt={holding.twinHandle}
                         className="w-16 h-16 rounded-full object-cover"
@@ -261,7 +264,7 @@ export default function PortfolioPage() {
                 <div className="mb-6">
                   <SharePriceChart
                     twinId={holding.id}
-                    shareholders={twins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
+                    shareholders={currentUserTwins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
                     pricePerShare={holding.pricePerShare}
                     isExpanded={true}
                   />

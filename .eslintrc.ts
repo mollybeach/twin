@@ -1,3 +1,4 @@
+// path: .eslintrc.js
 module.exports = {
     extends: [
         'eslint:recommended',
@@ -14,7 +15,7 @@ module.exports = {
             jsx: true,
         },
     },
-    plugins: ['@typescript-eslint', 'react'],
+    plugins: ['@typescript-eslint', 'react', 'react-hooks', 'next'],
     rules: {
         'react/no-unescaped-entities': 'off',
         '@next/next/no-img-element': 'off',
@@ -23,6 +24,9 @@ module.exports = {
     settings: {
         react: {
             version: 'detect',
+        },
+        next: {
+            rootDir: './',
         },
     },
 }

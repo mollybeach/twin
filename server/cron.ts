@@ -64,9 +64,9 @@ cron.schedule('*/1 * * * *', async () => {
                     twinId: twin.twinId,
                     content: generatedTwineet,
                     timestamp: new Date(),
-                    likes: 0,
-                    retwineets: 0,
-                    replies: 0,
+                    likesCount: 0,
+                    retwineetsCount: 0,
+                    repliesCount: 0,
                     isLiked: false,
                     isRetwineeted: false,
                 };
@@ -77,9 +77,9 @@ cron.schedule('*/1 * * * *', async () => {
                         twinId := <str>$twinId,
                         content := <str>$content,
                         timestamp := datetime_current(),
-                        likes := 0,
-                        retwineets := 0,
-                        replies := 0,
+                        likesCount := 0,
+                        retwineetsCount := 0,
+                        repliesCount := 0,
                         isLiked := false,
                         isRetwineeted := false
                     };

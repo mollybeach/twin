@@ -197,7 +197,7 @@ Backend scripts for server-side logic.
 | username         | VARCHAR(255)  | User's chosen username                  |
 | email            | VARCHAR(255)  | User's email address                    |
 | passwordHash     | VARCHAR(255)  | Hashed password for authentication      |
-| createdAt        | TIMESTAMP     | Timestamp of account creation           |
+| timestamp        | TIMESTAMP     | Timestamp of account creation           |
 | birthday         | TIMESTAMP     | Optional user's birthday                |
 | walletAddress     | VARCHAR(255)  | User's wallet address for transactions  |
 
@@ -205,7 +205,7 @@ Backend scripts for server-side logic.
 | Column Name      | Data Type     | Description                             |
 |------------------|---------------|-----------------------------------------|
 | twinId           | TwinIdType    | Unique identifier for the Twin         |
-| createdAt        | TIMESTAMP     | Timestamp of Twin creation              |
+| timestamp        | TIMESTAMP     | Timestamp of Twin creation              |
 | userId           | UserIdType    | Reference to the User who created the Twin |
 | twinHandle       | VARCHAR(255)  | Handle for the Twin                     |
 | twitterHandle    | VARCHAR(255)  | Twitter handle associated with the Twin |
@@ -297,7 +297,7 @@ Backend scripts for server-side logic.
 | walletAddress | str | Required | Blockchain wallet address. |
 | walletBalance | decimal | Default: 1,000,000 | User's token balance. |
 | birthday | datetime | Optional | User's date of birth. |
-| createdAt | datetime | Default: Now | Timestamp of account creation. |
+| timestamp | datetime | Default: Now | Timestamp of account creation. |
 
 ### 10 User Relationships
 | Relation | Type | Constraints | Description |

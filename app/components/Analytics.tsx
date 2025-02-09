@@ -15,7 +15,7 @@ import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { AnalyticsPropsType } from '../types/types';
 import { TrendingUp, Users, Clock, Target, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import TradingChart from './TradingChart';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 
 ChartJS.register(
   CategoryScale,
@@ -31,9 +31,9 @@ ChartJS.register(
 );
 
 export function Analytics({ analytics, twinId }: AnalyticsPropsType) {
-  const { getTransactionHistory, twins } = useMarketplaceStore();
+  const { getTransactionHistory, allTwins } = useStore();
   const transactions = getTransactionHistory(twinId);
-  const twin = twins.find((a: { twinId: string }) => a.twinId === twinId);
+  const twin = allTwins.find((a: { twinId: string }) => a.twinId === twinId);
 
   // Ensure analytics data exists with default values if needed
   const safeAnalytics = {

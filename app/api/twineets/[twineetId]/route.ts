@@ -21,9 +21,9 @@ export async function GET(req: NextRequest) {
                 twinId,
                 content,
                 timestamp,
-                likes,
-                retwineets,
-                replies,
+                likesCount,
+                retwineetsCount,
+                repliesCount,
                 isLiked,
                 isRetwineeted
             } 

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { TradingChartPropsType } from '../types/types';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 
 const TradingChart: React.FC<TradingChartPropsType> = ({ twinId }) => {
     // Fetch the relevant data for the specific twin using twinId
-    const { getTransactionHistory } = useMarketplaceStore();
+    const { getTransactionHistory } = useStore();
     const transactionHistory = getTransactionHistory(twinId);
 
     // Prepare data for the chart

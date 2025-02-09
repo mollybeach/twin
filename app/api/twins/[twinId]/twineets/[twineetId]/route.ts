@@ -21,9 +21,9 @@ export async function GET(req: NextRequest) {
                 twinId,
                 content,
                 timestamp,
-                likes,
-                retwineets,
-                replies,
+                likesCount,
+                retwineetsCount,
+                repliesCount,
                 isLiked,
                 isRetwineeted
             } 
@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
                 twinId := <str>$twinId,
                 content := <str>$content,
                 timestamp := datetime_current(),
-                likes := 0,
-                retwineets := 0,
-                replies := 0,
+                likesCount := 0,
+                retwineetsCount := 0,
+                repliesCount := 0,
                 isLiked := false,
                 isRetwineeted := false
             };

@@ -82,7 +82,7 @@ export namespace $default {
     "verification": Verification;
     "twinId": string;
     "autoReply": boolean;
-    "createdAt": Date;
+    "timestamp": Date;
     "description": string;
     "isListed": boolean;
     "modelData": unknown;

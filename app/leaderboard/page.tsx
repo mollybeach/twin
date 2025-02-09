@@ -1,10 +1,12 @@
 "use client";
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 import { Trophy, TrendingUp, Users, MessageCircle, DollarSign, BadgeCheck, Bot } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LeaderboardPage() {
-  const twins = useMarketplaceStore((state) => state.twins);
+  const { allTwins } = useStore();
+  const twins = allTwins;
 
   // Sort twins by different metrics
   const byEngagement = [...twins].sort((a, b) => 
@@ -60,10 +62,12 @@ export default function LeaderboardPage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <img
+                        <Image
                           src={twin.profileImage}
                           alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
+                          width={12}
+                          height={12}
                         />
                         {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
@@ -71,9 +75,12 @@ export default function LeaderboardPage() {
                       </div>
                       <div>
                         <div className="text-white font-medium">@{twin.twinHandle}</div>
-                        <div className="text-purple-300 text-sm">
-                          {twin.analytics.engagementRate.toFixed(1)}% engagement
-                        </div>
+                        // app/leaderboard/page.tsx
+                      <div className="text-purple-300 text-sm">
+                          {typeof twin.analytics.engagementRate === 'number' 
+                              ? twin.analytics.engagementRate.toFixed(1) 
+                              : 'N/A'}% engagement
+                      </div>
                       </div>
                       <div className="ml-auto">
                         <div className="text-purple-300 text-2xl font-bold">#{index + 1}</div>
@@ -102,10 +109,12 @@ export default function LeaderboardPage() {
                     >
                       <div className="flex items-center space-x-4">
                         <div className="relative">
-                          <img
+                          <Image
                             src={twin.profileImage}
                             alt={twin.twinHandle}
                             className="w-12 h-12 rounded-full object-cover"
+                            width={12}
+                            height={12}
                           />
                           {twin.verification.isVerified && (
                             <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
@@ -142,10 +151,12 @@ export default function LeaderboardPage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <img
+                        <Image
                           src={twin.profileImage}
                           alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
+                          width={12}
+                          height={12}
                         />
                         {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
@@ -181,10 +192,12 @@ export default function LeaderboardPage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <img
+                        <Image
                           src={twin.profileImage}
                           alt={twin.twinHandle}
                           className="w-12 h-12 rounded-full object-cover"
+                          width={12}
+                          height={12}
                         />
                         {twin.verification.isVerified && (
                           <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         const query = `
         SELECT Twineet {
             id,
-            replies
+            repliesCount
         }
         FILTER .id = <uuid>$twineetId;
     `;
@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
             UPDATE Twineet
             FILTER .id = <uuid>$twineetId
             SET {
-                replies := (
+                repliesCount := (
                     SELECT (
-                        IF .replies IS NULL THEN 1 ELSE .replies + 1
+                        IF .repliesCount IS NULL THEN 1 ELSE .repliesCount + 1
                     )
                 )
             };

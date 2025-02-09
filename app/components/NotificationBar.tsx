@@ -77,7 +77,7 @@ export const NotificationBar: React.FC<NotificationBarProps> = ({ notification, 
 
   if (!notification) return null;
 
-  const { twinId, kind, message, twitterHandle, twinHandle, timestamp } = notification;
+  const { twinId, kind, twitterHandle, twinHandle, timestamp } = notification;
 
   return (
     <div className="sticky top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm">

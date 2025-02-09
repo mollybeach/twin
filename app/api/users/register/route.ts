@@ -3,27 +3,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { edgeDBCloudClient } from '../../../../lib/client';
 import { hashPassword } from '../../../../lib/auth';
 import { UserType } from '../../../types/types';
+import { createInsertUserQuery } from '../../../../lib/queries';
+
 
 export async function POST(req: NextRequest) {
     
-    let { userId, username, password, email, walletAddress } = await req.json();
+    const { userId, username, password, email, walletAddress } = await req.json();
 
     if (!username || !password || !email || !walletAddress) {
         return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
+    const passwordHash = await hashPassword(password)
+    const insertUserQuery = createInsertUserQuery({
+        userId,
+        username,
+        passwordHash,
+        email,
+        walletAddress
+    });
     try {
-        const passwordHash = await hashPassword(password);
 
-        const query = `
-            INSERT User {
-                userId := <str>$userId,
-                username := <str>$username,
-                passwordHash := <str>$passwordHash,
-                email := <str>$email,
-                walletAddress := <str>$walletAddress
-            };
-        `;
-        await edgeDBCloudClient.query<UserType>(query, { userId, username, passwordHash, email, walletAddress });
+        await edgeDBCloudClient.query<UserType>(insertUserQuery, { userId, username, passwordHash, email, walletAddress });
 
         return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
     } catch (error) {

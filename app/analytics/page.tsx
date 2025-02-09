@@ -1,14 +1,16 @@
 "use client";
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { useMarketplaceStore } from '@/store/marketplace';
+import { useStore } from '@/store/store';
 import { Analytics as AnalyticsComponent } from '@/components/Analytics';
 import { Bot } from 'lucide-react';
+import Image from 'next/image';
+import { TwinType } from '../types/types';
 
 export default function AnalyticsPage() {
   const { twinId } = useParams<{ twinId: string }>();
-  const { twins, updateAnalytics } = useMarketplaceStore();
-  const twin = twins.find(a => a.twinId === twinId);
+  const { allTwins, updateAnalytics } = useStore();
+  const twin = allTwins.find((a: TwinType) => a.twinId === twinId);
 
   React.useEffect(() => {
     if (twinId) {
@@ -29,7 +31,7 @@ export default function AnalyticsPage() {
         <div className="text-center">
           <Bot className="w-12 h-12 text-purple-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white">Twin Not Found</h2>
-          <p className="text-purple-300">The Twin you're looking for doesn't exist.</p>
+          <p className="text-purple-300">The Twin you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -40,7 +42,7 @@ export default function AnalyticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center space-x-4">
-            <img
+            <Image
               src={twin.profileImage}
               alt={twin.twinHandle}
               className="w-16 h-16 rounded-full object-cover"

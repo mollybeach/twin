@@ -1,59 +1,32 @@
 // app/marketplace/page.tsx
-"use client";
+'use client';
 import { useState, useEffect } from 'react';
 import { Bot, DollarSign, MessageCircle, PieChart, TrendingUp, ArrowDownToLine, ArrowUpToLine, BadgeCheck, AlertCircle } from 'lucide-react';
 import { PriceChart } from '../components/PriceChart';
 import { TwinType } from '../types/types';
-import { UserType } from '../types/types';
+import Image from 'next/image';
+import { useStore } from '../store/store';
+
+export default function MarketplacePage() { 
 
 const VERIFICATION_FEE = 100;
-
-const MarketplacePage = ({ userData }: { userData: UserType }) => {
+const { allTwins, currentUserData, fetchAllTwins, fetchUserShares } = useStore();
   const [twins, setTwins] = useState<TwinType[]>([]);
   const [userShares, setUserShares] = useState<{ [key: string]: number }>({});
   const [selectedTwin, setSelectedTwin] = useState<string | null>(null);
   const [sharesToBuy, setSharesToBuy] = useState<number>(1);
   const [isSellingShares, setIsSellingShares] = useState<boolean>(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [userBalance, setUserBalance] = useState<number>(userData?.walletBalance || 0);
+  const [userBalance, setUserBalance] = useState<number>(currentUserData?.walletBalance || 0);
 
-  // Fetch twins and user shares from the API
-  const fetchTwins = async () => {
-    try {
-      const response = await fetch('/api/twins'); // Fetch all twins
-      if (!response.ok) {
-        throw new Error('Failed to fetch twins');
-      }
-      const allTwins: TwinType[] = await response.json();
-      const filteredTwins = allTwins.filter(twin => twin.userId !== userData?.userId); // Filter out twins owned by the user
-      setTwins(filteredTwins);
-    } catch (error) {
-      console.error('Error fetching twins:', error);
-    }
-  };
-
-  // Fetch user shares
-  const fetchUserShares = async () => {
-    try {
-      const response = await fetch(`/api/users/${userData?.userId}/shares`); // Fetch user shares
-      if (!response.ok) {
-        throw new Error('Failed to fetch user shares');
-      }
-      const sharesData = await response.json();
-      const sharesMap: { [key: string]: number } = {};
-      sharesData.forEach((share: { twinId: string; shares: number }) => {
-        sharesMap[share.twinId] = share.shares;
-      });
-      setUserShares(sharesMap);
-    } catch (error) {
-      console.error('Error fetching user shares:', error);
-    }
-  };
 
   useEffect(() => {
-    fetchTwins();
-    fetchUserShares();
-  }, []);
+    fetchAllTwins(); 
+    setTwins(allTwins);
+    fetchUserShares(currentUserData?.userId);
+    setUserShares(userShares);
+  }, [fetchAllTwins, fetchUserShares, allTwins, currentUserData?.userId, userShares]);
+    
 
   const handleBuyShares = async (twinId: string) => {
     const twin = twins.find(a => a.twinId === twinId);
@@ -81,7 +54,7 @@ const MarketplacePage = ({ userData }: { userData: UserType }) => {
         },
         body: JSON.stringify({
           twinId,
-          userId: userData.userId, // Pass the user ID
+          userId: currentUserData?.userId, // Pass the user ID
           sharesToBuy,
         }),
       });
@@ -130,6 +103,7 @@ const MarketplacePage = ({ userData }: { userData: UserType }) => {
 
   const handleVerification = async (twinId: string) => {
     setVerificationError(null);
+    console.log("handleVerification", twinId);
     // Call your verifyTwin function here
     // const success = await verifyTwin(twinId);
     // if (!success) {
@@ -166,12 +140,14 @@ const MarketplacePage = ({ userData }: { userData: UserType }) => {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div className="relative">
-                          <img
+                          <Image
                             src={twin.profileImage}
                             alt={`@${twin.twinHandle}`}
                             className={`w-16 h-16 rounded-full object-cover border-2 ${
                               twin.verification.isVerified ? 'border-blue-500' : 'border-white/20'
                             }`}
+                            width={16}
+                            height={16}
                           />
                           {twin.verification.isVerified && (
                             <BadgeCheck className="absolute -bottom-1 -right-1 w-6 h-6 text-blue-500 bg-white rounded-full" />
@@ -198,7 +174,7 @@ const MarketplacePage = ({ userData }: { userData: UserType }) => {
                     <div className="flex items-center justify-between mt-3 text-purple-300 max-w-md">
                       <div className="flex items-center">
                         <MessageCircle className="h-4 w-4 mr-1" />
-                        {twin.stats.replies.toLocaleString()} replies
+                        {twin.stats.repliesCount.toLocaleString()} replies
                       </div>
                       <div>
                         {twin.stats.interactions.toLocaleString()} friends
@@ -363,5 +339,3 @@ const MarketplacePage = ({ userData }: { userData: UserType }) => {
     </div>
   );
 }
-
-export default MarketplacePage;

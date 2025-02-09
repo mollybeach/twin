@@ -2,6 +2,7 @@
 import edgeql from '../dbschema/edgeql-js'
 import { edgeDBCloudClient } from '../lib/client';
 import { Twin, Analytics, CryptoHolding, PeakHours, FetchedTweet, Twineet, UserTokenShare, TokenShare, TokenStats, Transaction,  DailyImpressions, ReachByPlatform, TopInteractions, Demographics } from '../dbschema/edgeql-js/modules/default';
+import { UserIdType } from '../app/types/types';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -28,13 +29,9 @@ import {
     TwinType 
 } from '../app/types/types';
 
-const eQlString = (value: string) => {
-    console.log('String', value)
-    return value;
-}
 
-export const eQlDate = (date: Date) => {
-    console.log('Date', date)
+export const eQlDate = (date: Date, queryName: string) => {
+    console.log('Date', date, 'for query', queryName)
     return edgeql.cast(edgeql.datetime, date);
 }
 
@@ -79,7 +76,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         }),
         dailyImpressions: edgeql.insert(DailyImpressions, {
             twinId: formattedAnalytics.twinId,
-            date: eQlDate(formattedDailyImpressions.date),
+            date: eQlDate(formattedDailyImpressions.date, 'dailyImpressions'),
             count: formattedDailyImpressions.count,
         }),
         peakHours: edgeql.insert(PeakHours, {
@@ -100,30 +97,30 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
     });
     
     const fetchedTweetsQuery = await edgeql.insert(FetchedTweet, {
-        twinId: formattedFetchedTweets.twinId,
+        twinId: twinData.twinId,
         text: formattedFetchedTweets.text,
         edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
-        timestamp: eQlDate(formattedFetchedTweets.timestamp), 
+        timestamp: eQlDate(new Date, 'fetchedTweets'), 
     });
 
     const twineetsQuery = await edgeql.insert(Twineet, {
-        twinId: formattedTwineets.twinId,
+        twinId: twinData.twinId,
         content: formattedTwineets.content,
         isLiked: formattedTwineets.isLiked,
         isRetwineeted: formattedTwineets.isRetwineeted,
-        likes: formattedTwineets.likes,
-        retwineets: formattedTwineets.retwineets,
-        replies: formattedTwineets.replies,
-        timestamp: eQlDate(formattedTwineets.timestamp)
+        likesCount: formattedTwineets.likesCount,
+        retwineetsCount: formattedTwineets.retwineetsCount,
+        repliesCount: formattedTwineets.repliesCount,
+        timestamp: eQlDate(new Date(formattedTwineets.timestamp), 'twineets')
     });
 
     const transactionsQuery = await edgeql.insert(Transaction, {
         twinId: formattedTransactions.twinId,
-        kind: formattedTransactions.kind,
-        shares: formattedTransactions.shares,
+        trade: formattedTransactions.trade,
+        shares: eQlDecimal(formattedTransactions.shares),
         pricePerShare: eQlDecimal(formattedTransactions.pricePerShare),
         totalAmount: eQlDecimal(formattedTransactions.totalAmount),
-        timestamp: eQlDate(formattedTransactions.timestamp), 
+        timestamp: eQlDate(formattedTransactions.timestamp, 'transactions')
     });
 
     const userTokenSharesQuery = await edgeql.insert(UserTokenShare, {
@@ -160,7 +157,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         autoReply: formattedTwin.autoReply,
         isListed: formattedTwin.isListed,
         price: eQlDecimal(formattedTwin.price),
-        createdAt: eQlDate(formattedTwin.createdAt), 
+        timestamp: eQlDate(formattedTwin.timestamp, 'twins'), 
         modelData: formattedTwin.modelData,
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedTwin.verification)),
@@ -173,3 +170,586 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
     });
     await insertTwinQuery.run(edgeDBCloudClient);
 }
+
+export const getAllTwineetsQuery = `
+    SELECT Twineet {
+        id,
+        twinId,
+        content,
+        timestamp,
+        likesCount,
+        retwineetsCount,
+        repliesCount,
+        isLiked,
+        isRetwineeted
+    };
+`;
+
+export const getTwineetByIdQuery = `
+    SELECT Twineet {
+        id,
+        twinId,
+        content,
+        timestamp,
+        likesCount,
+        retwineetsCount,
+        repliesCount,
+        isLiked,
+        isRetwineeted
+    } 
+    FILTER .id = <uuid>$twineetId;
+`;
+
+export const getUserDataQuery = `
+    SELECT User {
+        userId,
+        username,
+        email,
+        walletBalance,
+        walletAddress,
+        timestamp,
+        birthday,
+        twins : {
+            twinId,
+            twinHandle,
+            twitterHandle,
+            profileImage,
+            isListed,
+            price,
+            twineets : {
+                twinId,
+                content,
+                timestamp,
+                likesCount,
+                retwineetsCount,
+                repliesCount
+            }
+        },
+        notifications :{
+            twinId,
+            kind,
+            message,
+            twinHandle,
+            twitterHandle,
+            timestamp
+        },
+        tokenShares : {
+            twinId,
+            pricePerShare,
+            totalShares,
+            availableShares,
+            shareholders : {
+                twinId,
+                userId,
+                shares,
+                purchasePrice,
+                purchaseDate
+            }
+        },
+        userTokenShares :{
+            twinId,
+            shares,
+            purchasePrice,
+            purchaseDate
+        },
+        likes : {
+            twinId,
+            userId
+        },
+        retwineets : {
+            twinId,
+            userId
+        },
+        replies : {
+            twinId,
+            userId
+        }
+    }
+`;
+
+export const getUserByUserIdQuery = `
+    SELECT User {
+        userId,
+        username,
+        email,
+        walletBalance,
+        walletAddress,
+        timestamp,
+        birthday,
+        twins : {
+            twinId,
+            twinHandle,
+            twitterHandle,
+            profileImage,
+            isListed,
+            price,
+            twineets : {
+                twinId,
+                content,
+                timestamp,
+                likesCount,
+                retwineetsCount,
+                repliesCount
+            }
+        },
+        notifications :{
+            twinId,
+            kind,
+            message,
+            twinHandle,
+            twitterHandle,
+            timestamp
+        },
+        tokenShares : {
+            twinId,
+            pricePerShare,
+            totalShares,
+            availableShares,
+            shareholders : {
+                twinId,
+                userId,
+                shares,
+                purchasePrice,
+                purchaseDate
+            }
+        },
+        userTokenShares :{
+            twinId,
+            shares,
+            purchasePrice,
+            purchaseDate
+        },
+        likes : {
+            twinId,
+            userId
+        },
+        retwineets : {
+            twinId,
+            userId
+        },
+        replies : {
+            twinId,
+            userId
+        }
+    }
+    FILTER .userId = <str>$userId;
+`;
+
+export const getAllTwinsQuery = `
+    SELECT Twin {
+        twinId,
+        userId,
+        username,
+        email,
+        walletBalance,
+        walletAddress,
+        timestamp,
+        birthday,
+        profileImage,
+        isListed,
+        personality,
+        twinHandle,
+        twitterHandle,
+        analytics: {
+            twinId,
+            clickThroughRate,
+            engagementRate,
+            impressions,
+            cryptoHoldings: {
+                twinId,
+                amount,
+                symbol,
+                value,
+                change24h
+            },
+            demographics: {
+                twinId,
+                age,
+                percentage
+            },
+            dailyImpressions: {
+                twinId,
+                count,
+                date
+            },
+            peakHours: {
+                twinId,
+                engagement,
+                hour
+            },
+            reachByPlatform: {
+                twinId,
+                platform,
+                count
+            },
+            topInteractions: {
+                twinId,
+                kind,
+                count
+            }
+        },
+        fetchedTweets: {
+            id,
+            content,
+            timestamp,
+            likesCount,
+            retwineetsCount,
+            repliesCount,
+            isLiked,
+            isRetwineeted
+        },
+        modelData,
+        stats: {
+            twinId,
+            interactions,
+            repliesCount,
+            uptime
+        },
+        tokenShares: {
+            twinId,
+            pricePerShare,
+            totalShares,
+            availableShares,
+            shareholders: {
+                userId,
+                shares,
+                purchasePrice,
+                purchaseDate
+            }
+        },
+        userTokenShares: {
+            twinId,
+            shares,
+            purchasePrice,
+            purchaseDate
+        },
+        verification: {
+            twinId,
+            isVerified,
+            verificationDate,
+            error
+        },
+        transactions: {
+            twinId,
+            trade,
+            shares,
+            pricePerShare,
+            totalAmount,
+            timestamp
+        }
+    };
+`;
+
+
+export const getTwinByIdQuery = `
+    SELECT Twin {
+        twinId,
+        userId,
+        username,
+        email,
+        walletBalance,
+        walletAddress,
+        timestamp,
+        birthday,
+        profileImage,
+        isListed,
+        personality,
+        twinHandle,
+        twitterHandle,
+        analytics: {
+            twinId,
+            clickThroughRate,
+            engagementRate,
+            impressions,
+            cryptoHoldings: {
+                twinId,
+                amount,
+                symbol,
+                value,
+                change24h
+            },
+            demographics: {
+                twinId,
+                age,
+                percentage
+            },
+            dailyImpressions: {
+                twinId,
+                count,
+                date
+            },
+            peakHours: {
+                twinId,
+                engagement,
+                hour
+            },
+            reachByPlatform: {
+                twinId,
+                platform,
+                count
+            },
+            topInteractions: {
+                twinId,
+                kind,
+                count
+            }
+        },
+        fetchedTweets: {
+            id,
+            content,
+            timestamp,
+            likesCount,
+            retwineetsCount,
+            repliesCount,
+            isLiked,
+            isRetwineeted
+        },
+        modelData,
+        stats: {
+            twinId,
+            interactions,
+            repliesCount,
+            uptime
+        },
+        tokenShares: {
+            twinId,
+            pricePerShare,
+            totalShares,
+            availableShares,
+            shareholders: {
+                userId,
+                shares,
+                purchasePrice,
+                purchaseDate
+            }
+        },
+        userTokenShares: {
+            twinId,
+            shares,
+            purchasePrice,
+            purchaseDate
+        },
+        verification: {
+            twinId,
+            isVerified,
+            verificationDate,
+            error
+        },
+        transactions: {
+            twinId,
+            kind,
+            shares,
+            pricePerShare,
+            totalAmount,
+            timestamp
+        }
+    }
+    FILTER .twinId = <str>$twinId;
+`;
+
+export const createInsertUserQuery = (userData: {
+    userId: UserIdType;
+    username: string;
+    email: string;
+    passwordHash: string;
+    birthday?: Date;
+    walletBalance?: number;
+    walletAddress?: string;
+    timestamp?: Date;
+}) => {
+    const { birthday, walletBalance, walletAddress} = userData;
+
+    let query = `
+        INSERT User {
+            userId := <str>$userId,
+            username := <str>$username,
+            email := <str>$email,
+            passwordHash := <str>$passwordHash,
+    `;
+
+    if (birthday) {
+        query += `birthday := <datetime>$birthday,`;
+    }
+    if (walletBalance !== undefined) {
+        query += `walletBalance := <decimal>$walletBalance,`;
+    }
+    if (walletAddress) {
+        query += `walletAddress := <str>$walletAddress,`;
+    }
+    query += `timestamp := datetime_current();
+        };
+    `;
+
+    return query;
+};
+
+export const insertTwinQueryString = `
+    INSERT Twin {
+        userId := <UserIdType>$userId,
+        twinId := <TwinIdType>$twinId,
+        autoReply := <bool>$autoReply,
+        timestamp := datetime_current(),
+        description := <str>$description,
+        personality := <str>$personality,
+        price := <decimal>$price,
+        profileImage := <str>$profileImage,
+        isListed := <bool>$isListed,
+        twinHandle := <str>$twinHandle,
+        twitterHandle := <str>$twitterHandle,
+        analytics := (
+            INSERT Analytics {
+                twinId := <TwinIdType>$twinId,
+                clickThroughRate := <decimal>$clickThroughRate,
+                engagementRate := <decimal>$engagementRate,
+                impressions := <int16>$impressions,
+                cryptoHoldings := (
+                    FOR holding IN <array<CryptoHolding>>$cryptoHoldings
+                    UNION (
+                        INSERT CryptoHolding {
+                            twinId := <TwinIdType>$twinId,
+                            amount := <decimal>$amount,
+                            symbol := <str>$symbol,
+                            value := <decimal>$value,
+                            change24h := <decimal>$change24h
+                        }
+                    )
+                ),
+                demographics := (
+                    FOR demo IN <array<Demographics>>$demographics
+                    UNION (
+                        INSERT Demographics {
+                            twinId := <TwinIdType>$twinId,
+                            age := <AgeGroup>$age,
+                            percentage := <decimal>$percentage
+                        }
+                    )
+                ),
+                dailyImpressions := (
+                    FOR impression IN <array<DailyImpressions>>$dailyImpressions
+                    UNION (
+                        INSERT DailyImpressions {
+                            twinId := <TwinIdType>$twinId,
+                            count := <int16>$count,
+                            date := datetime_current()
+                        }
+                    )
+                ),
+                peakHours := (
+                    FOR hour IN <array<PeakHours>>$peakHours
+                    UNION (
+                        INSERT PeakHours {
+                            twinId := <TwinIdType>$twinId,
+                            engagement := <decimal>$engagement,
+                            hour := <int16>$hour
+                        }
+                    )
+                ),
+                reachByPlatform := (
+                    FOR platform IN <array<ReachByPlatform>>$reachByPlatform
+                    UNION (
+                        INSERT ReachByPlatform {
+                            twinId := <TwinIdType>$twinId,
+                            platform := <PlatformType>$platform,
+                            count := <int16>$count
+                        }
+                    )
+                ),
+                topInteractions := (
+                    FOR interaction IN <array<TopInteractions>>$topInteractions
+                    UNION (
+                        INSERT TopInteractions {
+                            twinId := <TwinIdType>$twinId,
+                            kind := <InteractionGroup>$kind,
+                            count := <int16>$count
+                        }
+                    )
+                )
+            }
+        ),
+        fetchedTweets := (
+            FOR tweet IN <array<FetchedTweet>>$fetchedTweets
+            UNION (
+                INSERT FetchedTweet {
+                    twinId := <TwinIdType>$twinId, 
+                    text := <str>$text,
+                    edit_history_tweet_ids := <array<str>>$edit_history_tweet_ids,
+                    timestamp := datetime_current()
+                }
+            )
+        ),
+        modelData := <json>$modelData,
+        stats := (
+            INSERT TwinStats {
+                twinId := <TwinIdType>$twinId, 
+                interactions := <int16>$interactions,
+                repliesCount := <int16>$repliesCount,
+                uptime := <str>$uptime
+            }
+        ),
+        tokenShares := (
+            INSERT TokenShare {
+                twinId := <TwinIdType>$twinId,
+                totalShares := <int16>$totalShares,
+                availableShares := <int16>$availableShares,
+                pricePerShare := <decimal>$pricePerShare,
+                shareholders := (
+                    FOR shareholder IN <array<UserTokenShare>>$shareholders
+                    UNION (
+                        INSERT UserTokenShare {
+                            twinId := <TwinIdType>$twinId, 
+                            userId := <UserIdType>$userId,
+                            shares := <decimal>$shares,
+                            purchasePrice := <decimal>$purchasePrice,
+                            purchaseDate := datetime_current()
+                        }
+                    )
+                )
+            }
+        ),
+        tokenStats := (
+            INSERT TokenStats {
+                twinId := <TwinIdType>$twinId,
+                price := <decimal>$price,
+                change24h := <decimal>$change24h,
+                volume24h := <decimal>$volume24h,
+                marketCap := <decimal>$marketCap
+            }
+        ),
+        twineets := (
+            FOR twineet IN <array<Twineet>>$twineets
+            UNION (
+                INSERT Twineet {
+                    twinId := <TwinIdType>$twinId,
+                    content := <str>$content,
+                    timestamp := datetime_current(),
+                    likesCount := <int16>$likesCount,
+                    retwineetsCount := <int16>$retwineetsCount,
+                    repliesCount := <int16>$repliesCount,
+                    isLiked := <bool>$isLiked,
+                    isRetwineeted := <bool>$isRetwineeted
+                }
+            )
+        ),
+        verification := (
+            INSERT Verification {
+                twinId := <TwinIdType>$twinId,
+                isVerified := <bool>$isVerified,
+                verificationDate := datetime_current()
+            }
+        ),
+        transactions := (
+            FOR transaction IN <array<Transaction>>$transactions
+            UNION (
+                INSERT Transaction {
+                    twinId := <TwinIdType>$twinId,
+                    trade := <TransactionGroup>$trade,
+                    shares := <decimal>$shares,
+                    pricePerShare := <decimal>$pricePerShare,
+                    totalAmount := <decimal>$totalAmount,
+                    timestamp := datetime_current()
+                }
+            )
+        )
+    };
+`;
+

@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    images: {
+        domains: ['i.imgur.com'],
+    },
     webpack: (config, { isServer }) => {
-        // Ignore native modules on the client-side
         if (!isServer) {
             config.resolve.fallback = {
                 fs: false,
@@ -18,16 +20,12 @@ const nextConfig = {
                 process: require.resolve('process/browser'),
             };
         }
-
-        // Add any additional Webpack configuration here
         config.module.rules.push({
             test: /\.html$/,
-            use: 'ignore-loader', // Ignore HTML files
+            use: 'ignore-loader',
         });
-
         return config;
     },
-    // Additional Next.js configuration options can go here
 };
 
 module.exports = nextConfig;

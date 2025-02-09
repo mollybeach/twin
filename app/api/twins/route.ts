@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TwinType } from '../../types/types';
-import { insertTwin } from '../../../lib/queries';
+import { insertTwin} from '../../../lib/queries';
 import { edgeDBCloudClient } from '../../../lib/client';
 
 export async function GET() {
@@ -10,7 +10,7 @@ export async function GET() {
                 id,
                 twinId,
                 autoReply,
-                createdAt,
+                timestamp,
                 description,
                 personality,
                 price,
@@ -66,7 +66,7 @@ export async function GET() {
                 stats: {
                     twinId,
                     interactions,
-                    replies,
+                    repliesCount,
                     uptime
                 },
                 tokenShares: {
@@ -94,9 +94,9 @@ export async function GET() {
                     twinId,
                     content,
                     timestamp,
-                    likes,
-                    retwineets,
-                    replies,
+                    likesCount,
+                    retwineetsCount,
+                    repliesCount,
                     isLiked,
                     isRetwineeted
                 },
@@ -107,7 +107,7 @@ export async function GET() {
                 },
                 transactions: {
                     twinId,
-                    kind,
+                    trade,
                     shares,
                     pricePerShare,
                     totalAmount,
@@ -127,7 +127,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     const newTwinData = await req.json();
-    console.log('POST Request received with data:', newTwinData);
+    console.log('POST REQUEST RECEIVED: ', newTwinData);
     try {
         await insertTwin(newTwinData); 
         return NextResponse.json({ message: 'Twin created successfully' }, { status: 201 });

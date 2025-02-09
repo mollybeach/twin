@@ -86,8 +86,8 @@ module default {
     # Define the Transaction type
     type Transaction {
         required property twinId -> TwinIdType;
-        required property kind -> TransactionGroup;
-        required property shares -> int16;
+        required property trade -> TransactionGroup;
+        required property shares -> decimal;
         required property pricePerShare -> decimal;
         required property totalAmount -> decimal;
         required property timestamp -> datetime {
@@ -112,13 +112,13 @@ module default {
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }
-        required property likes -> int16 {
+        required property likesCount -> int16 {
             default := <int16>0;  # Default value for likes
         }
-        required property retwineets -> int16 {
+        required property retwineetsCount -> int16 {
             default := <int16>0;  # Default value for retwineets
         }
-        required property replies -> int16 {
+        required property repliesCount -> int16 {
             default := <int16>0;  # Default value for replies
         }
         required property isLiked -> bool {
@@ -138,7 +138,7 @@ module default {
     # Define the TwinStats type
     type TwinStats {
         required property twinId -> TwinIdType;
-        required property replies -> int16;
+        required property repliesCount -> int16;
         required property interactions -> int16;
         required property uptime -> str;
     }
@@ -148,7 +148,7 @@ module default {
         required property twinId -> TwinIdType { 
             constraint exclusive
         }
-        required property createdAt -> datetime {
+        required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }
         required property userId -> UserIdType {
@@ -195,7 +195,7 @@ module default {
     # Define the User type
     type User {
         optional property birthday -> datetime;
-        required property createdAt -> datetime {
+        required property timestamp -> datetime {
             default := datetime_current(); 
         }
         required property email -> str {

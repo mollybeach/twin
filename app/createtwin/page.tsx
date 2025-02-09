@@ -1,17 +1,23 @@
 "use client";
 import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
-import { useMarketplaceStore } from '../store/marketplace';
+import { useStore } from '../store/store';
 import { useRouter } from 'next/navigation';
-import {  TwinType, AnalyticsType, FetchedTweetType, TwineetType, } from '../types/types';
+import {  TwinType } from '../types/types';
 import { defaultTwin } from '../utils/defaultData';
+import Image from 'next/image';
 
 export default function CreateTwinPage() {
   const router = useRouter();
-  const addTwin = useMarketplaceStore((state) => state.addTwin);
+  const addTwin = useStore((state) => state.addTwin); 
+  const fetchTweets = useStore((state) => state.fetchTweets);
+  const generateTwineetContent = useStore((state) => state.generateTwineetContent);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { getNewTwinId, currentUserId } = useStore();
+  const newTwinId = getNewTwinId();
+  
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<TwinType>(defaultTwin);
+  const [config, setConfig] = useState<TwinType>(defaultTwin(newTwinId, currentUserId));
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
@@ -20,25 +26,18 @@ export default function CreateTwinPage() {
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
 
 
-  const handleFetchTweets = async () => {
+  const trainTwinOnTwitterHistory = async () => {
     setIsFetchingTweets(true);
     try {
-        const response = await fetch(`/api/tweets?username=${encodeURIComponent(config.twitterHandle)}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch tweets');
-        }
-
-        const tweets = await response.json();
+        await fetchTweets(config.twitterHandle);
+        const tweets = useStore.getState().fetchedTweets; 
         setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
+        
+        const { generatedText } = await generateTwineetContent(tweets, config.personality);
+        setGeneratedTwineet(generatedText);
+        setConfig((prev) => ({ ...prev, twineets: [...prev.twineets, { twinId: newTwinId, content: generatedText, timestamp: new Date(), likesCount: Math.floor(Math.random() * 100), retwineetsCount: Math.floor(Math.random() * 100), repliesCount: Math.floor(Math.random() * 100), isLiked: false, isRetwineeted: false }] }));
 
-        const modelData = await handleGenerateResponse(tweets);
-        console.log('Model data:', modelData);
+        console.log('Generated twineet:', generatedText);
         setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
     } catch (error) {
         if (error instanceof Error) {
@@ -53,73 +52,7 @@ export default function CreateTwinPage() {
     }
 };
 
-const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Record<string, unknown>> => {
-  const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${config.personality} AI twin.`;
-  try {
-      const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
-      });
-
-      if (!response.ok) {
-          throw new Error('Failed to generate response from OpenAI');
-      }
-
-      const data = await response.json();
-      const generatedText = data.choices[0].message?.content || data.choices[0].text;
-
-      setConfig(prev => ({
-          ...prev,
-          twineets: [...(prev.twineets || []), {
-              id: crypto.randomUUID(),
-              twinId: config.twinId,
-              content: generatedText,
-              timestamp: new Date(),
-              likes: Math.floor(Math.random() * 100),
-              retwineets: Math.floor(Math.random() * 100),
-              replies: Math.floor(Math.random() * 100),
-              isLiked: false,
-              isRetwineeted: false,
-          }]
-      }));
-
-      return { generatedText };
-  } catch (error) {
-      console.error('Failed to generate response:', error);
-      throw new Error('Failed to generate response from OpenAI.');
-  }
-};
-
-  const setTwinIdInConfig = (obj: any, myTwinId: string) => {
-    if (Array.isArray(obj)) {
-        obj.forEach(item => setTwinIdInConfig(item, myTwinId));
-    } else if (typeof obj === 'object' && obj !== null) {
-
-        for (const key in obj) {
-            if (key === 'twinId') {
-                obj[key] = myTwinId; 
-            } else if (key === 'timestamp' && obj[key] === null) {
-                obj[key] = new Date();
-            } else if (key === 'fetchedTweets' && Array.isArray(obj[key])) {
-                obj[key].forEach(tweet => {
-                    if (!tweet.timestamp) {
-                        tweet.twinId = myTwinId;
-                        tweet.timestamp = new Date();
-                    }
-                });
-            } else {
-                if (!obj.hasOwnProperty('twinId')) {
-                    obj.twinId = myTwinId;
-                }
-                setTwinIdInConfig(obj[key], myTwinId);
-            }
-        }
-    }
-};
-  const handleDeploy = async () => {
+  const deployTwin = async () => {
     if (config.isListed && (config.price === undefined || config.price <= 0)) {
       setDeployError('Please set a valid price for your Twin');
       return;
@@ -127,63 +60,16 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
     setIsDeploying(true);
     setDeployError(null);
 
-    const myTwinId = crypto.randomUUID();
-    setTwinIdInConfig(config, myTwinId);
+    await addTwin(config);
+    const isAdded = useStore.getState().twinAdded;
 
-    
-    try {
-      const response = await fetch('/api/twins', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create twin', { cause: response.statusText });
-      }
-
-      const result = await response.json();
-      console.log('Twin created successfully:', result);
-
-      addTwin(config);
-
+    if (isAdded) {
       setIsDeployed(true);
       setTimeout(() => {
         router.push(`/timeline`);
       }, 2000);
-    } catch (error) {
-      console.error('Failed to deploy Twin:', error);
-      setDeployError('Failed to deploy Twin. Please try again later.');
-    } finally {
-      setIsDeploying(false);
     }
   };
-
-/*
-  const generateMultipleTwineets = async (twinId: string): Promise<TwineetType[]> => {
-    const twineets: TwineetType[] = [];
-    for (let i = 0; i < 5; i++) {
-      const prompt = `Generate a twineet for a ${config.personality} AI twin based on the following tweets: ${config.fetchedTweets
-        .map((tweet) => tweet.text)
-        .join(', ')}`;
-      const content = await generateResponse(prompt);
-      const newTwineet: TwineetType = {
-        twinId: twinId,
-        content: content,
-        timestamp: new Date(),
-        likes: 0,
-        retwineets: 0,
-        replies: 0,
-        isLiked: false,
-        isRetwineeted: false,
-      };
-      twineets.push(newTwineet);
-    }
-    return twineets;
-  };*/
-
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -258,7 +144,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
             </div>
 
             <button
-              onClick={handleFetchTweets}
+              onClick={trainTwinOnTwitterHistory}
               disabled={!config.twitterHandle}
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -319,10 +205,12 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <div className="flex flex-col items-center justify-center">
-                <img
+                <Image
                   src={config.profileImage}
                   alt="Twin Profile"
                   className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-purple-500"
+                  width={24}
+                  height={24}
                 />
                 <Check className="w-8 h-8 text-purple-500" />
               </div>
@@ -335,7 +223,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/5 p-4 rounded-lg text-center">
                 <MessageCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{config.stats.replies}</div>
+                <div className="text-2xl font-bold text-white">{config.stats.repliesCount}</div>
                 <div className="text-xs text-purple-300">Replies</div>
               </div>
               <div className="bg-white/5 p-4 rounded-lg text-center">
@@ -359,7 +247,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
 
             {config.description && (
               <div className="bg-white/5 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-purple-300 mb-2">Twin's Mission</h3>
+                <h3 className="text-sm font-medium text-purple-300 mb-2">Twin&apos;s Mission</h3>
                 <p className="text-sm text-white">{config.description}</p>
               </div>
             )}
@@ -373,7 +261,7 @@ const handleGenerateResponse = async (tweets: FetchedTweetType[]): Promise<Recor
             </div>
 
             <button
-              onClick={handleDeploy}
+              onClick={deployTwin}
               disabled={isDeploying}
               className="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >

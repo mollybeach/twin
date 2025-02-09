@@ -1,12 +1,12 @@
 // path: app/timeline/page.tsx
 "use client";
 import { useEffect, useState } from 'react';
-//import { useMarketplaceStore } from '../store/marketplace';
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles, Send } from 'lucide-react';
+//import { useStore } from '../store/marketplace';
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
 import { TwinType, TwineetType } from '../types/types';
-
+import Image from 'next/image';
 export default function TimelinePage() {
- // const twins = useMarketplaceStore((state) => state.twins);
+ // const twins = useStore((state) => state.twins);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
   const [followedTwins, setFollowedTwins] = useState<Set<string>>(new Set());
@@ -89,7 +89,7 @@ export default function TimelinePage() {
             if (twineet.id === twineetId) {
                 return {
                     ...twineet,
-                    likes: twineet.isLiked ? twineet.likes - 1 : twineet.likes + 1,
+                    likesCount: twineet.isLiked ? twineet.likesCount - 1 : twineet.likesCount + 1,
                     isLiked: !twineet.isLiked,
                 };
             }
@@ -119,7 +119,7 @@ export default function TimelinePage() {
             if (twineet.id === twineetId) {
                 return {
                     ...twineet,
-                    retwineets: twineet.isRetwineeted ? twineet.retwineets - 1 : twineet.retwineets + 1,
+                    retwineetsCount: twineet.isRetwineeted ? twineet.retwineetsCount - 1 : twineet.retwineetsCount + 1,
                     isRetwineeted: !twineet.isRetwineeted,
                 };
             }
@@ -256,10 +256,12 @@ export default function TimelinePage() {
               return (
                 <article key={twineet.id} className="p-4 hover:bg-white/5 transition-colors">
                   <div className="flex space-x-3">
-                    <img
+                    <Image
                       src={twin.profileImage}
                       alt={twin.twinHandle}
                       className="w-12 h-12 rounded-full object-cover"
+                      width={12}
+                      height={12}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
@@ -289,7 +291,7 @@ export default function TimelinePage() {
                           <div className="p-2 rounded-full group-hover:bg-purple-500/10">
                             <MessageCircle className="w-5 h-5" />
                           </div>
-                          <span>{twineet.replies}</span>
+                          <span>{twineet.repliesCount}</span>
                         </button>
                         <button
                           onClick={() => handleRetwineet(twineet.id ?? '') }
@@ -300,7 +302,7 @@ export default function TimelinePage() {
                           <div className="p-2 rounded-full group-hover:bg-green-500/10">
                             <Repeat2 className="w-5 h-5" />
                           </div>
-                          <span>{twineet.retwineets}</span>
+                          <span>{twineet.retwineetsCount}</span>
                         </button>
                         <button
                           onClick={() => handleLike(twineet.id ?? '')}
@@ -311,7 +313,7 @@ export default function TimelinePage() {
                           <div className="p-2 rounded-full group-hover:bg-pink-500/10">
                             <Heart className={`w-5 h-5 ${twineet.isLiked ? 'fill-current' : ''}`} />
                           </div>
-                          <span>{twineet.likes}</span>
+                          <span>{twineet.likesCount}</span>
                         </button>
                         <button className="flex items-center space-x-2 hover:text-purple-200 group">
                           <div className="p-2 rounded-full group-hover:bg-purple-500/10">
@@ -341,10 +343,12 @@ export default function TimelinePage() {
                       {replyContent[twineet.id ?? '']?.map((reply: string, index: number) => (
                         <div key={index} className="mt-2 text-white bg-purple-500/10 p-2 rounded-xl">
                           <div className="flex space-x-3">
-                            <img
+                            <Image
                               src={twin.profileImage}
                               alt={twin.twinHandle}
                               className="w-8 h-8 rounded-full object-cover"
+                              width={8}
+                              height={8}
                             />
                             <div className="flex items-center justify-between">
                               <div className="flex-1 min-w-0">

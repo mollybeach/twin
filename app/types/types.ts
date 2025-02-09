@@ -27,7 +27,7 @@ export interface TwinType {
     userId?: UserIdType;
     twinId: TwinIdType;
     autoReply: boolean;
-    createdAt: Date;
+    timestamp: Date;
     description: string;
     personality: string;
     price: number;
@@ -45,11 +45,10 @@ export interface TwinType {
     verification: VerificationResponseType;
     transactions: TransactionType[];
 }
-
 export interface TwinStatsType {
     twinId: TwinIdType;
     interactions: number;
-    replies: number;
+    repliesCount: number;
     uptime: string;
 } 
 
@@ -72,20 +71,33 @@ export interface DemographicsType {
     age: string;
     percentage: number;
 }
-
-export interface MarketplaceStoreType {
-    twins: TwinType[];
-    transactions: TransactionType[];
+export interface storeType {
     notification: NotificationType | null;
     setNotification: (notification: NotificationType | null) => void;
-    addTwin: (twin: TwinType) => Promise<string>;
+    addTwin: (twin: TwinType) => Promise<string>; // Should return a string
     buyShares: (twinId: string, shares: number) => Promise<void>;
     sellShares: (twinId: string, shares: number) => Promise<void>;
-    verifyTwin: (twinId: string) => Promise<boolean>;
-    getUserShares: (twinId: string) => number;
+    verifyTwin: (twinId: string) => Promise<boolean>; // Should return a boolean
+    getUserShares: (twinId: string) => number; // Should return a number
+    getNewTwinId: () => string;
+    getNewUserId: () => string;
+    currentUserId: UserIdType;
     getTwins: () => TwinType[];
     updateAnalytics: (twinId: string) => void;
-    getTransactionHistory: (twinId?: string) => TransactionType[];
+    getTransactionHistory: (twinId?: string) => TransactionType[]; // Should return an array
+    fetchCurrentUser: () => Promise<void>;
+    fetchAllTwins: () => Promise<void>;
+    fetchUserShares: (userId: string) => Promise<void>;
+    fetchTransactions: (userId: string) => Promise<void>;
+    fetchTweets: (username: string) => Promise<void>;
+    generateTwineetContent: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>; // Update this line
+    currentUserData: UserType;
+    allTwins: TwinType[]; // Add this property
+    currentUserTwins: TwinType[]; // Add this property
+    transactions: TransactionType[]; // Add this property
+    fetchedTweets: FetchedTweetType[]; // Add this property
+    generatedTwineetContent: string;
+    twinAdded: boolean;
 }
 
 export interface NotificationType {
@@ -134,7 +146,7 @@ export interface UserTokenShareType {
 }
 export interface TransactionType {
     twinId: TwinIdType;
-    kind: TransactionGroup;
+    trade: TransactionGroup;
     shares: number;
     pricePerShare: number;
     totalAmount: number;
@@ -159,9 +171,9 @@ export interface TwineetType {
     twinId: TwinIdType;
     content: string;
     timestamp: Date;
-    likes: number;
-    retwineets: number;
-    replies: number;
+    likesCount: number;
+    retwineetsCount: number;
+    repliesCount: number;
     isLiked: boolean;
     isRetwineeted: boolean;
 }
@@ -196,11 +208,16 @@ export interface UserType {
     tokenShares?: TokenShareType[];
     userTokenShares?: UserTokenShareType[];
     tokenStats?: TokenStatsType[];
-    createdAt: Date;
-    likes?: LikesType[];
+    timestamp: Date;
+    likes?: LikesType[];  
     retwineets?: RetwineetsType[];
     replies?: RepliesType[];
 }
+
+export interface PageProps extends UserType {
+    userData: UserType; // Ensuring userData is correctly defined
+}
+
 export interface VerificationResponseType {
     twinId: TwinIdType;
     isVerified: boolean;

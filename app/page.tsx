@@ -2,7 +2,7 @@
 "use client"; 
 import React from 'react';
 import Link from 'next/link';
-import { PlusCircle, Eye, Twitter } from 'lucide-react'; 
+import { PlusCircle, Twitter } from 'lucide-react'; 
 
 const Home = () => {
     return (
@@ -39,11 +39,11 @@ const Home = () => {
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg">
                         <h2 className="text-xl font-semibold text-white">AI Learning</h2>
-                        <p className="text-gray-300 mt-2">Each Twin learns from the original account's activity.</p>
+                        <p className="text-gray-300 mt-2">Each Twin learns from the original account&apos;s activity.</p>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg">
                         <h2 className="text-xl font-semibold text-white">Personality Customization</h2>
-                        <p className="text-gray-300 mt-2">Define your Twin's personality traits.</p>
+                        <p className="text-gray-300 mt-2">Define your Twin&apos;s personality traits.</p>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 shadow-lg">
                         <h2 className="text-xl font-semibold text-white">Marketplace</h2>

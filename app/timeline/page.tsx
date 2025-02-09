@@ -41,7 +41,7 @@ export default function TimelinePage() {
         throw new Error('Failed to fetch twineets');
       }
       const result = await response.json();
-      setTwineets(result);
+      setTwineets(result.reverse());
     } catch (error) {
       console.error('Error fetching twineets:', error);
     } finally {

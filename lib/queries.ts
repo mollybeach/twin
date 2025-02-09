@@ -30,13 +30,11 @@ import {
 } from '../app/types/types';
 
 
-export const eQlDate = (date: Date, queryName: string) => {
-    console.log('Date', date, 'for query', queryName)
+export const eQlDate = (date: Date) => {
     return edgeql.cast(edgeql.datetime, date);
 }
 
 const eQlDecimal = (value: number) => {
-    console.log('Decimal', value)
     return edgeql.decimal(value.toString());
 }
 
@@ -76,7 +74,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         }),
         dailyImpressions: edgeql.insert(DailyImpressions, {
             twinId: formattedAnalytics.twinId,
-            date: eQlDate(formattedDailyImpressions.date, 'dailyImpressions'),
+            date: eQlDate(formattedDailyImpressions.date),
             count: formattedDailyImpressions.count,
         }),
         peakHours: edgeql.insert(PeakHours, {
@@ -100,7 +98,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         twinId: twinData.twinId,
         text: formattedFetchedTweets.text,
         edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
-        timestamp: eQlDate(new Date, 'fetchedTweets'), 
+        timestamp: eQlDate(new Date), 
     });
 
     const twineetsQuery = await edgeql.insert(Twineet, {
@@ -111,7 +109,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         likesCount: formattedTwineets.likesCount,
         retwineetsCount: formattedTwineets.retwineetsCount,
         repliesCount: formattedTwineets.repliesCount,
-        timestamp: eQlDate(new Date(formattedTwineets.timestamp), 'twineets')
+        timestamp: eQlDate(new Date(formattedTwineets.timestamp))
     });
 
     const transactionsQuery = await edgeql.insert(Transaction, {
@@ -120,7 +118,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         shares: eQlDecimal(formattedTransactions.shares),
         pricePerShare: eQlDecimal(formattedTransactions.pricePerShare),
         totalAmount: eQlDecimal(formattedTransactions.totalAmount),
-        timestamp: eQlDate(formattedTransactions.timestamp, 'transactions')
+        timestamp: eQlDate(formattedTransactions.timestamp)
     });
 
     const userTokenSharesQuery = await edgeql.insert(UserTokenShare, {
@@ -157,7 +155,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
         autoReply: formattedTwin.autoReply,
         isListed: formattedTwin.isListed,
         price: eQlDecimal(formattedTwin.price),
-        timestamp: eQlDate(formattedTwin.timestamp, 'twins'), 
+        timestamp: eQlDate(formattedTwin.timestamp), 
         modelData: formattedTwin.modelData,
         analytics: analyticsQuery,
         verification: edgeql.insert(edgeql.Verification, formatVerification(formattedTwin.verification)),
@@ -576,9 +574,7 @@ export const createInsertUserQuery = (userData: {
     if (walletAddress) {
         query += `walletAddress := <str>$walletAddress,`;
     }
-    query += `timestamp := datetime_current();
-        };
-    `;
+    query += `timestamp := datetime_current();`;
 
     return query;
 };

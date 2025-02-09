@@ -8,7 +8,6 @@ export default function LeaderboardPage() {
   const { allTwins } = useStore();
   const twins = allTwins;
 
-  // Sort twins by different metrics
   const byEngagement = [...twins].sort((a, b) => 
     (b.analytics.engagementRate - a.analytics.engagementRate)
   );

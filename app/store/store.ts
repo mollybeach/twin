@@ -176,7 +176,7 @@ const useStore = create<storeType>()(
 
       fetchCurrentUser: async () => {
         try {
-          const response = await fetch(`/api/users/${userId}`);
+          const response = await fetch(`/api/users/${get().currentUserId}`);
           if (!response.ok) throw new Error("Failed to fetch user data");
           const userData: UserType = await response.json();
           set((state) => ({ ...state, currentUserData: userData }));

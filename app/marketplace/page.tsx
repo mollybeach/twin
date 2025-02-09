@@ -21,10 +21,17 @@ const { allTwins, currentUserData, fetchAllTwins, fetchUserShares } = useStore()
 
 
   useEffect(() => {
-    fetchAllTwins(); 
-    setTwins(allTwins);
-    fetchUserShares(currentUserData?.userId);
-    setUserShares(userShares);
+    const fetchData = async () => {
+      await fetchAllTwins(); 
+      setTwins(allTwins);
+
+      if (currentUserData?.userId) {
+        await fetchUserShares(currentUserData.userId);
+        setUserShares(userShares);
+      }
+    };
+
+    fetchData();
   }, [fetchAllTwins, fetchUserShares, allTwins, currentUserData?.userId, userShares]);
     
 

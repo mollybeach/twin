@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { storeType, TwinType, TransactionType, UserType, NotificationType, UserTokenShareType, AnalyticsType, UserIdType, FetchedTweetType } from '../types/types';
+import { storeType, TwinType, TransactionType, UserType, NotificationType, UserTokenShareType, AnalyticsType, FetchedTweetType } from '../types/types';
 
 const userId = 'a1cea84c-153a-4ac8-8f83-b229fbbf5971'; // Replace with dynamic user ID
 const useStore = create<storeType>()(

@@ -15,7 +15,6 @@ export function Navbar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const allTwins = useStore((state) => state.allTwins);
   const router = useRouter();
-  const setCurrentUserData = useStore((state) => state.setCurrentUserData);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

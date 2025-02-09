@@ -2,20 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { storeType, TwinType, TransactionType, UserType, NotificationType, UserTokenShareType, AnalyticsType, FetchedTweetType } from '../types/types';
 
-const userId = 'a1cea84c-153a-4ac8-8f83-b229fbbf5971'; // Replace with dynamic user ID
 const useStore = create<storeType>()(
   persist(
     (set, get) => ({
       notification: null as NotificationType | null,
       setNotification: (notification: NotificationType | null) => set({ notification }),
       allTwins: [] as TwinType[],
-      currentUserData: null as UserType | null, // Initialize as null
+      currentUserData: null as UserType | null, 
       setCurrentUserData: (userData: UserType) => set({ currentUserData: userData }), // Method to set user data
       currentUserTwins: [] as TwinType[], 
       setCurrentUserTwins: (userTwins: TwinType[]) => set({ currentUserTwins: userTwins }),
       transactions: [] as TransactionType[],
       setTransactions: (transactions: TransactionType[]) => set({ transactions }),
-      currentUserId: '', // Initialize as empty string or null
+      currentUserId: '',
       fetchedTweets: [] as FetchedTweetType[],
       setFetchedTweets: (fetchedTweets: FetchedTweetType[]) => set({ fetchedTweets }),
       twinAdded: false,
@@ -133,7 +132,7 @@ const useStore = create<storeType>()(
 
       fetchCurrentUserTwins: async () => {
         try {
-          const response = await fetch(`/api/users/${userId}/twins`);
+          const response = await fetch(`/api/users/${get().currentUserId}/twins`);
           if (!response.ok) throw new Error("Failed to fetch current user's twins");
           const twins: TwinType[] = await response.json();
           set({ currentUserTwins: twins }); // Update state with fetched twins

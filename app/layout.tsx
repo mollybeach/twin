@@ -14,33 +14,31 @@ import { UserType } from "./types/types";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const { notification, setNotification } = useStore();
-    const fetchCurrentUser = useStore((state) => state.fetchCurrentUser);
+    const setCurrentUserData = useStore((state) => state.setCurrentUserData);
     const [user, setUser] = useState<UserType | null>(null);
     const theme = useThemeStore((state) => state.theme);
 
     useEffect(() => {
-        const getUser = async () => {
-            try {
-                await fetchCurrentUser();
-                setUser(useStore.getState().currentUserData);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
-
-        getUser();
-    }, [fetchCurrentUser]); 
+        const userDataString = localStorage.getItem('userData'); // Fetch user data from local storage
+        if (userDataString) {
+            const userData: UserType = JSON.parse(userDataString); // Parse the JSON string
+            setCurrentUserData(userData); // Set user data in Zustand store
+            setUser(userData); // Set user state
+            console.log(userData);
+        } else {
+            setCurrentUserData(null as unknown as UserType); // Clear user data if not found
+            setUser(null); // Ensure user state is null
+        }
+    }, [setCurrentUserData]);
 
     return (
         <html lang="en" className={`${theme} antialiased`}>
             <body className="grid grid-rows-[auto_1fr_auto] min-h-screen bg-gray-50 dark:bg-black text-black dark:text-white">
                 <div className="sticky top-0 z-50">
-                {user && (
                         <Wallet 
-                            balance={user.walletBalance ?? 0} 
-                            username={user.username} 
+                            balance={user?.walletBalance ?? 0} 
+                            username={user?.username ?? ''} 
                         /> 
-                    )}
                     <Navbar />
                     <NotificationBar
                         twinId={notification?.twinId || ''}

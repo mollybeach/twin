@@ -81,7 +81,9 @@ export interface storeType {
     getUserShares: (twinId: string) => number; // Should return a number
     getNewTwinId: () => string;
     getNewUserId: () => string;
-    currentUserId: UserIdType;
+    currentUserId: UserIdType | null;
+    currentUserData: UserType | null;
+    setCurrentUserData: (userData: UserType) => void;
     getTwins: () => TwinType[];
     updateAnalytics: (twinId: string) => void;
     getTransactionHistory: (twinId?: string) => TransactionType[]; // Should return an array
@@ -91,7 +93,6 @@ export interface storeType {
     fetchTransactions: (userId: string) => Promise<void>;
     fetchTweets: (username: string) => Promise<void>;
     generateTwineetContent: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>; // Update this line
-    currentUserData: UserType;
     allTwins: TwinType[]; // Add this property
     currentUserTwins: TwinType[]; // Add this property
     transactions: TransactionType[]; // Add this property

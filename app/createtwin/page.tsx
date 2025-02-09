@@ -15,9 +15,8 @@ export default function CreateTwinPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { getNewTwinId, currentUserId } = useStore();
   const newTwinId = getNewTwinId();
-  
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<TwinType>(defaultTwin(newTwinId, currentUserId));
+  const [config, setConfig] = useState<TwinType>(defaultTwin(newTwinId ?? '', currentUserId ?? ''));
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);

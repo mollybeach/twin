@@ -75,12 +75,11 @@ export default function LeaderboardPage() {
                       </div>
                       <div>
                         <div className="text-white font-medium">@{twin.twinHandle}</div>
-                        // app/leaderboard/page.tsx
-                      <div className="text-purple-300 text-sm">
+                        <div className="text-purple-300 text-sm">
                           {typeof twin.analytics.engagementRate === 'number' 
                               ? twin.analytics.engagementRate.toFixed(1) 
                               : 'N/A'}% engagement
-                      </div>
+                        </div>
                       </div>
                       <div className="ml-auto">
                         <div className="text-purple-300 text-2xl font-bold">#{index + 1}</div>

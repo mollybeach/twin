@@ -15,6 +15,7 @@ export function Navbar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const allTwins = useStore((state) => state.allTwins);
   const router = useRouter();
+  const setCurrentUserData = useStore((state) => state.setCurrentUserData);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -64,30 +65,31 @@ export function Navbar() {
     router.push(`/analytics/${twinId}`);
   };
 
-  const handleLogin = () => {
-    router.push('/login');
-  };
-
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/users/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+        const response = await fetch('/api/users/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
+        if (!response.ok) {
+            throw new Error('Logout failed');
+        }
 
-      localStorage.removeItem('userId');
-      setIsLoggedIn(false);
-      window.location.href = '/login'; 
+        // Clear user data from local storage
+        localStorage.removeItem('userData');
+
+        // Clear user data in Zustand store
+        useStore.setState({ currentUserData: null, currentUserId: null });
+
+        // Redirect to the login page
+        window.location.href = '/login'; 
     } catch (error) {
-      console.error('Error logging out:', error);
+        console.error('Error logging out:', error);
     }
-  };
+};
 
   return (
     <nav className="bg-white/10 backdrop-blur-lg border-b border-white/10 relative z-50 transition-colors duration-200 h-16">
@@ -179,9 +181,11 @@ export function Navbar() {
                   Logout
                 </button>
               ) : (
-                <button onClick={handleLogin} className="text-purple-400 hover:text-purple-200">
-                  Login
-                </button>
+                <Link href="/login" className="text-purple-400 hover:text-purple-200">
+                  <button className="text-purple-400 hover:text-purple-200">
+                    Login
+                  </button>
+                </Link>
               )}
             </div>
             {/* Mobile menu button */}

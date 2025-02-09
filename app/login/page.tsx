@@ -1,3 +1,4 @@
+// app/login/page.tsx
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -27,8 +28,8 @@ export default function LoginPage() {
             }
 
             const data = await response.json();
-            // Store user data in local storage or context
-            localStorage.setItem('userId', data.userId); // Example of storing userId
+            // Store user data in local storage
+            localStorage.setItem('userData', JSON.stringify(data)); // Store the entire user data object
             router.push('/portfolio'); // Redirect to the portfolio page after successful login
         } catch (err) {
             if (err instanceof Error) {

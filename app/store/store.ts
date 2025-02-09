@@ -7,21 +7,23 @@ const useStore = create<storeType>()(
   persist(
     (set, get) => ({
       notification: null as NotificationType | null,
-      allTwins: [] as TwinType[],
-      currentUserData: {} as UserType,
-      currentUserTwins: [] as TwinType[], 
-      transactions: [] as TransactionType[],
-      currentUserId: userId as UserIdType,
-      fetchedTweets: [] as FetchedTweetType[],
-      twinAdded: false as boolean,
-      generatedTwineetContent: '' as string,
       setNotification: (notification: NotificationType | null) => set({ notification }),
-      getNewTwinId: () => {
-        return crypto.randomUUID();
-      },
-      getNewUserId: () => {
-        return crypto.randomUUID();
-      },
+      allTwins: [] as TwinType[],
+      currentUserData: null as UserType | null, // Initialize as null
+      setCurrentUserData: (userData: UserType) => set({ currentUserData: userData }), // Method to set user data
+      currentUserTwins: [] as TwinType[], 
+      setCurrentUserTwins: (userTwins: TwinType[]) => set({ currentUserTwins: userTwins }),
+      transactions: [] as TransactionType[],
+      setTransactions: (transactions: TransactionType[]) => set({ transactions }),
+      currentUserId: '', // Initialize as empty string or null
+      fetchedTweets: [] as FetchedTweetType[],
+      setFetchedTweets: (fetchedTweets: FetchedTweetType[]) => set({ fetchedTweets }),
+      twinAdded: false,
+      setTwinAdded: (twinAdded: boolean) => set({ twinAdded }),
+      generatedTwineetContent: '',
+      setGeneratedTwineetContent: (generatedTwineetContent: string) => set({ generatedTwineetContent }),
+      getNewTwinId: () => crypto.randomUUID(),
+      getNewUserId: () => crypto.randomUUID(),
       addTwin: async (twin: TwinType): Promise<string> => {
         try {
           const response = await fetch('/api/twins', {
@@ -99,13 +101,11 @@ const useStore = create<storeType>()(
           return false; // Return false on error
         }
       },
-
       getUserShares: (twinId: string): number => {
-        const userShares = get().currentUserData.userTokenShares?.find((a: UserTokenShareType) => a.twinId === twinId);
+        const userShares = get().currentUserData?.userTokenShares?.find((a: UserTokenShareType) => a.twinId === twinId);
         return userShares ? userShares.shares : 0; // Return the number of shares or 0 if not found
       },
       getTwins: () => get().allTwins,
-      
       updateAnalytics: async (twinId: string): Promise<AnalyticsType> => {
         const twin = get().allTwins.find((a: TwinType) => a.twinId === twinId);
         if (twin) {

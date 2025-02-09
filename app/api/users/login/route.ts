@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
         const query = `
             SELECT User {
                 userId,
+                username,
+                email,
+                walletBalance,
+                walletAddress,
                 passwordHash
             }
             FILTER .username = <str>$username;
@@ -26,7 +30,15 @@ export async function POST(req: NextRequest) {
         }
 
         // Set a cookie with the user ID
-        const res = NextResponse.json({ message: 'Login successful', userId: user.userId }, { status: 200 });
+        const res = NextResponse.json({ 
+            message: 'Login successful', 
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            walletBalance: user.walletBalance,
+            walletAddress: user.walletAddress
+        }, { status: 200 });
+
         res.cookies.set('userId', user.userId, { httpOnly: true, path: '/' }); // Set cookie
 
         return res;

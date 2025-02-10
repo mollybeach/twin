@@ -149,10 +149,10 @@ export function formatTopInteractions(interactions: TopInteractionsType) {
 
 export function formatFetchedTweet(tweet: FetchedTweetType) {
     return {
-        twinId: tweet.twinId,
-        text: tweet.text,
-        edit_history_tweet_ids: tweet.edit_history_tweet_ids,
-        timestamp: new Date(tweet.timestamp), 
+        twinId: tweet.twinId || '',
+        text: tweet.text || '',
+        edit_history_tweet_ids: tweet.edit_history_tweet_ids || [],
+        timestamp: new Date(tweet.timestamp || Date.now()),
     };
 }
 

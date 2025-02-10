@@ -38,6 +38,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(tweets);
     } catch (error) {
         console.error('Error fetching tweets:', error);
-        return NextResponse.json({ message: 'Error fetching tweets' }, { status: 500 }); // Handle errors
+        return NextResponse.json({ message: 'Error fetching tweets' }, { status: 500 });
     }
 }

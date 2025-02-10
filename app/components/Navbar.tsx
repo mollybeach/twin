@@ -10,12 +10,12 @@ export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ twinId: string; twinHandle: string; personality: string }>>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const allTwins = useStore((state) => state.allTwins);
+  const allTwins = useStore((state) => state.stateAllTwins);
+  const stateCurrentUserId = useStore((state) => state.stateCurrentUserId);
   const router = useRouter();
-
+  const { getLogout } = useStore();
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -32,11 +32,6 @@ export function Navbar() {
       inputRef.current.focus();
     }
   }, [isSearchOpen]);
-
-  useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    setIsLoggedIn(!!userId);
-  }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -66,29 +61,12 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
-        const response = await fetch('/api/users/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Logout failed');
-        }
-
-        // Clear user data from local storage
-        localStorage.removeItem('userData');
-
-        // Clear user data in Zustand store
-        useStore.setState({ currentUserData: null, currentUserId: null });
-
-        // Redirect to the login page
-        window.location.href = '/login'; 
+      await getLogout(); // Call the logout function from the store
+      window.location.href = '/login'; // Redirect to the login page
     } catch (error) {
-        console.error('Error logging out:', error);
+      console.error('Error logging out:', error);
     }
-};
+  };
 
   return (
     <nav className="bg-white/10 backdrop-blur-lg border-b border-white/10 relative z-50 transition-colors duration-200 h-16">
@@ -175,7 +153,7 @@ export function Navbar() {
             </div>
             {/* Login/Logout Button */}
             <div className="flex items-center">
-              {isLoggedIn ? (
+              {stateCurrentUserId ? (
                 <button onClick={handleLogout} className="text-purple-400 hover:text-purple-200">
                   Logout
                 </button>

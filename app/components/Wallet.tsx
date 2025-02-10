@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface WalletProps {
-    balance: number | string | null; // Allow balance to be a string as well
-    username: string; // Add username to props
+    balance: number | string | null;
+    username: string;
 }
 
 const Wallet = ({ balance, username }: WalletProps) => {

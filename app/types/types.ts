@@ -72,33 +72,43 @@ export interface DemographicsType {
     percentage: number;
 }
 export interface storeType {
-    notification: NotificationType | null;
+    // State Variables
+    stateAllTwins: TwinType[];
+    stateCurrentUserData: UserType | null;
+    stateCurrentUserId: UserIdType | null;
+    stateCurrentUserTwins: TwinType[];
+    stateFetchedTweets: FetchedTweetType[];
+    stateGeneratedTwineetContent: string;
+    stateNotification: NotificationType | null;
+    stateTransactions: TransactionType[];
+    stateTwinAdded: boolean;
+
+    // Setters
+    setCurrentUserData: (userData: UserType) => void;
     setNotification: (notification: NotificationType | null) => void;
-    addTwin: (twin: TwinType) => Promise<string>; // Should return a string
-    buyShares: (twinId: string, shares: number) => Promise<void>;
-    sellShares: (twinId: string, shares: number) => Promise<void>;
-    verifyTwin: (twinId: string) => Promise<boolean>; // Should return a boolean
-    getUserShares: (twinId: string) => number; // Should return a number
+    setCurrentUserTwins: (userTwins: TwinType[]) => void;
+    setFetchedTweets: (fetchedTweets: FetchedTweetType[]) => void;
+    setTwinAdded: (twinAdded: boolean) => void;
+    setTransactions: (transactions: TransactionType[]) => void;
+    setGeneratedTwineetContent: (generatedTwineetContent: string) => void;
+
+    // Getters
+    getAllTwins: () => Promise<TwinType[]>;
+    getBuyShares: (twinId: string, currentUserId: string, sharesToBuy: number) => Promise<void>;
+    getCreateTwin: (twin: TwinType) => Promise<string>; 
+    getCurrentUser: () => Promise<UserType>;
+    getGeneratedTwineetContent: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>; 
+    getLogin: (username: string, password: string) => Promise<void>;
+    getLogout: () => Promise<void>;
     getNewTwinId: () => string;
     getNewUserId: () => string;
-    currentUserId: UserIdType | null;
-    currentUserData: UserType | null;
-    setCurrentUserData: (userData: UserType) => void;
-    getTwins: () => TwinType[];
-    updateAnalytics: (twinId: string) => void;
-    getTransactionHistory: (twinId?: string) => TransactionType[]; // Should return an array
-    fetchCurrentUser: () => Promise<void>;
-    fetchAllTwins: () => Promise<void>;
-    fetchUserShares: (userId: string) => Promise<void>;
-    fetchTransactions: (userId: string) => Promise<void>;
-    fetchTweets: (username: string) => Promise<void>;
-    generateTwineetContent: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>; // Update this line
-    allTwins: TwinType[]; // Add this property
-    currentUserTwins: TwinType[]; // Add this property
-    transactions: TransactionType[]; // Add this property
-    fetchedTweets: FetchedTweetType[]; // Add this property
-    generatedTwineetContent: string;
-    twinAdded: boolean;
+    getSellShares: (twinId: string, shares: number) => Promise<void>;
+    getTransactionsUserHistory: (userId: string) => Promise<TransactionType[]>;
+    getTweets: (username: string) => Promise<FetchedTweetType[]>;
+    getUpdateAnalytics: (twinId: string) => Promise<AnalyticsType>;
+    getUserShares: (userId: string) => Promise<UserTokenShareType[]>;
+    getUserSharesOfATwin: (twinId: string) => number;
+    getVerifyTwin: (twinId: string) => Promise<boolean>; 
 }
 
 export interface NotificationType {

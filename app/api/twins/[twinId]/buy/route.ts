@@ -5,22 +5,22 @@ import { edgeDBCloudClient } from '../../../../../lib/client';
 import { TwinType } from '../../../../types/types';
 
 export async function POST(req: NextRequest) {
-    const { twinId, userId, sharesToBuy } = await req.json();
 
+    const { twinId, currentUserId, sharesToBuy } = await req.json();
+    console.log("BUY POST REQUEST RECEIVED: ", twinId, currentUserId, sharesToBuy);
     try {
-        // Fetch the twin's current price and owner
         const query = `
             SELECT Twin {
                 price,
-                userId,  // Owner's userId
-                tokenShares {
+                userId,
+                tokenShares : {
                     availableShares
                 }
             }
             FILTER .twinId = <str>$twinId
         `;
         const twin = await edgeDBCloudClient.querySingle<TwinType>(query, { twinId });
-
+        console.log("TWIN: ", twin);
         if (!twin) {
             return NextResponse.json({ message: 'Twin not found' }, { status: 404 });
         }
@@ -29,24 +29,25 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'Not enough shares available' }, { status: 400 });
         }
 
-        // Calculate total cost
-        const totalCost = sharesToBuy * twin.price;
+        const price =  Number(twin.price);
 
-        // Update buyer's balance and owner's balance
+        const totalCost = Number(sharesToBuy) * Number(price);
+        console.log("TOTAL COST: ", totalCost);
+
         const updateQuery = `
             UPDATE User
-            FILTER .userId = <str>$userId
+            FILTER .userId = <str>$currentUserId
             SET {
-                walletBalance -= <decimal>$totalCost
+                walletBalance := .walletBalance - <decimal>$totalCost
             };
             UPDATE User
-            FILTER .userId = <str>$ownerId
+            FILTER .userId = <str>$twinUserId
             SET {
-                walletBalance += <decimal>$totalCost
+                walletBalance := .walletBalance + <decimal>$totalCost
             };
         `;
 
-        await edgeDBCloudClient.execute(updateQuery, { userId, ownerId: twin.userId, totalCost });
+        await edgeDBCloudClient.execute(updateQuery, { twinUserId: twin.userId, currentUserId,  totalCost: totalCost.toString()});
 
         return NextResponse.json({ message: 'Shares purchased successfully' }, { status: 200 });
     } catch (error) {

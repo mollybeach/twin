@@ -1,5 +1,5 @@
 // path: src/components/Portfolio.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../store/store';
 import { 
   TrendingUp, 
@@ -13,11 +13,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
-import { TradeModalPropsType } from '../types/types';
+import { TradeModalPropsType, TokenShareType} from '../types/types';
 import Image from 'next/image';
+
 function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
   const [shares, setShares] = useState<number>(1);
-  const { buyShares, sellShares } = useStore();
+  const { getBuyShares, getSellShares, stateCurrentUserData } = useStore();
 
   const maxShares = isSelling ? currentShares : availableShares;
   const totalCost = shares * pricePerShare;
@@ -26,9 +27,9 @@ function TradeModal({ twinId, twinHandle, currentShares, availableShares, priceP
     if (shares <= 0 || shares > maxShares) return;
 
     if (isSelling) {
-      await sellShares(twinId, shares);
+      await getSellShares(twinId, shares);
     } else {
-      await buyShares(twinId, shares);
+      await getBuyShares(twinId, stateCurrentUserData?.userId || '', shares);
     }
     onClose();
   };
@@ -110,22 +111,44 @@ export function Portfolio() {
     isSelling: boolean;
   } | null>(null);
   
-  const { currentUserTwins, getUserShares } = useStore();
+  const { stateCurrentUserTwins, getUserShares } = useStore();
 
-  const holdings = currentUserTwins.map(twin => {
-    const shares = getUserShares(twin.twinId);
-    const value = shares * twin.tokenShares.pricePerShare;
-    return {
-      id: twin.twinId,
-      twinHandle: twin.twinHandle,
-      shares,
-      value,
-      pricePerShare: twin.tokenShares.pricePerShare,
-      isVerified: twin.verification.isVerified,
-      profileImage: twin.profileImage,
-      availableShares: twin.tokenShares.availableShares
+  const [holdings, setHoldings] = useState<{
+    id: string;
+    twinHandle: string;
+    shares: number;
+    value: number;
+    pricePerShare: number;
+    isVerified: boolean;
+    profileImage: string;
+    availableShares: number;
+    tokenShares: TokenShareType;
+  }[]>([]);
+
+  useEffect(() => {
+    const fetchHoldings = async () => {
+      const fetchedHoldings = await Promise.all(stateCurrentUserTwins.map(async (twin) => {
+        const userShares = await getUserShares(twin.twinId);
+        const shares = userShares.find(share => share.twinId === twin.twinId)?.shares || 0;
+        const value = shares * twin.tokenShares.pricePerShare;
+        return {
+          id: twin.twinId,
+          twinHandle: twin.twinHandle,
+          shares,
+          value,
+          pricePerShare: twin.tokenShares.pricePerShare,
+          isVerified: twin.verification.isVerified,
+          profileImage: twin.profileImage,
+          availableShares: twin.tokenShares.availableShares,
+          tokenShares: userShares
+        };
+      }));
+
+      setHoldings(fetchedHoldings.filter(holding => holding.shares > 0) as any);
     };
-  }).filter(holding => holding.shares > 0);
+
+    fetchHoldings();
+  }, [stateCurrentUserTwins, getUserShares]);
 
   const totalValue = holdings.reduce((sum, holding) => sum + holding.value, 0);
 
@@ -201,7 +224,7 @@ export function Portfolio() {
                     <div className="mb-4">
                       <SharePriceChart
                         twinId={holding.id}
-                        shareholders={currentUserTwins.find(a => a.twinId === holding.id)?.tokenShares.shareholders || []}
+                        shareholders={holding.tokenShares.shareholders || []}
                         pricePerShare={holding.pricePerShare}
                         isExpanded={isExpanded}
                       />

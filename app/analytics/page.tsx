@@ -9,21 +9,21 @@ import { TwinType } from '../types/types';
 
 export default function AnalyticsPage() {
   const { twinId } = useParams<{ twinId: string }>();
-  const { allTwins, updateAnalytics } = useStore();
+  const { allTwins, getUpdateAnalytics } = useStore();
   const twin = allTwins.find((a: TwinType) => a.twinId === twinId);
 
   React.useEffect(() => {
     if (twinId) {
       // Initial update
-      updateAnalytics(twinId);
+      getUpdateAnalytics(twinId);
       
       const interval = setInterval(() => {
-        updateAnalytics(twinId);
+        getUpdateAnalytics(twinId);
       }, 60000); // Update every minute for demo purposes
       
       return () => clearInterval(interval);
     }
-  }, [twinId, updateAnalytics]);
+  }, [twinId, getUpdateAnalytics]);
 
   if (!twin || !twinId) {
     return (

@@ -5,11 +5,11 @@ import { TwinIdType, UserIdType } from '../types/types';
 const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 // Factory function to create a new default twin
-export const defaultTwin = (newTwinId: TwinIdType, newUserId: UserIdType): TwinType => {
+export const defaultTwin = (newTwinId: TwinIdType, myUserId: UserIdType): TwinType => {
 
     return {
         twinId: newTwinId,
-        userId: newUserId,
+        userId: myUserId,
         timestamp: new Date(),
         twinHandle: '',
         twitterHandle: '',
@@ -36,7 +36,7 @@ export const defaultTwin = (newTwinId: TwinIdType, newUserId: UserIdType): TwinT
             shareholders: [
                 {
                     twinId: newTwinId,
-                    userId: newUserId,
+                    userId: myUserId,
                     shares: getRandomInt(1, 100),
                     purchasePrice: parseFloat((Math.random() * 100).toFixed(2)),
                     purchaseDate: new Date()

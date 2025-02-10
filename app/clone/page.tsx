@@ -8,7 +8,8 @@ import { TwinType } from '../types/types';
 import Image from 'next/image';
 
 export default function ClonePage() {
-  const { allTwins, addTwin } = useStore();
+  const { stateAllTwins, getCreateTwin } = useStore(); 
+  const { stateCurrentUserData } = useStore();
   const [selectedTwins, setSelectedTwins] = useState<string[]>([]);
   const [draggedTwin, setDraggedTwin] = useState<string | null>(null);
   const [isCloning, setIsCloning] = useState(false);
@@ -67,8 +68,8 @@ export default function ClonePage() {
     if (selectedTwins.length !== 2) return;
 
     setIsCloning(true);
-    const twin1 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[0]);
-    const twin2 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[1]);
+    const twin1 = stateAllTwins.find((a: TwinType) => a.twinId === selectedTwins[0]);
+    const twin2 = stateAllTwins.find((a: TwinType) => a.twinId === selectedTwins[1]);
 
     if (!twin1 || !twin2) return;
 
@@ -80,6 +81,7 @@ export default function ClonePage() {
     const totalPrice = basePrice * 1000; // Example calculation
 
     const newTwin: TwinType = {
+      userId: stateCurrentUserData?.userId || '',
       twinId: `${twin1.twinId}_${twin2.twinId}`,
       timestamp: new Date(),
       twitterHandle: `${twin1.twitterHandle}_${twin2.twitterHandle}`,
@@ -139,86 +141,13 @@ export default function ClonePage() {
 
   const handleCreateClone = async () => {
     if (!cloneResult) return;
-    
+
     try {
-      setIsCloning(true);
-      setError(null);
-      const twin1 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[0]);
-      const twin2 = allTwins.find((a: TwinType) => a.twinId === selectedTwins[1]);
-
-      if (!twin1 || !twin2) {
-        setError('Selected twins not found.');
-        setIsCloning(false);
-        return;
-      }
-
-      // Create the new clone
-      const newTwinId = await addTwin({
-        twinId: `${twin1.twinId}_${twin2.twinId}`,  
-        timestamp: new Date(),
-        stats: {
-          twinId: `${twin1.twinId}_${twin2.twinId}`,
-          repliesCount: 0,
-          interactions: 0,
-          uptime: '0h 0m'
-        },
-        twinHandle: cloneResult.twinHandle,
-        twitterHandle: cloneResult.twitterHandle,
-        personality: cloneResult.personality,
-        description: cloneResult.description,
-        profileImage: cloneResult.profileImage,
-        price: cloneResult.price,
-        verification: {
-          twinId: `${twin1.twinId}_${twin2.twinId}`,
-          isVerified: false,
-          verificationDate: new Date()
-        },
-        analytics: {
-          twinId: `${twin1.twinId}_${twin2.twinId}`,
-          impressions: 0,
-          engagementRate: 0,
-          clickThroughRate: 0,
-          dailyImpressions: [],
-          topInteractions: [],
-          reachByPlatform: [],
-          demographics: [],
-          peakHours: [],
-          cryptoHoldings: []
-        },
-
-        tokenShares: {
-          twinId: `${twin1.twinId}_${twin2.twinId}`,
-          totalShares: 1000,
-          availableShares: 1000,
-          pricePerShare: cloneResult.price / 1000,
-          shareholders: []
-        },
-        twineets: [],
-        fetchedTweets: [],
-        modelData: {},
-        autoReply: false,
-        isListed: true,
-        tokenStats: {
-          twinId: `${twin1.twinId}_${twin2.twinId}`,
-          price: cloneResult.price,
-          change24h: 0,
-          volume24h: 0,
-          marketCap: 0
-        },
-        transactions: []
-      });
-      
-      // Reset state
-      setSelectedTwins([]);
-      setCloneResult(null);
-      
-      // Navigate to the new clone's analytics page
-      router.push(`/analytics/${newTwinId}`);
+      await getCreateTwin(cloneResult);
+      router.push('/marketplace'); // Redirect to the marketplace after creating the clone
     } catch (error) {
-      console.error('Failed to create clone:', error);
       setError('Failed to create clone. Please try again.');
-    } finally {
-      setIsCloning(false);
+      console.error('Error creating clone:', error);
     }
   };
 
@@ -233,7 +162,7 @@ export default function ClonePage() {
           <p className="text-purple-200">Drag two AI Twins into the Yinyang to create a powerful new hybrid!</p>
         </div>
 
-        {allTwins.length < 2 ? (
+        {stateAllTwins.length < 2 ? (
           <div className="text-center py-12">
             <Bot className="w-16 h-16 text-purple-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-white mb-2">Not Enough Twins</h2>
@@ -247,7 +176,7 @@ export default function ClonePage() {
                 Available Twins
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {allTwins.map((twin) => (
+                {stateAllTwins.map((twin) => (
                   <div
                     key={twin.twinId}
                     draggable
@@ -291,7 +220,7 @@ export default function ClonePage() {
               >
                 {selectedTwins[0] && (
                   <Image
-                    src={allTwins.find(a => a.twinId === selectedTwins[0])?.profileImage || ''}
+                    src={stateAllTwins.find(a => a.twinId === selectedTwins[0])?.profileImage || ''}
                     alt="Left Twin"
                     className="w-full h-full rounded-full object-cover"
                     width={12}
@@ -308,7 +237,7 @@ export default function ClonePage() {
               >
                 {selectedTwins[1] && (
                   <Image
-                    src={allTwins.find(a => a.twinId === selectedTwins[1])?.profileImage || ''}
+                    src={stateAllTwins.find(a => a.twinId === selectedTwins[1])?.profileImage || ''}
                     alt="Right Twin"
                     className="w-full h-full rounded-full object-cover"
                     width={12}
@@ -320,7 +249,7 @@ export default function ClonePage() {
 
             {draggedTwin && (
               <div className="dragged-twin-info">
-                <p>Currently dragging: {allTwins.find(a => a.twinId === draggedTwin)?.twinHandle}</p>
+                <p>Currently dragging: {stateAllTwins.find(a => a.twinId === draggedTwin)?.twinHandle}</p>
               </div>
             )}
 

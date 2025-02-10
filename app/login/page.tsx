@@ -3,34 +3,23 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Wallet } from 'lucide-react';
+import { useStore } from '../store/store';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+    const { getLogin } = useStore();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
         try {
-            const response = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Invalid username or password');
-            }
-
-            const data = await response.json();
-            // Store user data in local storage
-            localStorage.setItem('userData', JSON.stringify(data)); // Store the entire user data object
-            router.push('/portfolio'); // Redirect to the portfolio page after successful login
+            const data = await getLogin(username, password);
+            localStorage.setItem('userData', JSON.stringify(data));
+            router.push('/portfolio');
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);

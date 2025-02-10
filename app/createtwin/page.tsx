@@ -1,22 +1,26 @@
+// path: app/createtwin/page.tsx
 "use client";
 import React, { useState, useRef } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useStore } from '../store/store';
 import { useRouter } from 'next/navigation';
-import {  TwinType } from '../types/types';
+import { TwinType } from '../types/types';
 import { defaultTwin } from '../utils/defaultData';
 import Image from 'next/image';
 
 export default function CreateTwinPage() {
   const router = useRouter();
-  const addTwin = useStore((state) => state.addTwin); 
-  const fetchTweets = useStore((state) => state.fetchTweets);
-  const generateTwineetContent = useStore((state) => state.generateTwineetContent);
+  const { stateCurrentUserId, 
+          getNewTwinId, 
+          stateFetchedTweets, 
+          stateTwinAdded,
+          getTweets,
+          getGeneratedTwineetContent,
+          getCreateTwin } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { getNewTwinId, currentUserId } = useStore();
   const newTwinId = getNewTwinId();
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<TwinType>(defaultTwin(newTwinId ?? '', currentUserId ?? ''));
+  const [config, setConfig] = useState<TwinType>(defaultTwin(newTwinId ?? '', stateCurrentUserId ?? ''));
   const [isDeploying, setIsDeploying] = useState(false);
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
@@ -24,17 +28,30 @@ export default function CreateTwinPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
 
-
   const trainTwinOnTwitterHistory = async () => {
     setIsFetchingTweets(true);
     try {
-        await fetchTweets(config.twitterHandle);
-        const tweets = useStore.getState().fetchedTweets; 
-        setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
+        const fetchedTweets = await getTweets(config.twitterHandle);
+        setConfig((prev) => ({ ...prev, fetchedTweets: fetchedTweets }));
         
-        const { generatedText } = await generateTwineetContent(tweets, config.personality);
+        const { generatedText } = await getGeneratedTwineetContent(stateFetchedTweets, config.personality);
         setGeneratedTwineet(generatedText);
-        setConfig((prev) => ({ ...prev, twineets: [...prev.twineets, { twinId: newTwinId, content: generatedText, timestamp: new Date(), likesCount: Math.floor(Math.random() * 100), retwineetsCount: Math.floor(Math.random() * 100), repliesCount: Math.floor(Math.random() * 100), isLiked: false, isRetwineeted: false }] }));
+        setConfig((prev) => ({
+            ...prev,
+            twineets: [
+                ...prev.twineets,
+                {
+                    twinId: newTwinId,
+                    content: generatedText,
+                    timestamp: new Date(),
+                    likesCount: Math.floor(Math.random() * 100),
+                    retwineetsCount: Math.floor(Math.random() * 100),
+                    repliesCount: Math.floor(Math.random() * 100),
+                    isLiked: false,
+                    isRetwineeted: false,
+                },
+            ],
+        }));
 
         console.log('Generated twineet:', generatedText);
         setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
@@ -59,10 +76,8 @@ export default function CreateTwinPage() {
     setIsDeploying(true);
     setDeployError(null);
 
-    await addTwin(config);
-    const isAdded = useStore.getState().twinAdded;
-
-    if (isAdded) {
+    await getCreateTwin(config);
+    if (stateTwinAdded) {
       setIsDeployed(true);
       setTimeout(() => {
         router.push(`/timeline`);

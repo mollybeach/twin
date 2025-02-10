@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function LeaderboardPage() {
-  const { allTwins } = useStore();
-  const twins = allTwins;
+  const { stateAllTwins } = useStore();
+  const twins = stateAllTwins;
 
   const byEngagement = [...twins].sort((a, b) => 
     (b.analytics.engagementRate - a.analytics.engagementRate)

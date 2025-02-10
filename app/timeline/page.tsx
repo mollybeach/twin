@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 //import { useStore } from '../store/marketplace';
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bot, Users, Sparkles } from 'lucide-react';
-import { TwinType, TwineetType } from '../types/types';
+import { FetchedTweetType, TwinType, TwineetType } from '../types/types';
 import Image from 'next/image';
+
 export default function TimelinePage() {
  // const twins = useStore((state) => state.twins);
   const [twineets, setTwineets] = useState<TwineetType[]>([]);
@@ -26,6 +27,91 @@ export default function TimelinePage() {
     });
     const twinsResult = await response.json();
     setTwins(twinsResult);
+
+    for (const twin of twinsResult) {
+      const newTweetsResponse = await fetch(`/api/tweets?username=${encodeURIComponent(twin.twitterHandle)}&twinId=${twin.twinId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const newTweets = await newTweetsResponse.json();
+      console.log(newTweets);
+
+      newTweets.forEach((tweet: FetchedTweetType) => {
+        const newFetchedTweet = {
+          twinId: twin.twinId,
+          text: tweet.text,
+          edit_history_tweet_ids: tweet.edit_history_tweet_ids, // Ensure this property is included
+          timestamp: new Date().toISOString(),
+        };
+        console.log(newFetchedTweet);
+
+        if (!newTweets.some((existingTweet: FetchedTweetType) => existingTweet.text === newFetchedTweet.text)) {
+          newTweets.push(newFetchedTweet);
+        }
+      });
+      console.log('newTweets', newTweets);
+
+      const postFetchedTweetsResponse = await fetch('/api/tweets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify( {newTweets}),
+      });
+
+      if (!postFetchedTweetsResponse.ok) {
+        throw new Error('Failed to post fetched tweets');
+      }
+      
+      const allData = [...newTweets, ...twin.twineets];
+      const justTextAndContent = allData.map(tweet => tweet.text || tweet.content);
+      console.log('justTextAndContent', justTextAndContent);
+  
+      console.log('personality', twin.personality);
+      const prompt = `Based on the following tweets: ${justTextAndContent.join(', ')}, generate a twineet for a ${twin.personality} AI twin.`;
+
+      const generateResponse = await fetch(`/api/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const modelData = await generateResponse.json();
+      const generatedText = modelData.choices[0].message?.content || modelData.choices[0].text;
+      console.log('generatedTwineet', generatedText);
+
+      const newTwineet = {
+        id: crypto.randomUUID(),
+        twinId: twin.twinId,
+        content: generatedText,
+        timestamp: new Date().toISOString(),
+        likesCount: 0, 
+        retwineetsCount: 0, 
+        repliesCount: 0, 
+        isLiked: false, 
+        isRetwineeted: false, 
+      };
+    
+      const updateResponse = await fetch(`/api/twineets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newTwineet }),
+        
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update twin');
+      }
+
+      console.log('Twineet posted successfully for twin:', twin.twinId);
+    }
   };
 
   const fetchAndDisplayTwineets = async () => {
@@ -78,7 +164,7 @@ export default function TimelinePage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ twineetId }), 
+            body: JSON.stringify( twineetId ), 
         });
 
         if (!response.ok) {

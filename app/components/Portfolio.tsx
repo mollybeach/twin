@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
-import { TradeModalPropsType, TokenShareType} from '../types/types';
+import { TradeModalPropsType, TokenShareType, UserTokenShareType} from '../types/types';
 import Image from 'next/image';
 
 function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
@@ -122,8 +122,21 @@ export function Portfolio() {
     isVerified: boolean;
     profileImage: string;
     availableShares: number;
-    tokenShares: TokenShareType;
+    shareholders: UserTokenShareType[];
   }[]>([]);
+
+  type HoldingType = {
+    id: string;
+    twinHandle: string;
+    shares: number;
+    value: number;
+    pricePerShare: number;
+    isVerified: boolean;
+    profileImage: string;
+    availableShares: number;
+    tokenShares: TokenShareType;
+    shareholders: UserTokenShareType[];
+  }[];
 
   useEffect(() => {
     const fetchHoldings = async () => {
@@ -140,11 +153,11 @@ export function Portfolio() {
           isVerified: twin.verification.isVerified,
           profileImage: twin.profileImage,
           availableShares: twin.tokenShares.availableShares,
-          tokenShares: userShares
+          shareholders: userShares
         };
       }));
 
-      setHoldings(fetchedHoldings.filter(holding => holding.shares > 0) as any);
+      setHoldings(fetchedHoldings.filter(holding => holding.shares > 0) as HoldingType);
     };
 
     fetchHoldings();
@@ -224,7 +237,7 @@ export function Portfolio() {
                     <div className="mb-4">
                       <SharePriceChart
                         twinId={holding.id}
-                        shareholders={holding.tokenShares.shareholders || []}
+                        shareholders={holding.shareholders || []}
                         pricePerShare={holding.pricePerShare}
                         isExpanded={isExpanded}
                       />

@@ -1,14 +1,16 @@
 // server/cron.ts
+/*
 import cron from 'node-cron';
 import axios from 'axios';
-import { edgeDBCloudClient } from '../lib/client'; // Adjust the import based on your project structure
+import { edgeDBCloudClient } from '../lib/client';
 import dotenv from 'dotenv';
-import { TwinType, FetchedTweetType } from '../app/types/types'; // Adjust the import based on your project structure
+import { TwinType, FetchedTweetType } from '../app/types/types';
 
 dotenv.config();
 
 // Schedule the task to run every 5 minutes
-cron.schedule('*/1 * * * *', async () => {
+//cron.schedule('*///1 * * * *', async () => {
+/*
     try {
         // Fetch all Twins from the database
         const twinsQuery = `
@@ -17,7 +19,7 @@ cron.schedule('*/1 * * * *', async () => {
                 personality,
                 twitterHandle,
                 fetchedTweets,
-                twineets {
+                twineets : {
                     content
                 }
             };
@@ -27,7 +29,7 @@ cron.schedule('*/1 * * * *', async () => {
         // Generate and post a Twineet for each Twin
         for (const twin of twins) {
             // Fetch new tweets from Twitter API
-            const newTweetsResponse = await axios.get(`/api/tweets?username=${encodeURIComponent(twin.twitterHandle)}`);
+            const newTweetsResponse = await axios.get(`http://localhost:3000/api/tweets?username=${encodeURIComponent(twin.twitterHandle)}`);
             const newTweets: FetchedTweetType[] = newTweetsResponse.data;
 
             // Update fetchedTweets with new tweets if they are not duplicates
@@ -93,4 +95,4 @@ cron.schedule('*/1 * * * *', async () => {
     } catch (error) {
         console.error('Error generating twineets:', error);
     }
-});
+});*/

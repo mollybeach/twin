@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-
 const port = process.env.PORT || 3002;
 const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3002';
 
@@ -29,6 +28,7 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+
 
 app.listen(port, () => {
     console.log(`Server running at ${url}`);

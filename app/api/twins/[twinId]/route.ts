@@ -136,3 +136,56 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: 'Error fetching twin' }, { status: 500 });
     }
 }
+/*
+export async function PUT(req: NextRequest) {
+    const { twinId, fetchedTweets, twineets } = await req.json(); // Ensure twinId is included
+    console.log('PUT REQUEST RECEIVED: ', twinId, fetchedTweets, twineets);
+    
+    try {
+        // Ensure fetchedTweets and twineets are arrays of the correct type
+        const fetchedTweetsArray = fetchedTweets.map((tweet: FetchedTweetType) => ({
+            twinId: tweet.twinId,
+            text: tweet.text,
+            edit_history_tweet_ids: tweet.edit_history_tweet_ids,
+            timestamp: tweet.timestamp,
+        }));
+
+        const twineetsArray = twineets.map((twineet: TwineetType) => ({
+            id: twineet.id,
+            twinId: twineet.twinId,
+            content: twineet.content,
+            timestamp: twineet.timestamp,
+            likesCount: twineet.likesCount,
+            retwineetsCount: twineet.retwineetsCount,
+            repliesCount: twineet.repliesCount,
+            isLiked: twineet.isLiked,
+            isRetwineeted: twineet.isRetwineeted,
+        }));
+
+        console.log('fetchedTweetsArray: ', fetchedTweetsArray);
+        console.log('typeof fetchedTweetsArray: ', typeof fetchedTweetsArray);
+        console.log('twineetsArray: ', twineetsArray);
+        console.log('typeof twineetsArray: ', typeof twineetsArray);
+        const query = `
+        UPDATE Twin
+        FILTER .twinId = <str>$twinId
+        SET {
+            twineets := <array<Twineet>>$twineets,
+            fetchedTweets := <array<FetchedTweet>>$fetchedTweets
+        };
+        `;
+
+        await edgeDBCloudClient.querySingle<TwinType>(query, { 
+            twinId, 
+            twineets: twineetsArray,
+            fetchedTweets: fetchedTweetsArray, 
+         
+        });
+        console.log('Twin updated successfully: ', twinId, fetchedTweetsArray, twineetsArray);
+
+        return NextResponse.json({ message: 'Twin updated successfully' }, { status: 200 });
+    } catch (error) {
+        console.error('Error updating twin:', error);
+        return NextResponse.json({ message: 'Error updating twin' }, { status: 500 });
+    }
+}*/

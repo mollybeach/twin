@@ -7,6 +7,8 @@ export type InteractionGroup = 'likes' | 'retwineets' | 'replies' | 'quotes';
 export type NotificationGroup = 'create' | 'buy' | 'sell';
 export type PlatformType = 'mobile' | 'desktop' | 'tablet';
 export type TransactionGroup = 'buy' | 'sell';
+export type FetchedTweetsMultiType = FetchedTweetType[];
+export type TwineetsMultiType = TwineetType[];
 
 
 export interface AnalyticsType {
@@ -104,6 +106,7 @@ export interface storeType {
     getNewUserId: () => string;
     getSellShares: (twinId: string, shares: number) => Promise<void>;
     getTransactionsUserHistory: (userId: string) => Promise<TransactionType[]>;
+    getTransactionTwinHistory: (twinId: string) => Promise<TransactionType[]>;
     getTweets: (username: string) => Promise<FetchedTweetType[]>;
     getUpdateAnalytics: (twinId: string) => Promise<AnalyticsType>;
     getUserShares: (userId: string) => Promise<UserTokenShareType[]>;

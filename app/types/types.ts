@@ -119,7 +119,7 @@ export interface storeType {
     getSellShares: (twinId: string, shares: number) => Promise<void>;
     getTransactionsUserHistory: (userId: string) => Promise<TransactionType[]>;
     getTransactionTwinHistory: (twinId: string) => Promise<TransactionType[]>;
-    getTweets: (username: string) => Promise<FetchedTweetType[]>;
+    getTweets: (username: string, twinId: string) => Promise<FetchedTweetType[]>;
     getUpdateAnalytics: (twinId: string) => Promise<AnalyticsType>;
     getUserShares: (userId: string) => Promise<UserTokenShareType[]>;
     getUserSharesOfATwin: (twinId: string) => number;

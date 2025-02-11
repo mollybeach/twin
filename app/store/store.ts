@@ -219,9 +219,9 @@ const useStore = create<storeType>()(
         }
       },
 
-      getTweets: async (username: string) => {
+      getTweets: async (username: string, twinId: string) => {
         try {
-            const response = await fetch(`/api/tweets?username=${encodeURIComponent(username)}`, {
+            const response = await fetch(`/api/tweets?username=${encodeURIComponent(username)}&twinId=${encodeURIComponent(twinId)}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

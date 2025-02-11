@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         const userId = userResponse.data.data.id; 
 
         const response = await axios.get(`https://api.twitter.com/2/users/${userId}/tweets`, {
-            params: { max_results: 5 },
+            params: { max_results: 100 },
             headers: {
                 Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
             },

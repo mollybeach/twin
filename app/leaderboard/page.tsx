@@ -9,20 +9,20 @@ export default function LeaderboardPage() {
   const twins = stateAllTwins;
 
   const byEngagement = [...twins].sort((a, b) => 
-    (b.analytics.engagementRate - a.analytics.engagementRate)
+    ((b.analytics?.engagementRate || 0) - (a.analytics?.engagementRate || 0))
   );
 
   const byImpressions = [...twins].sort((a, b) => 
-    (b.analytics.impressions - a.analytics.impressions)
+    ((b.analytics?.impressions || 0) - (a.analytics?.impressions || 0))
   );
 
   const byMarketValue = [...twins].sort((a, b) => 
-    ((b.tokenShares.totalShares - b.tokenShares.availableShares) * b.tokenShares.pricePerShare) -
-    ((a.tokenShares.totalShares - a.tokenShares.availableShares) * a.tokenShares.pricePerShare)
+    (((b.tokenShares?.totalShares || 0) - (b.tokenShares?.availableShares || 0)) * (b.tokenShares?.pricePerShare || 0)) -
+    (((a.tokenShares?.totalShares || 0) - (a.tokenShares?.availableShares || 0)) * (a.tokenShares?.pricePerShare || 0))
   );
 
   const byInteractions = [...twins].sort((a, b) => 
-    (b.stats.interactions - a.stats.interactions)
+    ((b.stats?.interactions || 0) - (a.stats?.interactions || 0))
   );
 
   const getTopThree = (list: typeof twins) => list.slice(0, 3);

@@ -31,7 +31,7 @@ export default function CreateTwinPage() {
   const trainTwinOnTwitterHistory = async () => {
     setIsFetchingTweets(true);
     try {
-        const fetchedTweets = await getTweets(config.twitterHandle);
+        const fetchedTweets = await getTweets(config.twitterHandle, newTwinId);
         setConfig((prev) => ({ ...prev, fetchedTweets: fetchedTweets }));
         
         const { generatedText } = await getGeneratedTwineetContent(stateFetchedTweets, config.personality);

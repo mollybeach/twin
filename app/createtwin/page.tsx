@@ -41,14 +41,15 @@ export default function CreateTwinPage() {
             twineets: [
                 ...prev.twineets,
                 {
-                    twinId: newTwinId,
+                    userId: stateCurrentUserId ?? '',
+                    twinId: newTwinId ?? '',
                     content: generatedText,
                     timestamp: new Date(),
                     likesCount: Math.floor(Math.random() * 100),
                     retwineetsCount: Math.floor(Math.random() * 100),
                     repliesCount: Math.floor(Math.random() * 100),
                     isLiked: false,
-                    isRetwineeted: false,
+                    isRetwineeted: false
                 },
             ],
         }));

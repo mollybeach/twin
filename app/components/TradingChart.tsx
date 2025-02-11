@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { TradingChartPropsType, TransactionType } from '../types/types';
 import { useStore } from '../store/store';
@@ -29,4 +29,4 @@ const TradingChart: React.FC<TradingChartPropsType> = async ({ twinId }) => {
     );
 };
 
-export default TradingChart;
+export default TradingChart;*/

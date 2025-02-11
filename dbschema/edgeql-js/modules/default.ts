@@ -126,6 +126,32 @@ const $FetchedTweet = $.makeType<$FetchedTweet>(_.spec, "a433934c-e51c-11ef-986e
 
 const FetchedTweet: $.$expr_PathNode<$.TypeSet<$FetchedTweet, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($FetchedTweet, $.Cardinality.Many), null);
 
+export type $FollowersλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
+  "userId": $.PropertyDesc<$.ArrayType<$UserIdType>, $.Cardinality.One, false, false, false, false>;
+  "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
+  "<followers[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<followers": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
+}>;
+type $Followers = $.ObjectType<"default::Followers", $FollowersλShape, null, [
+  ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
+]>;
+const $Followers = $.makeType<$Followers>(_.spec, "815e297a-e807-11ef-ac18-cd6f77af021f", _.syntax.literal);
+
+const Followers: $.$expr_PathNode<$.TypeSet<$Followers, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Followers, $.Cardinality.Many), null);
+
+export type $FollowingλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
+  "following": $.PropertyDesc<$.ArrayType<$TwinIdType>, $.Cardinality.One, false, false, false, false>;
+  "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, false, false, false, false>;
+  "<following[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<following": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
+}>;
+type $Following = $.ObjectType<"default::Following", $FollowingλShape, null, [
+  ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
+]>;
+const $Following = $.makeType<$Following>(_.spec, "815cef4c-e807-11ef-97d2-23bd433cdfd9", _.syntax.literal);
+
+const Following: $.$expr_PathNode<$.TypeSet<$Following, $.Cardinality.Many>, null> = _.syntax.$PathNode($.$toSet($Following, $.Cardinality.Many), null);
+
 export type $LikesλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588λShape & {
   "twinId": $.PropertyDesc<$TwinIdType, $.Cardinality.One, false, false, false, false>;
   "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, false, false, false, false>;
@@ -300,6 +326,7 @@ export type $TwinλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "stats": $.LinkDesc<$TwinStats, $.Cardinality.One, {}, false, false,  false, false>;
   "twineets": $.LinkDesc<$Twineet, $.Cardinality.AtLeastOne, {}, false, false,  false, false>;
   "verification": $.LinkDesc<$Verification, $.Cardinality.One, {}, false, false,  false, false>;
+  "followers": $.LinkDesc<$Followers, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
   "<twins[is User]": $.LinkDesc<$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<twins": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -335,6 +362,7 @@ export type $TwineetλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f7384
   "likesCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
   "repliesCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
   "retwineetsCount": $.PropertyDesc<_std.$int16, $.Cardinality.One, false, false, false, true>;
+  "userId": $.PropertyDesc<$UserIdType, $.Cardinality.One, false, false, false, true>;
   "<twineets[is Twin]": $.LinkDesc<$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
   "<twineets": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
 }>;
@@ -363,6 +391,7 @@ export type $UserλShape = $.typeutil.flatten<_std.$Object_8ce8c71ee4fa5f73840c2
   "likes": $.LinkDesc<$Likes, $.Cardinality.Many, {}, false, false,  false, false>;
   "replies": $.LinkDesc<$Replies, $.Cardinality.Many, {}, false, false,  false, false>;
   "retwineets": $.LinkDesc<$Retwineets, $.Cardinality.Many, {}, false, false,  false, false>;
+  "following": $.LinkDesc<$Following, $.Cardinality.AtMostOne, {}, false, false,  false, false>;
 }>;
 type $User = $.ObjectType<"default::User", $UserλShape, null, [
   ..._std.$Object_8ce8c71ee4fa5f73840c22d7eaa58588['__exclusives__'],
@@ -408,7 +437,7 @@ const Verification: $.$expr_PathNode<$.TypeSet<$Verification, $.Cardinality.Many
 
 
 
-export { AgeGroup, InteractionGroup, NotificationGroup, PlatformType, TransactionGroup, TwinIdType, UserIdType, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Likes, Likes, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $Replies, Replies, $Retwineets, Retwineets, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twin, Twin, $TwinStats, TwinStats, $Twineet, Twineet, $User, User, $UserTokenShare, UserTokenShare, $Verification, Verification };
+export { AgeGroup, InteractionGroup, NotificationGroup, PlatformType, TransactionGroup, TwinIdType, UserIdType, $Analytics, Analytics, $CryptoHolding, CryptoHolding, $DailyImpressions, DailyImpressions, $Demographics, Demographics, $FetchedTweet, FetchedTweet, $Followers, Followers, $Following, Following, $Likes, Likes, $Notification, Notification, $PeakHours, PeakHours, $ReachByPlatform, ReachByPlatform, $Replies, Replies, $Retwineets, Retwineets, $TokenShare, TokenShare, $TokenStats, TokenStats, $TopInteractions, TopInteractions, $Transaction, Transaction, $Twin, Twin, $TwinStats, TwinStats, $Twineet, Twineet, $User, User, $UserTokenShare, UserTokenShare, $Verification, Verification };
 
 type __defaultExports = {
   "AgeGroup": typeof AgeGroup;
@@ -423,6 +452,8 @@ type __defaultExports = {
   "DailyImpressions": typeof DailyImpressions;
   "Demographics": typeof Demographics;
   "FetchedTweet": typeof FetchedTweet;
+  "Followers": typeof Followers;
+  "Following": typeof Following;
   "Likes": typeof Likes;
   "Notification": typeof Notification;
   "PeakHours": typeof PeakHours;
@@ -453,6 +484,8 @@ const __defaultExports: __defaultExports = {
   "DailyImpressions": DailyImpressions,
   "Demographics": Demographics,
   "FetchedTweet": FetchedTweet,
+  "Followers": Followers,
+  "Following": Following,
   "Likes": Likes,
   "Notification": Notification,
   "PeakHours": PeakHours,

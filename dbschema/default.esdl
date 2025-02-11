@@ -108,6 +108,9 @@ module default {
     # Define the Twineet type
     type Twineet {
         required property twinId -> TwinIdType;
+        required property userId -> UserIdType {
+            default := "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+        }
         required property content -> str;
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
@@ -143,6 +146,15 @@ module default {
         required property uptime -> str;
     }
 
+    type Followers {
+        required property twinId -> TwinIdType;
+        required property userId -> array<UserIdType>;
+    }
+
+    type Following {
+        required property userId -> UserIdType;
+        required property following -> array<TwinIdType>;
+    }
     # Define the Twin type
     type Twin {
         required property twinId -> TwinIdType { 
@@ -172,6 +184,7 @@ module default {
         required link tokenShares -> TokenShare; 
         required link tokenStats -> TokenStats;
         required multi link transactions -> Transaction;
+        optional link followers -> Followers;
     }
 
     type Likes {
@@ -221,6 +234,7 @@ module default {
         required property walletBalance -> decimal{
             default := <decimal>1000000;
         }
+        optional link following -> Following;
     }
 
     # Define the Notification type

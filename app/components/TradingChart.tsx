@@ -1,12 +1,21 @@
-/*import React from 'react';
+// path: app/components/TradingChart.tsx
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { TradingChartPropsType, TransactionType } from '../types/types';
 import { useStore } from '../store/store';
 
-const TradingChart: React.FC<TradingChartPropsType> = async ({ twinId }) => {
-    // Fetch the relevant data for the specific twin using twinId
+const TradingChart: React.FC<TradingChartPropsType> = ({ twinId }) => {
     const { stateTransactions } = useStore();
-    const transactionHistory = stateTransactions.filter((t: TransactionType) => t.twinId === twinId);
+    const [transactionHistory, setTransactionHistory] = useState<TransactionType[]>([]);
+
+    useEffect(() => {
+        const fetchTransactionHistory = () => {
+            const filteredTransactions = stateTransactions.filter((t: TransactionType) => t.twinId === twinId);
+            setTransactionHistory(filteredTransactions);
+        };
+
+        fetchTransactionHistory();
+    }, [stateTransactions, twinId]);
 
     // Prepare data for the chart
     const chartData = {
@@ -29,4 +38,4 @@ const TradingChart: React.FC<TradingChartPropsType> = async ({ twinId }) => {
     );
 };
 
-export default TradingChart;*/
+export default TradingChart;

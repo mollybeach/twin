@@ -126,6 +126,21 @@ export interface storeType {
     getVerifyTwin: (twinId: string) => Promise<boolean>; 
 }
 
+export interface HoldingType {
+    id: string;
+    twinHandle: string;
+    shares: number;
+    value: number;
+    pricePerShare: number;
+    isVerified: boolean;
+    profileImage: string;
+    availableShares: number;
+    personality?: string;
+    analytics?: AnalyticsType;
+    tokenShares?: TokenShareType;
+    shareholders?: UserTokenShareType[];
+}
+
 export interface NotificationType {
     twinId: TwinIdType;
     kind: NotificationGroup;

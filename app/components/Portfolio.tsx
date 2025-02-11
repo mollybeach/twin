@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
-import { TradeModalPropsType, TokenShareType, UserTokenShareType} from '../types/types';
+import { TradeModalPropsType, HoldingType} from '../types/types';
 import Image from 'next/image';
 
 function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
@@ -112,31 +112,7 @@ export function Portfolio() {
   } | null>(null);
   
   const { stateCurrentUserTwins, getUserShares } = useStore();
-
-  const [holdings, setHoldings] = useState<{
-    id: string;
-    twinHandle: string;
-    shares: number;
-    value: number;
-    pricePerShare: number;
-    isVerified: boolean;
-    profileImage: string;
-    availableShares: number;
-    shareholders: UserTokenShareType[];
-  }[]>([]);
-
-  type HoldingType = {
-    id: string;
-    twinHandle: string;
-    shares: number;
-    value: number;
-    pricePerShare: number;
-    isVerified: boolean;
-    profileImage: string;
-    availableShares: number;
-    tokenShares: TokenShareType;
-    shareholders: UserTokenShareType[];
-  }[];
+  const [holdings, setHoldings] = useState<HoldingType[]>([]);
 
   useEffect(() => {
     const fetchHoldings = async () => {
@@ -157,7 +133,7 @@ export function Portfolio() {
         };
       }));
 
-      setHoldings(fetchedHoldings.filter(holding => holding.shares > 0) as HoldingType);
+      setHoldings(fetchedHoldings.filter(holding => holding.shares > 0) as HoldingType[]);
     };
 
     fetchHoldings();

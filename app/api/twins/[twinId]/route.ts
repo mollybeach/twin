@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
                 fetchedTweets: {
                     twinId,
                     text,
-                    edit_history_tweet_ids,
+                    tweetId,
                     timestamp
                 },
                 modelData,
@@ -146,7 +146,7 @@ export async function PUT(req: NextRequest) {
         const fetchedTweetsArray = fetchedTweets.map((tweet: FetchedTweetType) => ({
             twinId: tweet.twinId,
             text: tweet.text,
-            edit_history_tweet_ids: tweet.edit_history_tweet_ids,
+            tweetId: tweet.tweetId,
             timestamp: tweet.timestamp,
         }));
 

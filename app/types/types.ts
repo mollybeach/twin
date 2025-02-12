@@ -197,7 +197,7 @@ export interface TransactionType {
 export interface FetchedTweetType {
     twinId: TwinIdType;
     text: string;
-    edit_history_tweet_ids: string[];
+    tweetId: string;
     timestamp: Date;
 }
 

@@ -90,7 +90,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
     const fetchedTweetsQuery = edgeql.insert(edgeql.FetchedTweet, {
         twinId: formattedFetchedTweets.twinId,
         text: formattedFetchedTweets.text,
-        edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
+        tweetId: formattedFetchedTweets.tweetId,
         timestamp: edgeql.cast(edgeql.datetime, new Date(formattedFetchedTweets.timestamp)), // Ensure this is a Date object
     });
 

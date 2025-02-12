@@ -59,7 +59,7 @@ export async function GET() {
                 fetchedTweets: {
                     twinId,
                     text,
-                    edit_history_tweet_ids,
+                    tweetId,
                     timestamp
                 },
                 modelData,

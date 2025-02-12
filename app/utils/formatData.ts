@@ -151,7 +151,7 @@ export function formatFetchedTweet(tweet: FetchedTweetType) {
     return {
         twinId: tweet.twinId || '',
         text: tweet.text || '',
-        edit_history_tweet_ids: tweet.edit_history_tweet_ids || [],
+        tweetId: tweet.tweetId || '',
         timestamp: new Date(tweet.timestamp || Date.now()),
     };
 }

@@ -8,7 +8,7 @@
         "start": "next start",
         "lint": "next lint",
         "preview": "next preview",
-        "mg-cloud-gen": "edgedb migration create && edgedb migrate && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js && edgedb migrate -I mollybeach/twindb && npx @edgedb/generate edgeql-js",
+        "mg-cloud-gen": "edgedb migration create && edgedb migrate && edgedb migrate -I mollybeach/twinfundb && npx @edgedb/generate edgeql-js && edgedb migrate -I mollybeach/twinfundb && npx @edgedb/generate edgeql-js",
         "server": "ts-node -r tsconfig-paths/register server/index.ts",
         "typecheck": "tsc --noEmit"
     },

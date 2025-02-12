@@ -28,6 +28,8 @@ export async function GET(req: NextRequest) {
 
         const userId = userResponse.data.data.id; 
 
+        console.log('user response.data.data ', userResponse.data.data);
+
         const response = await axios.get(`https://api.twitter.com/2/users/${userId}/tweets`, {
             params: { max_results: 100 },
             headers: {
@@ -35,12 +37,14 @@ export async function GET(req: NextRequest) {
             },
         });
 
-        const tweets = response.data.data.map((tweet: { id: string; text: string; edit_history_tweet_ids: string[] }) => ({
+        console.log('response.data.data ', response.data.data);
+
+        const tweets = response.data.data.map((tweet: { id: string; text: string; edit_history_tweet_ids: string[]}) => ({
             id: tweet.id,
-            twinId: twinId, 
+            twinId: twinId,
             text: tweet.text,
             timestamp: new Date(),
-            edit_history_tweet_ids: tweet.edit_history_tweet_ids,
+            tweetId: tweet.edit_history_tweet_ids[0],
         }));
 
         return NextResponse.json(tweets);
@@ -61,11 +65,11 @@ export async function POST(req: NextRequest) {
                 twinId := <str>$twinId,
                 text := <str>$text,
                 timestamp := <datetime>$timestamp,
-                edit_history_tweet_ids := <array<str>>$edit_history_tweet_ids
+                tweetId := <str>$tweetId
             }
         `;
 
-        await edgeDBCloudClient.querySingle<FetchedTweetType>(query, { twinId: tweet.twinId, text: tweet.text, timestamp: new Date(tweet.timestamp), edit_history_tweet_ids: tweet.edit_history_tweet_ids });
+        await edgeDBCloudClient.querySingle<FetchedTweetType>(query, { twinId: tweet.twinId, text: tweet.text, timestamp: new Date(tweet.timestamp), tweetId: tweet.tweetId });
     }
     return NextResponse.json({ message: 'FetchedTweets created successfully' }, { status: 200 });
 

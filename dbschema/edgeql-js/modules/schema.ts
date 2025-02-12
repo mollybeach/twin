@@ -691,6 +691,8 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
   "<__type__[is schema::Trigger]": $.LinkDesc<$Trigger, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::ObjectType]": $.LinkDesc<$ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is schema::Extension]": $.LinkDesc<$Extension, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Following]": $.LinkDesc<_default.$Following, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Followers]": $.LinkDesc<_default.$Followers, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is CryptoHolding]": $.LinkDesc<_default.$CryptoHolding, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is DailyImpressions]": $.LinkDesc<_default.$DailyImpressions, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Demographics]": $.LinkDesc<_default.$Demographics, $.Cardinality.Many, {}, false, false,  false, false>;
@@ -707,13 +709,11 @@ export type $ObjectTypeλShape = $.typeutil.flatten<$SourceλShape & Omit<$Consi
   "<__type__[is Twineet]": $.LinkDesc<_default.$Twineet, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Verification]": $.LinkDesc<_default.$Verification, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Twin]": $.LinkDesc<_default.$Twin, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Notification]": $.LinkDesc<_default.$Notification, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is User]": $.LinkDesc<_default.$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Likes]": $.LinkDesc<_default.$Likes, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is Notification]": $.LinkDesc<_default.$Notification, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Replies]": $.LinkDesc<_default.$Replies, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__[is Retwineets]": $.LinkDesc<_default.$Retwineets, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Following]": $.LinkDesc<_default.$Following, $.Cardinality.Many, {}, false, false,  false, false>;
-  "<__type__[is Followers]": $.LinkDesc<_default.$Followers, $.Cardinality.Many, {}, false, false,  false, false>;
+  "<__type__[is User]": $.LinkDesc<_default.$User, $.Cardinality.Many, {}, false, false,  false, false>;
   "<__type__": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<intersection_of": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;
   "<subject": $.LinkDesc<$.ObjectType, $.Cardinality.Many, {}, false, false,  false, false>;

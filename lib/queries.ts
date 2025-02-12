@@ -97,7 +97,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
     const fetchedTweetsQuery = await edgeql.insert(FetchedTweet, {
         twinId: twinData.twinId,
         text: formattedFetchedTweets.text,
-        edit_history_tweet_ids: formattedFetchedTweets.edit_history_tweet_ids,
+        tweetId: formattedFetchedTweets.tweetId,
         timestamp: eQlDate(new Date), 
     });
 
@@ -748,4 +748,3 @@ export const insertTwinQueryString = `
         )
     };
 `;
-

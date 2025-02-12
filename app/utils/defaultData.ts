@@ -3,7 +3,15 @@
 import { TwinType } from '../types/types';
 import { TwinIdType, UserIdType } from '../types/types';
 const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-
+const getRandomDescription = () => {
+    const descriptions = [
+        'This Twin is a friendly and professional twin.',
+        'This Twin is a casual and witty twin.',
+        'This Twin is a witty and casual twin.',
+        'This Twin is evil and wants to destroy the world'
+    ];
+    return descriptions[Math.floor(Math.random() * descriptions.length)];
+}
 // Factory function to create a new default twin
 export const defaultTwin = (newTwinId: TwinIdType, myUserId: UserIdType): TwinType => {
 
@@ -15,7 +23,7 @@ export const defaultTwin = (newTwinId: TwinIdType, myUserId: UserIdType): TwinTy
         twitterHandle: '',
         profileImage: 'https://i.imgur.com/HDQ3OTC.png', 
         personality: ['friendly', 'professional', 'casual', 'witty'][Math.floor(Math.random() * 4)],
-        description: 'This is a default description for the twin.',
+        description: getRandomDescription(),
         autoReply: true,
         price: getRandomInt(100, 1000),
         isListed: Math.random() < 0.5,

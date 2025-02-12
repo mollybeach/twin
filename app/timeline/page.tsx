@@ -43,7 +43,7 @@ export default function TimelinePage() {
         const newFetchedTweet = {
           twinId: twin.twinId,
           text: tweet.text,
-          edit_history_tweet_ids: tweet.edit_history_tweet_ids, // Ensure this property is included
+          tweetId: tweet.tweetId, // Ensure this property is included
           timestamp: new Date().toISOString(),
         };
         console.log(newFetchedTweet);

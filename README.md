@@ -242,7 +242,7 @@ Backend scripts for server-side logic.
 |------------------|---------------|-----------------------------------------|
 | twinId           | TwinIdType    | Reference to the Twin that fetched the tweet |
 | text             | TEXT          | Content of the fetched tweet            |
-| edit_history_tweet_ids | ARRAY<STR> | Array of tweet IDs for edit history    |
+| tweetId | ARRAY<STR> | Array of tweet IDs for edit history    |
 | timestamp        | TIMESTAMP     | Timestamp of when the tweet was fetched |
 
 ### 5. TokenStats

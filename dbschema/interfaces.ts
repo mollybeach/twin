@@ -132,7 +132,7 @@ export namespace $default {
   }
   export interface FetchedTweet extends std.$Object {
     "twinId": string;
-    "edit_history_tweet_ids": string[];
+    "tweetId": string[];
     "text": string;
     "timestamp": Date;
   }

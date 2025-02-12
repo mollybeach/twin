@@ -99,7 +99,7 @@ module default {
     type FetchedTweet {
         required property twinId -> TwinIdType;
         required property text -> str;
-        required property edit_history_tweet_ids -> array<str>;
+        required property tweetId -> str;
         required property timestamp -> datetime {
             default := datetime_current();  # Default to the current timestamp
         }

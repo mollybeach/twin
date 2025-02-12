@@ -5,7 +5,7 @@ import { useStore } from '@/store/store';
 import AnalyticsComponent from '@/components/Analytics';
 import { Bot } from 'lucide-react';
 import Image from 'next/image';
-import { TwinType } from '../types/types';
+import { TwinType } from '../../types/types';
 
 export default function AnalyticsPage() {
   const { twinId } = useParams<{ twinId: string }>();

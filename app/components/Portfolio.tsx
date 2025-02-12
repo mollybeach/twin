@@ -1,6 +1,7 @@
 // path: src/components/Portfolio.tsx
 import { useState, useEffect } from 'react';
 import { useStore } from '../store/store';
+import { usePathname } from 'next/navigation';
 import { 
   TrendingUp, 
   ChevronRight, 
@@ -9,12 +10,21 @@ import {
   ChevronRight as ChevronRightIcon,
   ArrowDownToLine,
   ArrowUpToLine,
-  X
+  X,
+  Trophy,
+  GitMerge,
+  PlusCircle,
+  Home,
+  ShoppingBag,
+  Wallet as WalletIcon,
+  Info
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
 import { TradeModalPropsType, HoldingType} from '../types/types';
 import Image from 'next/image';
+import Wallet from './Wallet';
+
 
 function TradeModal({ twinId, twinHandle, currentShares, availableShares, pricePerShare, isSelling, onClose }: TradeModalPropsType) {
   const [shares, setShares] = useState<number>(1);
@@ -111,8 +121,9 @@ export function Portfolio() {
     isSelling: boolean;
   } | null>(null);
   
-  const { stateCurrentUserTwins, getUserShares } = useStore();
+  const { stateCurrentUserTwins, getUserShares, stateCurrentUserData } = useStore();
   const [holdings, setHoldings] = useState<HoldingType[]>([]);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchHoldings = async () => {
@@ -141,6 +152,16 @@ export function Portfolio() {
 
   const totalValue = holdings.reduce((sum, holding) => sum + holding.value, 0);
 
+
+  const navigationItems = [
+    { path: '/', icon: Home, label: 'Home' },
+    { path: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },
+    { path: '/createTwin', icon: PlusCircle, label: 'Create Twin' },
+    { path: '/clone', icon: GitMerge, label: 'Clone Lab' },
+    { path: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
+    { path: '/about', icon: Info, label: 'About' },
+  ];
+
   return (
     <>
       <div className={`${isExpanded ? 'w-80' : 'w-16'} h-screen bg-black border-r border-white/10 flex flex-col transition-all duration-300 relative group`}>
@@ -157,25 +178,83 @@ export function Portfolio() {
         </button>
 
         <div className={`flex-1 ${isExpanded ? 'p-4' : 'p-2'} overflow-hidden flex flex-col`}>
-          {/* Portfolio Section */}
+          {/* Navigation Section */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Portfolio</h2>
-            <p className="text-purple-300">Total Value: ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+            {navigationItems.map((item) => {
+              const isActive = pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`flex items-center ${isExpanded ? 'px-4' : 'justify-center'} py-2 mb-1 rounded-lg transition-colors ${
+                    isActive 
+                      ? 'bg-white/10 text-white' 
+                      : 'text-purple-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 ${isExpanded ? 'mr-3' : ''}`} />
+                  {isExpanded && <span>{item.label}</span>}
+                  {!isExpanded && (
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-white/10 backdrop-blur-lg rounded-lg text-white text-sm whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                      {item.label}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
+          {/* Portfolio Section */}
+          <div className="flex items-center space-x-2 mb-6">
+            <Link href="/portfolio" className="flex items-center space-x-2 w-full hover:bg-white/5 p-2 rounded-lg transition-colors">
+              <WalletIcon className="w-6 h-6 text-purple-400 flex-shrink-0" />
+              {isExpanded && (
+                <>
+                  <h2 className="text-xl font-bold text-white flex-1 text-left">Portfolio</h2>
+                  <ChevronRight className="w-4 h-4 text-purple-300" />
+                </>
+              )}
+            </Link>
+          </div>
+
+          {/* Wallet Display */}
+          <Wallet balance={stateCurrentUserData?.walletBalance || 0} username={stateCurrentUserData?.username || ''} />
+
+          {/* Login/Logout Button */}
+          <div className="flex justify-center">
+            {stateCurrentUserData ? (
+              <button className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+                Logout
+              </button>
+            ) : (
+              <Link href="/login" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                Login
+              </Link>
+            )}
+          </div>
+
+          {isExpanded ? (
+            <>
+              <div className="bg-white/5 backdrop-blur-lg rounded-lg p-4 mb-6">
+                <p className="text-sm text-purple-300 mb-1">Total Portfolio Value</p>
+                <p className="text-2xl font-bold text-white">
+                  ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                </p>
+              </div>
+
           <div className="overflow-y-auto flex-1">
-            <div className="space-y-4">
-              {holdings.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-purple-300 mb-4">No shares owned yet</p>
-                  <Link
-                    href="/marketplace"
-                    className="inline-flex items-center px-4 py-2 bg-purple-500/50 text-white rounded-lg hover:bg-purple-500/70 transition-colors"
-                  >
-                    Browse Marketplace
-                    <ChevronRightIcon className="w-4 h-4 ml-2" />
-                  </Link>
-                </div>
+                <div className="space-y-4">
+                  {holdings.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-purple-300 mb-4">No shares owned yet</p>
+                      <Link
+                        href="/marketplace"
+                        className="inline-flex items-center px-4 py-2 bg-purple-500/50 text-white rounded-lg hover:bg-purple-500/70 transition-colors"
+                      >
+                        Browse Marketplace
+                        <ChevronRightIcon className="w-4 h-4 ml-2" />
+                      </Link>
+                    </div>
               ) : (
                 holdings.map((holding) => (
                   <div
@@ -264,15 +343,43 @@ export function Portfolio() {
                         })}
                         className="flex-1 border border-purple-500 text-purple-400 py-2 rounded-lg hover:bg-purple-500/10 transition-colors flex items-center justify-center space-x-1"
                       >
-                        <ArrowUpToLine className="w-4 h-4" />
-                        <span>Sell</span>
-                      </button>
-                    </div>
+                            <ArrowUpToLine className="w-4 h-4" />
+                            <span>Sell</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              {holdings.map((holding) => (
+                <Link
+                  key={holding.id}
+                  href={`/analytics/${holding.id}`}
+                  className="block relative group"
+                >
+                  <div className="relative">
+                    <Image
+                      src={holding.profileImage}
+                      alt={holding.twinHandle}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-white/10"
+                    />
+                    {holding.isVerified && (
+                      <BadgeCheck className="absolute -bottom-1 -right-1 w-5 h-5 text-purple-400" />
+                    )}
                   </div>
-                ))
-              )}
+                  {/* Tooltip */}
+                  <div className="absolute left-full ml-2 px-3 py-2 bg-white/10 backdrop-blur-lg rounded-lg text-white text-sm whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <p className="font-medium">@{holding.twinHandle}</p>
+                    <p className="text-purple-300">${holding.value.toLocaleString()}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
 

@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
             FILTER .id = <uuid>$twineetId
             SET {
                 isLiked := NOT .isLiked,
-                likes := (
+                likesCount := (
                     SELECT (
-                        IF .isLiked THEN .likes - 1 ELSE .likes + 1
+                        IF .isLiked THEN .likesCount - 1 ELSE .likesCount + 1
                     )
                 )
             };

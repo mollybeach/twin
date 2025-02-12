@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
         FILTER .id = <uuid>$twineetId
         SET {
             isRetwineeted := NOT .isRetwineeted,
-            retwineets := .isRetwineeted ? .retwineets - 1 : .retwineets + 1
+            retwineetsCount := .isRetwineeted ? .retwineetsCount - 1 : .retwineetsCount + 1
         };
     `;
 
@@ -47,9 +47,9 @@ export async function POST(req: NextRequest) {
             FILTER .id = <uuid>$twineetId
             SET {
                 isRetwineeted := NOT .isRetwineeted,
-                retwineets := (
+                retwineetsCount := (
                     SELECT (
-                        IF .isRetwineeted THEN .retwineets - 1 ELSE .retwineets + 1
+                        IF .isRetwineeted THEN .retwineetsCount - 1 ELSE .retwineetsCount + 1
                     )
                 )
             };

@@ -26,7 +26,8 @@ export default function MarketplacePage() {
             setLoading(true); 
             try {
                 const twinsData = await getAllTwins();
-                setTwins(twinsData);
+                const filteredTwins = twinsData.filter((twin) => twin.userId === stateCurrentUserData?.userId);
+                setTwins(filteredTwins);
 
                 if (stateCurrentUserData?.userId) {
                     const shareData = await getUserShares(stateCurrentUserData.userId);
@@ -73,17 +74,17 @@ export default function MarketplacePage() {
 
             const newBalance = userBalance - totalCost;
             setCurrentUserData({ ...stateCurrentUserData,
-              userId: stateCurrentUserData?.userId || '',
-              walletBalance: newBalance, 
-              username: stateCurrentUserData?.username || '',
-              email: stateCurrentUserData?.email || '',
-              passwordHash: stateCurrentUserData?.passwordHash || '',
-              birthday: stateCurrentUserData?.birthday || new Date(),
-              walletAddress: stateCurrentUserData?.walletAddress || '',
-              twins: stateCurrentUserData?.twins || [],
-              transactions: stateCurrentUserData?.transactions || [],
-              userTokenShares: stateCurrentUserData?.userTokenShares || [],
-              timestamp: stateCurrentUserData?.timestamp || new Date(),
+                userId: stateCurrentUserData?.userId || '',
+                walletBalance: newBalance, 
+                username: stateCurrentUserData?.username || '',
+                email: stateCurrentUserData?.email || '',
+                passwordHash: stateCurrentUserData?.passwordHash || '',
+                birthday: stateCurrentUserData?.birthday || new Date(),
+                walletAddress: stateCurrentUserData?.walletAddress || '',
+                twins: stateCurrentUserData?.twins || [],
+                transactions: stateCurrentUserData?.transactions || [],
+                userTokenShares: stateCurrentUserData?.userTokenShares || [],
+                timestamp: stateCurrentUserData?.timestamp || new Date(),
             });
             localStorage.setItem('userBalance', newBalance.toString());
         } catch (error) {
@@ -92,27 +93,53 @@ export default function MarketplacePage() {
     };
 
     const handleSellShares = async (twinId: string) => {
+        const twin = twins.find(a => a.twinId === twinId);
+        if (!twin) return;
+    
         if (sharesToBuy <= 0) {
             alert('Please enter a valid number of shares');
             return;
         }
-
+    
         const userSharesCount = userShares[twinId] || 0;
         if (sharesToBuy > userSharesCount) {
             alert('You don\'t have enough shares to sell');
             return;
         }
-
+    
+        const numericPrice = typeof twin.price === 'string' ? parseFloat(twin.price) : twin.price;
+        const totalRevenue = sharesToBuy * numericPrice; 
+    
+        // Update the user's balance
+        const newBalance = userBalance + totalRevenue;
+    
         try {
             await getSellShares(twinId, sharesToBuy);
+            setSuccessMessage(`Successfully sold ${sharesToBuy} shares of ${twin.twinHandle}!`);
             setSelectedTwin(null);
             setSharesToBuy(1);
             setIsSellingShares(false);
+    
+            // Update user data
+            setCurrentUserData({
+                ...stateCurrentUserData,
+                userId: stateCurrentUserData?.userId || '',
+                walletBalance: newBalance, 
+                username: stateCurrentUserData?.username || '',
+                email: stateCurrentUserData?.email || '',
+                passwordHash: stateCurrentUserData?.passwordHash || '',
+                birthday: stateCurrentUserData?.birthday || new Date(),
+                walletAddress: stateCurrentUserData?.walletAddress || '',
+                twins: stateCurrentUserData?.twins || [],
+                transactions: stateCurrentUserData?.transactions || [],
+                userTokenShares: stateCurrentUserData?.userTokenShares || [],
+                timestamp: stateCurrentUserData?.timestamp || new Date(),
+            });
+            localStorage.setItem('userBalance', newBalance.toString());
         } catch (error) {
             console.error('Error selling shares:', error);
         }
     };
-
     const handleVerification = async (twinId: string) => {
         setVerificationError(null);
         const success = await getVerifyTwin(twinId);
@@ -126,13 +153,13 @@ export default function MarketplacePage() {
     };
 
     const LoadingSpinner = () => (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
-      </div>
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
     );
-  
+
     if (loading) {
-      return <LoadingSpinner />; 
+        return <LoadingSpinner />; 
     }
 
     return (
@@ -185,6 +212,7 @@ export default function MarketplacePage() {
                                                         )}
                                                     </div>
                                                     <div className="text-sm text-gray-600 dark:text-gray-400">{twin.personality}</div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-400">Owner: {twin.userId}</div>
                                                 </div>
                                             </div>
                                             <span className="flex items-center text-gray-900 dark:text-white font-semibold">
@@ -192,7 +220,7 @@ export default function MarketplacePage() {
                                                 { typeof twin.price === 'string' ? parseFloat(twin.price).toFixed(2) : twin.price.toFixed(2)}
                                             </span>
                                         </div>
-
+                                        
                                         <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">{twin.description}</p>
 
                                         <div className="flex items-center justify-between mt-3 text-purple-300 max-w-md">

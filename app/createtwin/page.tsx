@@ -1,22 +1,16 @@
-// path: app/createtwin/page.tsx
+// path: app/createTwin/page.tsx
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';
 import { useStore } from '../store/store';
 import { useRouter } from 'next/navigation';
-import { TwinType } from '../types/types';
+import { TwinType, FetchedTweetType } from '../types/types';
 import { defaultTwin } from '../utils/defaultData';
 import Image from 'next/image';
 
 export default function CreateTwinPage() {
   const router = useRouter();
-  const { stateCurrentUserId, 
-          getNewTwinId, 
-          stateFetchedTweets, 
-          stateTwinAdded,
-          getTweets,
-          getGeneratedTwineetContent,
-          getCreateTwin } = useStore();
+  const { stateCurrentUserId, getNewTwinId, stateTwinAdded, getTweets, getGeneratedTwineetContent, getCreateTwin } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const newTwinId = getNewTwinId();
   const [step, setStep] = useState(1);
@@ -28,7 +22,7 @@ export default function CreateTwinPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
   const [isGeneratingTwineet, setIsGeneratingTwineet] = useState(false);
-  const [fetchedTweets, setFetchedTweets] = useState<any[]>([]);
+  const [fetchedTweets, setFetchedTweets] = useState<FetchedTweetType[]>([]);
 
   const gatherTwitterHistory = async () => {
     setIsFetchingTweets(true);
@@ -37,6 +31,7 @@ export default function CreateTwinPage() {
       setFetchedTweets(tweets);
       setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
       setStep(2);
+      setSuccessMessage('Tweets Fetched Successfully');
     } catch (error) {
       console.error('Failed to fetch tweets:', error);
       setDeployError('Error fetching tweets');
@@ -53,20 +48,20 @@ export default function CreateTwinPage() {
       setConfig((prev) => ({
         ...prev,
         twineets: [
-            ...prev.twineets,
-            {
-                userId: stateCurrentUserId ?? '',
-                twinId: newTwinId ?? '',
-                content: generatedText,
-                timestamp: new Date(),
-                likesCount: Math.floor(Math.random() * 100),
-                retwineetsCount: Math.floor(Math.random() * 100),
-                repliesCount: Math.floor(Math.random() * 100),
-                isLiked: false,
-                isRetwineeted: false
-            },
+          ...prev.twineets,
+          {
+            userId: stateCurrentUserId ?? '',
+            twinId: newTwinId ?? '',
+            content: generatedText,
+            timestamp: new Date(),
+            likesCount: Math.floor(Math.random() * 100),
+            retwineetsCount: Math.floor(Math.random() * 100),
+            repliesCount: Math.floor(Math.random() * 100),
+            isLiked: false,
+            isRetwineeted: false
+          },
         ],
-    }));
+      }));
       setStep(3);
     } catch (error) {
       console.error('Failed to generate twineet:', error);
@@ -88,7 +83,7 @@ export default function CreateTwinPage() {
     if (stateTwinAdded) {
       setIsDeployed(true);
       setTimeout(() => {
-        router.push(`/timeline`);
+        router.push(`/`);
       }, 2000);
     }
   };
@@ -105,6 +100,16 @@ export default function CreateTwinPage() {
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-purple-900 py-8">
@@ -238,7 +243,7 @@ export default function CreateTwinPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-white">Fetched Tweets</h3>
             <ul className="space-y-2">
-              {fetchedTweets.slice(0, 5).map((tweet, index) => (
+                {fetchedTweets.slice(0, 5).map((tweet: FetchedTweetType, index: number) => (
                 <li key={index} className="bg-white/5 p-2 rounded-md">
                   {tweet.text}
                 </li>

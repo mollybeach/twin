@@ -8,6 +8,7 @@ export async function GET() {
         const query = `
             SELECT Twin {
                 id,
+                userId,
                 twinId,
                 autoReply,
                 timestamp,

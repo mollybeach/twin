@@ -62,6 +62,10 @@ export default function CreateTwinPage() {
           },
         ],
       }));
+      setConfig((prev) => ({
+        ...prev,
+        userId: stateCurrentUserId ?? '',
+      }));
       setStep(3);
     } catch (error) {
       console.error('Failed to generate twineet:', error);

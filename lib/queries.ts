@@ -147,6 +147,7 @@ export async function insertTwin(twinData: TwinType): Promise<void> {
     
     const insertTwinQuery = await edgeql.insert(Twin, {
         twinId: formattedTwin.twinId,
+        userId: formattedTwin.userId,
         twinHandle: formattedTwin.twinHandle,
         twitterHandle: formattedTwin.twitterHandle,
         profileImage: formattedTwin.profileImage,

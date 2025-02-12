@@ -42,6 +42,7 @@ export function formatTokenShare(tokenShare: TokenShareType) {
 export function formatTwin(twin: TwinType) {
     return {
         twinId: twin.twinId,
+        userId: twin.userId,
         twinHandle: twin.twinHandle,
         twitterHandle: twin.twitterHandle,
         profileImage: twin.profileImage,

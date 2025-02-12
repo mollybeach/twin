@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
         const query = `
             SELECT Twin {
                 id,
+                userId,
                 twinId,
                 autoReply,
                 timestamp,

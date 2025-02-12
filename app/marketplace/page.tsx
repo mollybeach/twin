@@ -26,8 +26,10 @@ export default function MarketplacePage() {
             setLoading(true); 
             try {
                 const twinsData = await getAllTwins();
-                const filteredTwins = twinsData.filter((twin) => twin.userId === stateCurrentUserData?.userId);
-                setTwins(filteredTwins);
+                console.log('twinsData', twinsData);
+              //  const filteredTwins = twinsData.filter((twin) => twin.userId === stateCurrentUserData?.userId);
+              //  setTwins(filteredTwins);
+                setTwins(twinsData);
 
                 if (stateCurrentUserData?.userId) {
                     const shareData = await getUserShares(stateCurrentUserData.userId);

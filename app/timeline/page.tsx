@@ -44,7 +44,7 @@ export default function TimelinePage() {
           twinId: twin.twinId,
           text: tweet.text,
           tweetId: tweet.tweetId, // Ensure this property is included
-          timestamp: new Date().toISOString(),
+          timestamp: new Date().toISOString()
         };
         console.log(newFetchedTweet);
 
@@ -90,11 +90,11 @@ export default function TimelinePage() {
         twinId: twin.twinId,
         content: generatedText,
         timestamp: new Date().toISOString(),
-        likesCount: 0, 
-        retwineetsCount: 0, 
-        repliesCount: 0, 
+        likesCount: Math.floor(Math.random() * 100), 
+        retwineetsCount: Math.floor(Math.random() * 100), 
+        repliesCount: Math.floor(Math.random() * 100), 
         isLiked: false, 
-        isRetwineeted: false, 
+        isRetwineeted: false
       };
     
       const updateResponse = await fetch(`/api/twineets`, {

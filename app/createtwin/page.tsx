@@ -27,47 +27,54 @@ export default function CreateTwinPage() {
   const [generatedTwineet, setGeneratedTwineet] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
+  const [isGeneratingTwineet, setIsGeneratingTwineet] = useState(false);
+  const [fetchedTweets, setFetchedTweets] = useState<any[]>([]);
 
-  const trainTwinOnTwitterHistory = async () => {
+  const gatherTwitterHistory = async () => {
     setIsFetchingTweets(true);
     try {
-        const fetchedTweets = await getTweets(config.twitterHandle, newTwinId);
-        setConfig((prev) => ({ ...prev, fetchedTweets: fetchedTweets }));
-        
-        const { generatedText } = await getGeneratedTwineetContent(stateFetchedTweets, config.personality);
-        setGeneratedTwineet(generatedText);
-        setConfig((prev) => ({
-            ...prev,
-            twineets: [
-                ...prev.twineets,
-                {
-                    userId: stateCurrentUserId ?? '',
-                    twinId: newTwinId ?? '',
-                    content: generatedText,
-                    timestamp: new Date(),
-                    likesCount: Math.floor(Math.random() * 100),
-                    retwineetsCount: Math.floor(Math.random() * 100),
-                    repliesCount: Math.floor(Math.random() * 100),
-                    isLiked: false,
-                    isRetwineeted: false
-                },
-            ],
-        }));
-
-        console.log('Generated twineet:', generatedText);
-        setSuccessMessage('Tweets fetched successfully! \n Model trained successfully!');
+      const tweets = await getTweets(config.twitterHandle, newTwinId);
+      setFetchedTweets(tweets);
+      setConfig((prev) => ({ ...prev, fetchedTweets: tweets }));
+      setStep(2);
     } catch (error) {
-        if (error instanceof Error) {
-            console.error('Failed to fetch tweets:', error);
-            setDeployError(error.message);
-        } else {
-            console.error('Failed to fetch tweets:', error);
-            setDeployError('An unknown error occurred');
-        }
+      console.error('Failed to fetch tweets:', error);
+      setDeployError('Error fetching tweets');
     } finally {
-        setIsFetchingTweets(false);
+      setIsFetchingTweets(false);
     }
-};
+  };
+
+  const handleGenerateTwineet = async () => {
+    setIsGeneratingTwineet(true);
+    try {
+      const { generatedText } = await getGeneratedTwineetContent(fetchedTweets, config.personality);
+      setGeneratedTwineet(generatedText);
+      setConfig((prev) => ({
+        ...prev,
+        twineets: [
+            ...prev.twineets,
+            {
+                userId: stateCurrentUserId ?? '',
+                twinId: newTwinId ?? '',
+                content: generatedText,
+                timestamp: new Date(),
+                likesCount: Math.floor(Math.random() * 100),
+                retwineetsCount: Math.floor(Math.random() * 100),
+                repliesCount: Math.floor(Math.random() * 100),
+                isLiked: false,
+                isRetwineeted: false
+            },
+        ],
+    }));
+      setStep(3);
+    } catch (error) {
+      console.error('Failed to generate twineet:', error);
+      setDeployError('Error generating twineet');
+    } finally {
+      setIsGeneratingTwineet(false);
+    }
+  };
 
   const deployTwin = async () => {
     if (config.isListed && (config.price === undefined || config.price <= 0)) {
@@ -158,8 +165,19 @@ export default function CreateTwinPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-purple-300">Description</label>
+              <textarea
+                value={config.description}
+                onChange={(e) => setConfig({ ...config, description: e.target.value })}
+                className="bg-white/5 block w-full pt-2 pl-3 pr-12 sm:text-sm border-white/10 rounded-md text-white"
+                placeholder="Enter a description for your Twin's mission"
+                rows={3}
+              />
+            </div>
+
             <button
-              onClick={trainTwinOnTwitterHistory}
+              onClick={gatherTwitterHistory}
               disabled={!config.twitterHandle}
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -216,40 +234,77 @@ export default function CreateTwinPage() {
               Next Step
             </button>
           </div>
+        ) : step === 2 ? (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white">Fetched Tweets</h3>
+            <ul className="space-y-2">
+              {fetchedTweets.slice(0, 5).map((tweet, index) => (
+                <li key={index} className="bg-white/5 p-2 rounded-md">
+                  {tweet.text}
+                </li>
+              ))}
+            </ul>
+            {config.description && (
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-purple-300 mb-2">Twin&apos;s Mission</h3>
+                <p className="text-sm text-white">{config.description}</p>
+              </div>
+            )}
+            <button
+              onClick={handleGenerateTwineet}
+              className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              {isGeneratingTwineet ? (
+                <>
+                  <span className="animate-spin">🔄</span> Generating Twineet...
+                </>
+              ) : (
+                'Generate Twineet'
+              )}
+            </button>
+            <button
+              onClick={() => setStep(1)}
+              className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Back
+            </button>
+          </div>
         ) : (
           <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <div className="flex flex-col items-center justify-center">
-                <Image
-                  src={config.profileImage}
-                  alt="Twin Profile"
-                  className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-purple-500"
-                  width={24}
-                  height={24}
-                />
-                <Check className="w-8 h-8 text-purple-500" />
+            <div className="space-y-6">
+              <div className="text-center space-y-2">
+                <div className="flex flex-col items-center justify-center">
+                  <Image
+                    src={config.profileImage}
+                    alt="Twin Profile"
+                    className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-purple-500"
+                    width={24}
+                    height={24}
+                  />
+                  <Check className="w-8 h-8 text-purple-500" />
+                </div>
+                <p className="text-lg font-medium text-white">Twin is Live!</p>
+                <p className="text-sm text-purple-300">
+                  @{config.twinHandle} • {config.personality} Mode
+                </p>
               </div>
-              <p className="text-lg font-medium text-white">Twin is Live!</p>
-              <p className="text-sm text-purple-300">
-                @{config.twinHandle} • {config.personality} Mode
-              </p>
-            </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white/5 p-4 rounded-lg text-center">
-                <MessageCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{config.stats.repliesCount}</div>
-                <div className="text-xs text-purple-300">Replies</div>
-              </div>
-              <div className="bg-white/5 p-4 rounded-lg text-center">
-                <Users className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{config.stats.interactions}</div>
-                <div className="text-xs text-purple-300">Friends</div>
-              </div>
-              <div className="bg-white/5 p-4 rounded-lg text-center">
-                <Activity className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{config.stats.uptime}</div>
-                <div className="text-xs text-purple-300">Uptime</div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white/5 p-4 rounded-lg text-center">
+                  <MessageCircle className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">{config.stats.repliesCount}</div>
+                  <div className="text-xs text-purple-300">Replies</div>
+                </div>
+                <div className="bg-white/5 p-4 rounded-lg text-center">
+                  <Users className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">{config.stats.interactions}</div>
+                  <div className="text-xs text-purple-300">Friends</div>
+                </div>
+                <div className="bg-white/5 p-4 rounded-lg text-center">
+                  <Activity className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-white">{config.stats.uptime}</div>
+                  <div className="text-xs text-purple-300">Uptime</div>
+                </div>
               </div>
             </div>
 
@@ -259,21 +314,6 @@ export default function CreateTwinPage() {
                 <p className="text-white">{generatedTwineet}</p>
               </div>
             )}
-
-            {config.description && (
-              <div className="bg-white/5 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-purple-300 mb-2">Twin&apos;s Mission</h3>
-                <p className="text-sm text-white">{config.description}</p>
-              </div>
-            )}
-
-            <div className="bg-white/5 p-4 rounded-lg">
-              <h3 className="text-sm font-medium text-purple-300 mb-2">Status</h3>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span className="text-sm text-white">Active and responding to mentions</span>
-              </div>
-            </div>
 
             <button
               onClick={deployTwin}

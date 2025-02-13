@@ -16,7 +16,6 @@ import {
   PlusCircle,
   Home,
   ShoppingBag,
-  Wallet as WalletIcon,
   Info,
   Briefcase
 } from 'lucide-react';

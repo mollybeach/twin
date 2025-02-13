@@ -14,7 +14,7 @@ const About = () => {
                         <p className="text-lg text-gray-200">Create your AI-powered digital alter egos based on social media activity.</p>
                     </div>
                     <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                        <Link href="/createTwin">
+                        <Link href="/createtwin">
                             <button className="flex items-center justify-center bg-purple-600 text-white py-3 rounded-lg shadow-lg hover:bg-purple-700 transition duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300 px-5">
                                 <PlusCircle className="h-5 w-5 mr-2" />
                                 Create Your Twin

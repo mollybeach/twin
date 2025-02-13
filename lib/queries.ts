@@ -247,6 +247,7 @@ export const getUserDataQuery = `
         },
         userTokenShares :{
             twinId,
+            userId,
             shares,
             purchasePrice,
             purchaseDate
@@ -314,6 +315,7 @@ export const getUserByUserIdQuery = `
         },
         userTokenShares :{
             twinId,
+            userId,
             shares,
             purchasePrice,
             purchaseDate
@@ -417,6 +419,7 @@ export const getAllTwinsQuery = `
             }
         },
         userTokenShares: {
+            userId,
             twinId,
             shares,
             purchasePrice,
@@ -523,6 +526,7 @@ export const getTwinByIdQuery = `
             }
         },
         userTokenShares: {
+            userId,
             twinId,
             shares,
             purchasePrice,

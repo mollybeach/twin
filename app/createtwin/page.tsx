@@ -1,4 +1,4 @@
-// path: app/createTwin/page.tsx
+// path: app/createtwin/page.tsx
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Check, AlertCircle, MessageCircle, Users, Activity, Rocket } from 'lucide-react';

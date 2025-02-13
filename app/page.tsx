@@ -120,7 +120,7 @@ export default function Home() {
       if (!pollingRef.current) {
           pollingRef.current = setInterval(() => {
               createNewTwineets();
-          }, 30000); 
+          }, 3000); 
       }
 
       return () => {

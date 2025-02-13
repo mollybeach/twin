@@ -146,7 +146,7 @@ export function Navbar() {
                 <span>Leaderboard</span>
               </Link>             
               {/* Gold Create Twin Button */}
-              <Link href="/createTwin" className="flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ml-4 text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-colors shadow-lg hover:shadow-amber-500/20 border border-amber-300">
+              <Link href="/createtwin" className="flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ml-4 text-amber-900 bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-colors shadow-lg hover:shadow-amber-500/20 border border-amber-300">
                 <PlusCircle className="h-5 w-5 mr-1.5" />
                 <span className="font-semibold">Create Twin</span>
               </Link>

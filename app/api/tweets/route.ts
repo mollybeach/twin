@@ -4,7 +4,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { FetchedTweetType } from '../../types/types';
 import { edgeDBCloudClient } from '../../../lib/client';
-
+import yetweets from '../../../lib/yetweets.json'; // Import the yetweets.json file
 
 dotenv.config();
 
@@ -20,6 +20,22 @@ export async function GET(req: NextRequest) {
     }
 
     try {
+        // Check if the username is 'kanyewest'
+        if (username.toLowerCase() === 'kanyewest') {
+            // Use the data from yetweets.json and limit to 100 tweets
+            console.log('using yetweets.json');
+            const tweets = yetweets.posts.slice(0, 100).map((post, index) => ({
+                id: `tweet-${index}`, // Generate a unique ID for each tweet
+                twinId: twinId,
+                text: post.text,
+                timestamp: new Date(), // Set the current date as the timestamp
+                tweetId: `tweet-${index}`, // Use the index as a unique tweet ID
+            }));
+
+            return NextResponse.json(tweets);
+        } 
+
+        // Fetch tweets from Twitter API for other usernames
         const userResponse = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
             headers: {
                 Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,

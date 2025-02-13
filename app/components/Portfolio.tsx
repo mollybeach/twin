@@ -17,7 +17,8 @@ import {
   Home,
   ShoppingBag,
   Wallet as WalletIcon,
-  Info
+  Info,
+  Briefcase
 } from 'lucide-react';
 import Link from 'next/link';
 import { SharePriceChart } from './SharePriceChart';
@@ -121,9 +122,18 @@ export function Portfolio() {
     isSelling: boolean;
   } | null>(null);
   
-  const { stateCurrentUserTwins, getUserShares, stateCurrentUserData } = useStore();
+  const { stateCurrentUserTwins, getUserShares, stateCurrentUserData, getLogout } = useStore();
   const [holdings, setHoldings] = useState<HoldingType[]>([]);
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    try {
+      await getLogout(); // Call the logout function from the store
+      window.location.href = '/login'; // Redirect to the login page
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchHoldings = async () => {
@@ -156,7 +166,7 @@ export function Portfolio() {
   const navigationItems = [
     { path: '/', icon: Home, label: 'Home' },
     { path: '/marketplace', icon: ShoppingBag, label: 'Marketplace' },
-    { path: '/createTwin', icon: PlusCircle, label: 'Create Twin' },
+    { path: '/createtwin', icon: PlusCircle, label: 'Create Twin' },
     { path: '/clone', icon: GitMerge, label: 'Clone Lab' },
     { path: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
     { path: '/about', icon: Info, label: 'About' },
@@ -207,7 +217,7 @@ export function Portfolio() {
           {/* Portfolio Section */}
           <div className="flex items-center space-x-2 mb-6">
             <Link href="/portfolio" className="flex items-center space-x-2 w-full hover:bg-white/5 p-2 rounded-lg transition-colors">
-              <WalletIcon className="w-6 h-6 text-purple-400 flex-shrink-0" />
+              <Briefcase className="w-6 h-6 text-purple-400 flex-shrink-0" />
               {isExpanded && (
                 <>
                   <h2 className="text-xl font-bold text-white flex-1 text-left">Portfolio</h2>
@@ -216,33 +226,38 @@ export function Portfolio() {
               )}
             </Link>
           </div>
-
-          {/* Wallet Display */}
-          <Wallet balance={stateCurrentUserData?.walletBalance || 0} username={stateCurrentUserData?.username || ''} />
-
-          {/* Login/Logout Button */}
-          <div className="flex justify-center">
-            {stateCurrentUserData ? (
-              <button className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
-                Logout
-              </button>
-            ) : (
-              <Link href="/login" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                Login
-              </Link>
-            )}
-          </div>
-
-          {isExpanded ? (
+            
+          {/* Show Wallet and Login/Logout only if expanded */}
+          {isExpanded && (
             <>
+              {/* Wallet Display */}
+              <Wallet balance={stateCurrentUserData?.walletBalance || 0} username={stateCurrentUserData?.username || ''} />
+
+              {/* Login/Logout Button */}
+              <div className="flex justify-center">
+                {stateCurrentUserData ? (
+                  <button onClick={handleLogout} className="bg-purple-700 text-white mb-2 py-2 px-4 rounded hover:bg-purple-600">
+                    Logout
+                  </button>
+                  ) : (
+                  <Link href="/login" className="bg-white text-purple-900 py-2 mb-2 px-4 rounded hover:bg-purple-600">
+                    Login
+                  </Link>
+                )}
+              </div>
+
               <div className="bg-white/5 backdrop-blur-lg rounded-lg p-4 mb-6">
                 <p className="text-sm text-purple-300 mb-1">Total Portfolio Value</p>
                 <p className="text-2xl font-bold text-white">
                   ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </p>
               </div>
+            </>
+          )}
 
-          <div className="overflow-y-auto flex-1">
+          {isExpanded ? (
+            <>
+              <div className="overflow-y-auto flex-1">
                 <div className="space-y-4">
                   {holdings.length === 0 ? (
                     <div className="text-center py-8">

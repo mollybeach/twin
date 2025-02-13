@@ -214,7 +214,7 @@ export default function MarketplacePage() {
                                                         )}
                                                     </div>
                                                     <div className="text-sm text-gray-600 dark:text-gray-400">{twin.personality}</div>
-                                                    <div className="text-sm text-gray-600 dark:text-gray-400">Owner: {twin.userId}</div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-400">Owner: {twin.userId.substring(0, 4)}</div>
                                                 </div>
                                             </div>
                                             <span className="flex items-center text-gray-900 dark:text-white font-semibold">

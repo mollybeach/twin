@@ -111,7 +111,7 @@ function TradeModal({ twinId, twinHandle, currentShares, availableShares, priceP
 }
 
 export function Portfolio() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(window.innerWidth > 768);
   const [tradeModal, setTradeModal] = useState<{
     twinId: string;
     twinHandle: string;
@@ -159,6 +159,15 @@ export function Portfolio() {
     fetchHoldings();
   }, [stateCurrentUserTwins, getUserShares]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsExpanded(window.innerWidth > 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const totalValue = holdings.reduce((sum, holding) => sum + holding.value, 0);
 
 
@@ -203,11 +212,6 @@ export function Portfolio() {
                 >
                   <item.icon className={`w-5 h-5 ${isExpanded ? 'mr-3' : ''}`} />
                   {isExpanded && <span>{item.label}</span>}
-                  {!isExpanded && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-white/10 backdrop-blur-lg rounded-lg text-white text-sm whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                      {item.label}
-                    </div>
-                  )}
                 </Link>
               );
             })}

@@ -4,7 +4,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { FetchedTweetType } from '../../types/types';
 import { edgeDBCloudClient } from '../../../lib/client';
-import yetweets from '../../../lib/yetweets.json'; // Import the yetweets.json file
+import yetweets from '../../../lib/yetweets.json';
 
 dotenv.config();
 
@@ -12,49 +12,35 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url); 
     const username = searchParams.get('username');
     const twinId = searchParams.get('twinId');
-    console.log('username', username);
-    console.log('twinId', twinId);
 
     if (!username) {
         return NextResponse.json({ message: 'Username is required' }, { status: 400 });
     }
-
     try {
-        // Check if the username is 'kanyewest'
+        // Use the data from yetweets.json and limit to 100 tweets
         if (username.toLowerCase() === 'kanyewest') {
-            // Use the data from yetweets.json and limit to 100 tweets
             console.log('using yetweets.json');
             const tweets = yetweets.posts.slice(0, 100).map((post, index) => ({
-                id: `tweet-${index}`, // Generate a unique ID for each tweet
+                id: `tweet-${index}`,
                 twinId: twinId,
                 text: post.text,
-                timestamp: new Date(), // Set the current date as the timestamp
-                tweetId: `tweet-${index}`, // Use the index as a unique tweet ID
+                timestamp: new Date(), 
+                tweetId: `tweet-${index}`, 
             }));
-
             return NextResponse.json(tweets);
         } 
-
-        // Fetch tweets from Twitter API for other usernames
         const userResponse = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
             headers: {
                 Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
             },
         });
-
         const userId = userResponse.data.data.id; 
-
-        console.log('user response.data.data ', userResponse.data.data);
-
         const response = await axios.get(`https://api.twitter.com/2/users/${userId}/tweets`, {
             params: { max_results: 100 },
             headers: {
                 Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
             },
         });
-
-        console.log('response.data.data ', response.data.data);
-
         const tweets = response.data.data.map((tweet: { id: string; text: string; edit_history_tweet_ids: string[]}) => ({
             id: tweet.id,
             twinId: twinId,
@@ -69,7 +55,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: 'Error fetching tweets' }, { status: 500 });
     }
 }
-
 
 export async function POST(req: NextRequest) {
     const { ...updatedData } = await req.json(); // Destructure to get twinId and the rest of the data

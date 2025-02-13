@@ -116,33 +116,6 @@ const useStore = create<storeType>()(
         }
       },
 
-      getGeneratedTwineetContent: async (tweets: FetchedTweetType[], personality: string) => {
-        const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${personality} AI twin.`;
-        try {
-          const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ prompt }),
-          });
-          if (!response.ok) {
-            throw new Error('Failed to generate response from OpenAI');
-          }
-          const modelData = await response.json();
-          const generatedText = modelData.choices[0].message?.content || modelData.choices[0].text;
-          
-          set((state) => ({ 
-            ...state,
-            stateGeneratedTwineetContent: generatedText,
-          }));
-          return { generatedText };
-        } catch (error) {
-          console.error('Failed to generate response:', error);
-          throw new Error('Failed to generate response from OpenAI.');
-        }
-      },
-
       getLogin: async (username: string, password: string) => {
         try {
           const response = await fetch('/api/users/login', {
@@ -218,7 +191,33 @@ const useStore = create<storeType>()(
           throw error;
         }
       },
-
+      getGeneratedTwineetContent: async (tweets: FetchedTweetType[], personality: string) => {
+        const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${personality} AI twin do not include any hashtags.`;
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to generate response from OpenAI');
+          }
+          const modelData = await response.json();
+          const generatedText = modelData.choices[0].message?.content || modelData.choices[0].text;
+          
+          set((state) => ({ 
+            ...state,
+            stateGeneratedTwineetContent: generatedText,
+          }));
+          return { generatedText };
+        } catch (error) {
+          console.error('Failed to generate response:', error);
+          throw new Error('Failed to generate response from OpenAI.');
+        }
+      },
+      
       getTweets: async (username: string, twinId: string) => {
         try {
             const response = await fetch(`/api/tweets?username=${encodeURIComponent(username)}&twinId=${encodeURIComponent(twinId)}`, {

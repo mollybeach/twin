@@ -111,7 +111,7 @@ function TradeModal({ twinId, twinHandle, currentShares, availableShares, priceP
 }
 
 export function Portfolio() {
-  const [isExpanded, setIsExpanded] = useState(window.innerWidth > 768);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [tradeModal, setTradeModal] = useState<{
     twinId: string;
     twinHandle: string;
@@ -164,6 +164,7 @@ export function Portfolio() {
       setIsExpanded(window.innerWidth > 768);
     };
 
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

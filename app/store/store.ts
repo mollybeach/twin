@@ -191,6 +191,54 @@ const useStore = create<storeType>()(
           throw error;
         }
       },
+      getGeneratedTwineetContentKanyeWest: async (tweets: FetchedTweetType[], personality: string) => {
+        const prompt = `
+          You are an AI trained to generate tweets in the style of Kanye West. 
+          Analyze the following tweets for tone, structure, and style:
+      
+            ${tweets.map(tweet => `- "${tweet.text}"`).join('\n')}
+      
+            Now, generate a new tweet that follows these rules:
+            - The tweet should have a strong, singular subject or theme.
+            - The tone should reflect Kanye’s unique, bold, and often philosophical or humorous style.
+            - It should be short and direct, under 280 characters.
+            - It should feel spontaneous, almost like a stream of consciousness.
+            - If referencing pop culture, fame, or personal greatness, do so with confidence.
+            - Prsonalize the tweet to the personality of Kanye West + the personality of the twin : ${personality}
+            - Avoid hashtags.
+      
+            Respond with only the tweet, nothing else.
+          `;
+      
+          try {
+              const response = await fetch('/api/generate', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ prompt }),
+              });
+      
+              if (!response.ok) {
+                  throw new Error('Failed to generate response from OpenAI');
+              }
+      
+              const modelData = await response.json();
+              const generatedText = modelData.choices[0].message?.content || modelData.choices[0].text;
+      
+              set((state) => ({
+                  ...state,
+                  stateGeneratedTwineetContent: generatedText,
+              }));
+      
+              return { generatedText };
+          } catch (error) {
+              console.error('Failed to generate response:', error);
+              throw new Error('Failed to generate response from OpenAI.');
+          }
+      },
+      
+      
       getGeneratedTwineetContent: async (tweets: FetchedTweetType[], personality: string) => {
         const prompt = `Based on the following tweets: ${tweets.map(tweet => tweet.text).join(', ')}, generate a twineet for a ${personality} AI twin do not include any hashtags.`;
         try {
@@ -217,6 +265,26 @@ const useStore = create<storeType>()(
           throw new Error('Failed to generate response from OpenAI.');
         }
       },
+      getGenerateImage: async (prompt: string) => {
+        try {
+          const response = await fetch('/api/generate/images', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to generate image');
+          }
+          const imageData = await response.json();
+          return imageData;
+        } catch (error) {
+          console.error('Failed to generate image:', error);
+          throw new Error('Failed to generate image.');
+        }
+      },
+      
       
       getTweets: async (username: string, twinId: string) => {
         try {

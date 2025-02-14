@@ -4,7 +4,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { FetchedTweetType } from '../../types/types';
 import { edgeDBCloudClient } from '../../../lib/client';
-import yetweets from '../../../lib/yetweets.json';
+import yetweets from '../../../lib/yetweetsIconic.json';
 
 dotenv.config();
 

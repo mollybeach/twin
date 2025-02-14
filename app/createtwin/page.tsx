@@ -23,6 +23,7 @@ export default function CreateTwinPage() {
   const [isFetchingTweets, setIsFetchingTweets] = useState(false);
   const [isGeneratingTwineet, setIsGeneratingTwineet] = useState(false);
   const [fetchedTweets, setFetchedTweets] = useState<FetchedTweetType[]>([]);
+  const { getGenerateImage, getGeneratedTwineetContentKanyeWest } = useStore();
 
   const gatherTwitterHistory = async () => {
     setIsFetchingTweets(true);
@@ -39,6 +40,42 @@ export default function CreateTwinPage() {
       setIsFetchingTweets(false);
     }
   };
+
+  const handleGenerateTwineetKanyeWest = async () => {
+    setIsGeneratingTwineet(true);
+    try {
+      const { generatedText } = await getGeneratedTwineetContentKanyeWest(fetchedTweets, config.personality);
+      setGeneratedTwineet(generatedText);
+      setConfig((prev) => ({
+        ...prev,
+        twineets: [
+          ...prev.twineets,
+          {
+            userId: stateCurrentUserId ?? '',
+            twinId: newTwinId ?? '',
+            content: generatedText,
+            timestamp: new Date(),
+            likesCount: Math.floor(Math.random() * 100),
+            retwineetsCount: Math.floor(Math.random() * 100),
+            repliesCount: Math.floor(Math.random() * 100),
+            isLiked: false,
+            isRetwineeted: false
+          },
+        ],
+      }));
+      setConfig((prev) => ({
+        ...prev,
+        userId: stateCurrentUserId ?? '',
+      }));
+      setStep(3);
+    } catch (error) {
+      console.error('Failed to generate twineet:', error);
+      setDeployError('Error generating twineet');
+    } finally {
+      setIsGeneratingTwineet(false);
+    }
+  };
+
 
   const handleGenerateTwineet = async () => {
     setIsGeneratingTwineet(true);
@@ -72,6 +109,21 @@ export default function CreateTwinPage() {
       setDeployError('Error generating twineet');
     } finally {
       setIsGeneratingTwineet(false);
+    }
+  };
+
+  const handleGenerateProfileImage = async () => {
+    const prompt = `A profile image for a twin named ${config.twinHandle} with the personality of ${config.personality} based on the following tweets: ${fetchedTweets.map(tweet => tweet.text).join(', ')}`;
+    try {
+      const imageData = await getGenerateImage(prompt);
+      if (imageData && imageData.imageUrl) {
+        setConfig((prev) => ({ ...prev, profileImage: imageData.imageUrl }));
+      } else {
+        throw new Error('No image data returned');
+      }
+    } catch (error) {
+      console.error('Failed to generate profile image:', error);
+      setDeployError('Error generating profile image');
     }
   };
 
@@ -235,6 +287,13 @@ export default function CreateTwinPage() {
             >
               Upload Profile Image
             </button>
+            {/**Add a button to generate an profile image for the twin */}
+            <button
+              onClick={() => handleGenerateProfileImage()}
+              className="flex-1 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              Generate Profile Image
+            </button>
 
             <button
               onClick={() => setStep(2)}
@@ -259,24 +318,35 @@ export default function CreateTwinPage() {
                 <p className="text-sm text-white">{config.description}</p>
               </div>
             )}
-            <button
-              onClick={handleGenerateTwineet}
-              className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              {isGeneratingTwineet ? (
-                <>
-                  <span className="animate-spin">🔄</span> Generating Twineet...
-                </>
+            <div>
+              {config.twitterHandle === 'kanyewest' ? (
+                <button
+                  onClick={handleGenerateTwineetKanyeWest}
+                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Generate Twineet
+                </button>
               ) : (
-                'Generate Twineet'
+                <button
+                  onClick={handleGenerateTwineet}
+                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-500/50 hover:bg-purple-500/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  {isGeneratingTwineet ? (
+                    <>
+                      <span className="animate-spin">🔄</span> Generating Twineet...
+                    </>
+                  ) : (
+                    'Generate Twineet'
+                  )}
+                </button>
               )}
-            </button>
-            <button
-              onClick={() => setStep(1)}
-              className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Back
-            </button>
+              <button
+                onClick={() => setStep(1)}
+                className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Back
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">

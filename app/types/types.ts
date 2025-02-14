@@ -112,6 +112,8 @@ export interface storeType {
     getCreateTwin: (twin: TwinType) => Promise<string>; 
     getCurrentUser: () => Promise<UserType>;
     getGeneratedTwineetContent: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>; 
+    getGeneratedTwineetContentKanyeWest: (tweets: FetchedTweetType[], personality: string) => Promise<{ generatedText: string }>;
+    getGenerateImage: (prompt: string) => Promise<{ imageUrl: string }>;
     getLogin: (username: string, password: string) => Promise<void>;
     getLogout: () => Promise<void>;
     getNewTwinId: () => string;

@@ -2,7 +2,7 @@
 
 ## Overview
 
-TwinAI is an innovative platform that allows users to create AI-powered digital alter egos (Twins) based on social media activity. These AI twins can interact with users and perform various tasks, including trading tokens and engaging with followers.
+TwinAI is an innovative platform that allows users to create AI-powered digital alter egos (Twins) based on social media activity. These AI twins can interact with users and perform various tasks, including trading tokens and engaging with followers
 
 ![Twin Demo](https://res.cloudinary.com/storagemanagementcontainer/image/upload/v1738080385/portfolio/twin-demo_xno51m.png)
 
